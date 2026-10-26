@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **plan only, nothing built yet.** v2, 26 Oct 2026. It folds in Chris's answers to Q1, Q2, Q12, Q13 and Q16 and the August build pack.
+Status: **plan only, nothing built yet.** v3, 26 Oct 2026. It folds in Chris's answers to Q1, Q2, Q12, Q13, Q16 and Q23, the domain/nameserver facts, portfolio consent, and the August build pack.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -12,8 +12,9 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 - **Gated detail never ships in the static site.** It lives server-side (Postgres, read by n8n) and only reaches the browser after an approved login. Any failure keeps the page locked.
 - **No secrets in the site.** Protection comes from server-side checks in n8n, Turnstile, rate limits and a Cloudflare-injected edge header.
 - **Four NDA webhooks** (approved): `nda-submission`, `nda-login`, `nda-content`, `nda-review`.
-- **Portfolio** = every site IT7Q has built, each on its own `pN.it7q.com.au` link. Five are confirmed. Extra candidates need Chris's consent check first, and nothing is published without it.
-- **Investor financials are out of this repo.** The two source transcripts now live in `/srv/work/it7q-private` and are git-ignored. The business plan is read from there and is never copied in. No financial figures appear anywhere in this repo.
+- **Gated detail is written at feature level only.** Even behind the NDA there are no internal ports, hostnames, IPs, repo URLs, WireGuard or infrastructure details (Q23).
+- **Portfolio** = every site IT7Q has built, each on its own `pN.it7q.com.au` link. Consent covers all of them; p1–p7 are known (§2.2).
+- **Private material stays out of this repo.** The build pack, business plan and the two transcripts with financials all live in `/srv/work/it7q-private` and are git-ignored. I work from them there and never copy them in. No financial figures appear anywhere in this repo.
 - Server-side pieces (n8n workflows, SQL, Cloudflare steps, DNS list) are **files for Chris to review and deploy**. I don't touch n8n, Docker, Cloudflare or DNS.
 
 ---
@@ -22,7 +23,7 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 | Source | Where | Role | Notes |
 |---|---|---|---|
-| `it7q-website-build-pack.md` (Aug 2026) | `_source/`, **untracked** for now (Q23) | **Primary**: brand (locked), NDA-wall pattern, full division/project map, portfolio p1–p4 | Newest source and the one that wins conflicts. Its "Detail (NDA)" blocks include internal ports, hostnames and security architecture, so they need sanitising before they become gated content (Q23). It assumed deploying on Pantheon, which Q2 replaces. |
+| `it7q-website-build-pack.md` (Aug 2026) | `/srv/work/it7q-private/` **only** (never committed) | **Primary**: brand (locked), NDA-wall pattern, full division/project map, portfolio p1–p4 | Newest source and the one that wins conflicts. Its "Detail (NDA)" blocks are rewritten at feature level for `gated/`, with infrastructure detail dropped (Q23, §4.9). It assumed deploying on Pantheon, which Q2 replaces. |
 | `IT7Q_Complete_Business_Plan.docx` | `/srv/work/it7q-private/` **only** | **Secondary**: project discovery (TEMPESTAS tiers, PORTUS features, FABRICUS/DOMUS/MENTIS service lines) | Older: still has NEXUS, no OPUS. **Read in place; never copied, quoted for figures or committed.** |
 | `_source/v2/` + zip (May 2026) | repo | Look, copy, layout; v2 product list (extra project names) | NDA and forms are mock only, and the NDA fails open (unlocks on tick). |
 | Jan 2026 spec transcript | `/srv/work/it7q-private/` | Multi-page structure, policy page drafts | Moved out of the repo because it holds company financials. |
@@ -44,9 +45,10 @@ Division accent colours from v2 stay as secondary accents, checked for WCAG AA c
 | Q | Decision |
 |---|---|
 | 1 | Yes to `nda-content` and `nda-review`. |
-| 2 | Cloudflare Pages, free plan. Registrar is HostPapa, and Chris will confirm the nameservers. §6.1 lists what's needed; I plan no DNS changes. |
+| 2 | Cloudflare Pages, free plan. Registrar is HostPapa; nameservers are already on Cloudflare (`morgan` / `megan.ns.cloudflare.com`), so Pages can serve the bare `it7q.com.au`. §6.1 lists what's needed; I plan no DNS changes. |
 | 5 | Settled by the build pack: login + password emailed on manual approval. |
-| 12 | Every IT7Q-built site gets a thumbnail + `pN.it7q.com.au` link. p1–p5 confirmed (§2.2). Extra sites are listed as candidates pending consent. |
+| 12 | Every IT7Q-built site gets a thumbnail + `pN.it7q.com.au` link. Consent covers **all** IT7Q-built sites. p1–p7 known (§2.2). |
+| 23 | All gated "Detail (NDA)" text is rewritten at feature level: no internal ports, hostnames, IPs, repo URLs, WireGuard or infrastructure details. The build pack moves to `/srv/work/it7q-private` and is not committed. |
 | 13 / 16 | Content source is the build pack (primary) + business plan (secondary, private). OPUS = software products, per the build pack. Every project gets a card; full info is gated. |
 | 14 | Settled by the build pack: public card = image + one-line description + "why it's unique". No ports, source, schematics or security architecture. |
 | Fonts/colours | Build pack brand replaces v2's (DM Sans → Exo 2, new palette). |
@@ -68,7 +70,7 @@ Home users first, small business second, all in plain English.
 /divisions/portus/        │  Gated detail loads per project after an approved
 /divisions/fabricus/      │  login (see §4).
 /divisions/domus/         ┘
-/portfolio/               Client websites, p1–p5 (+ more once consented)
+/portfolio/               Client websites, p1–p7 (every IT7Q-built site)
 /services/                "How we can help": plain-English services + enquiry form (pick service & division)
 /contact/                 Contact details, WhatsApp/Messenger, short form
 /access/                  NDA: read, request access, log in, log out
@@ -155,21 +157,19 @@ Retired, so no card unless Chris says otherwise: original single-tenant Calendi 
 
 ### 2.2 Portfolio
 
-| Label | Client | Link | Consent | Repo (Chris's GitHub) |
+Consent is on file for **all** IT7Q-built sites.
+
+| Label | Client | Link | Repo (Chris's GitHub) | Hosted where? |
 |---|---|---|---|---|
-| p1 | True Colours | `p1.it7q.com.au` | Signed (contract clause) | `TCDSS_Website`? (Q27) |
-| p2 | Red Bird | `p2.it7q.com.au` | Signed (contract clause) | — |
-| p3 | Pine Rivers RSL | `p3.it7q.com.au` | Signed (contract clause) | `PRRSL_Website`? (Q27) |
-| p4 | The Artist Apron | `p4.it7q.com.au` | Signed | — |
-| p5 | Burpengary Jets | `p5.it7q.com.au` | Consented | — |
+| p1 | True Colours DSS | `p1.it7q.com.au` | `TCDSS_Website` | Q27 |
+| p2 | Red Bird | `p2.it7q.com.au` | — | Q27 |
+| p3 | Pine Rivers RSL | `p3.it7q.com.au` | `PRRSL_Website` | Q27 |
+| p4 | The Artist Apron | `p4.it7q.com.au` | — | Q27 |
+| p5 | Burpengary Jets | `p5.it7q.com.au` | — | Q27 |
+| p6 | BlueVibes (display name to confirm, Q29) | `p6.it7q.com.au` | `BlueVibes_Website` | Q27 |
+| p7 | AustPathClub (display name to confirm, Q29) | `p7.it7q.com.au` | `AustPathClub` | Q27 |
 
-**Candidates: NOT published until Chris confirms consent**
-| Candidate | Source | Status |
-|---|---|---|
-| `BlueVibes_Website` | Chris's GitHub | Consent check needed |
-| `AustPathClub` | Chris's GitHub | Consent check needed |
-
-The cards show the client name, thumbnail and outbound `pN` link. New consented sites take the next label (p6, p7…). The build data marks unconsented entries `published: false`, and `tools/check.py` fails if one appears in `dist/`.
+The cards show the client name, thumbnail and outbound `pN` link. Any future IT7Q-built site takes the next label (p8…). The `published` flag in `portfolio.json` stays, so a card can be held back (e.g. a site that's offline), and `tools/check.py` fails if an unpublished entry appears in `dist/`.
 
 ---
 
@@ -193,16 +193,16 @@ src/                 page sources + partials
   data/portfolio.json
   assets/css|js|fonts|img|video
 tools/build.py       stdlib-only Python: partials + data → dist/ (Q21)
-tools/check.py       links, HTML sanity, gated-content leak check, unconsented-portfolio check, financial-figure guard
+tools/check.py       links, HTML sanity, gated-content leak check, infrastructure-detail guard on gated/, unpublished-portfolio check, financial-figure guard
 dist/                build output, the only thing deployed (git-ignored)
-gated/               sanitised gated detail per project as JSON, NEVER in dist/ (Q23 on where it lives)
+gated/               feature-level gated detail per project as JSON, NEVER in dist/ (§4.9)
 n8n/workflows/       nda-submission, nda-login, nda-content, nda-review, website-enquiry
 n8n/sql/             001_schema.sql, 002_seed_gated.sql (generated)
 deploy/              Cloudflare Pages, DNS record list, n8n import, Postgres, env vars
 docs/IMAGES.md       image checklist (mirrors §5)
 ```
 
-`tools/check.py` also refuses to build if any `$`-amount next to revenue/projection-style words appears in `src/` or `gated/`. It's a cheap guard against investor figures creeping back in.
+`tools/check.py` also refuses to build if any `$`-amount next to revenue/projection-style words appears in `src/` or `gated/`. It's a cheap guard against investor figures creeping back in. A second guard (§4.9) does the same for infrastructure detail in `gated/`.
 
 ---
 
@@ -280,6 +280,25 @@ nda_audit          id, at, event, request_id, ip, ua, detail jsonb
 - Postgres `it7q_web` DB + role, then run the SQL.
 - Cloudflare: Transform Rule, cache bypass, rate-limit rule, Turnstile widget, optional Access on `nda-review`.
 
+### 4.9 Gated content rules (Q23)
+Gated detail tells an approved reader **what** a project does, how it helps, where it's at and what's next. It never says **how it's wired up**.
+
+| Allowed behind the NDA | Never, even behind the NDA |
+|---|---|
+| Features and capabilities in plain English | Ports, internal or external hostnames, IP addresses |
+| Who it's for, the problem it solves, why it's different | Repo URLs, git hosts, package/apt repos |
+| Status, milestones, roadmap in general terms | WireGuard, tunnels, VPN layout, network topology |
+| General tech family where it helps understanding (e.g. "self-hosted", "runs on a Raspberry Pi compute module", "uses AI models") | Service/agent internals, enrolment mechanisms, auth tokens, retention/config values |
+| Integrations by product name (e.g. "works with Athena and Nexus") | Exact software versions or security-tool placement that maps the attack surface |
+| Pricing, if Chris approves (Q28) | Anything from the business plan's financials |
+
+Process: I write each project's gated text from the private build pack into `gated/<division>.json` with those rules applied, and Chris reviews it before it's seeded into Postgres. `tools/check.py` scans `gated/` and fails on:
+- IPv4/IPv6 addresses
+- `:<port>` patterns
+- hostnames (`*.nubius.com.au`, `*.it7q.com.au` other than public `pN`/`www`/`downloads`)
+- `git.`/`.git` URLs
+- words like `WireGuard`, `wg0`, `tunnel`, `port`
+
 ---
 
 ## 5. Image and media list
@@ -305,13 +324,15 @@ Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (
 **Portfolio**
 | ID | Asset | Size |
 |---|---|---|
-| IMG-19 | p1 True Colours screenshot | 1600×1000 + mobile 750×1334 |
+| IMG-19 | p1 True Colours DSS screenshot | 1600×1000 + mobile 750×1334 |
 | IMG-20 | p2 Red Bird screenshot | as above |
 | IMG-21 | p3 Pine Rivers RSL screenshot | as above |
 | IMG-22 | p4 The Artist Apron screenshot | as above |
 | IMG-23 | p5 Burpengary Jets screenshot | as above |
-| IMG-24–28 | Client logos p1–p5 (if consent covers logos) | SVG/PNG |
-| (later) | Screenshots for any newly consented sites | as above |
+| IMG-35 | p6 BlueVibes screenshot | as above |
+| IMG-36 | p7 AustPathClub screenshot | as above |
+| IMG-24–28, IMG-37–38 | Client logos p1–p7 (if consent covers logos) | SVG/PNG |
+| (later) | Screenshots for any future IT7Q-built sites (p8…) | as above |
 
 **Project cards** (one public-safe image each, 800×500 WebP; render, photo, product shot or illustrative graphic)
 | IDs | Count | Notes |
@@ -341,13 +362,15 @@ That's roughly **39–51 project images**, depending on Q24.
 
 ### 6.1 DNS: records needed (listed only; Chris decides and makes the changes)
 
-Domain registered at HostPapa. Chris is confirming whether the nameservers are HostPapa's or Cloudflare's. **This matters.** Cloudflare Pages can only serve the **apex** `it7q.com.au` when the zone's nameservers are on Cloudflare. With HostPapa nameservers, only subdomains like `www` can point at Pages (via CNAME), and the apex would need a redirect at HostPapa.
+Registrar: HostPapa. Nameservers: **already on Cloudflare** (`morgan.ns.cloudflare.com`, `megan.ns.cloudflare.com`), so the zone is managed in Cloudflare and Pages can serve the bare `it7q.com.au` directly. No nameserver change is needed.
+
+Adding a custom domain in Pages → Custom domains creates the matching record in the zone for you. Chris does that step at go-live, after checking nothing already sits on those names.
 
 | Record | Purpose | Points to | Notes |
 |---|---|---|---|
-| `it7q.com.au` (apex) | Main site | Pages project (`<project>.pages.dev`) | Needs Cloudflare nameservers. Added via Pages → Custom domains |
-| `www.it7q.com.au` | Main site | CNAME `<project>.pages.dev` | Works with either nameserver setup. Redirect www → apex (or the reverse) |
-| `p1`–`p5.it7q.com.au` | Portfolio sites | Wherever each site is hosted (today's `tc/rb/pr/aa` hosts?) | Need the hosting target for each (Q27) |
+| `it7q.com.au` (apex) | Main site | Pages project (`<project>.pages.dev`) | CNAME at the apex (Cloudflare flattens it). Replaces whatever the apex points at today, so check that first |
+| `www.it7q.com.au` | Main site | CNAME `<project>.pages.dev` | Redirect www → apex via a Cloudflare redirect rule (or the reverse; Chris's pick) |
+| `p1`–`p7.it7q.com.au` | Portfolio sites | Wherever each site is hosted | Hosting target for each still unknown (Q27). Old `tc/rb/pr/aa` names: keep, redirect to `pN`, or retire? |
 | `downloads.it7q.com.au` | Existing (build pack) | unchanged | Confirm it stays |
 | MX / SPF / DKIM / DMARC for the n8n sender | NDA emails deliverable | Mail provider (MXRoute per build pack) | Check SPF/DKIM cover the sending domain once Q8 is answered |
 | `hooks.nubius.com.au` | Webhooks | Existing cloudflared tunnel | Different domain (`nubius.com.au`); no change |
@@ -363,7 +386,7 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
 6. n8n down → locked, with a friendly error.
 7. No Turnstile / not via Cloudflare → rejected.
 8. Rate limits trigger and recover.
-9. `tools/check.py`: no gated canary/text, no unconsented portfolio entry and no financial figures in `dist/`. View-source spot checks.
+9. `tools/check.py`: no gated canary/text, no unpublished portfolio entry and no financial figures in `dist/`; no infrastructure detail in `gated/`. View-source spot checks.
 10. Accessibility (axe/Lighthouse), links, mobile.
 
 ---
@@ -374,7 +397,7 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
 1. Scaffold `src/`, build/check tools, brand tokens, base CSS, header/footer, placeholder component, Home.
 2. Public pages: About, Divisions index + 7 division pages with project cards from `projects.json`, Portfolio, Services, Contact, Legal.
 3. NDA front end (`/access/`, locked panels, renderer) against a local mock with failure simulation.
-4. Gated content: sanitised `gated/` JSON (after Q23), n8n workflows, SQL, `deploy/` docs for Chris to review.
+4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), n8n workflows, SQL, `deploy/` docs for Chris to review.
 5. Blog, Downloads, Investors shell.
 6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live.
 
@@ -382,7 +405,7 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
 
 ## 8. Open questions for Chris
 
-**Answered**: 1, 2, 12, 13, 16 (Chris); 5, 14 (settled by build pack). See §1a.
+**Answered**: 1, 2, 12, 13, 16, 23 (Chris); 5, 14 (settled by build pack). See §1a. Q27 is narrowed to hosting only.
 
 **Still open from v1**
 3. **Bot protection**: Cloudflare Turnstile OK, or in-house only?
@@ -402,12 +425,12 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
 22. **Logo files**: Elementals MP4 + division SVGs still around?
 
 **New**
-23. **Gated detail is too detailed.** The build pack's "Detail (NDA)" blocks include internal ports, hostnames, repo URLs, WireGuard bindings and security architecture. NDA signers are outsiders, and the box has been compromised once before. I recommend writing the gated detail at feature/business level and leaving infrastructure specifics out entirely. OK? Related: should the build pack itself be committed to this private repo, or moved to `/srv/work/it7q-private` like the financials? It's **untracked** until you decide.
 24. **Placement / keep-or-drop** for the **?** items in §2.1: IT7Q SysMon, Andromeda CE/companion, Aegir SecureStart, FABRICUS App, FORTUNA, COLLOQUIUM, v2 Automations, PORTUS App, PORTUS Jnr, TABULAE, FORMAE, BIONICUS. Also: do Persephone's named agents get their own cards?
 25. **TEMPESTAS tier names**: three sets exist (business plan: SCUTUM/PARMA/CLIPEUS/THUREOS/ASPIS; Jan spec: Buckler…Aegis; v2: Scout/Sentinel/Guard), and SCUTUM is also the MSP AV/EDR working name. Which is current?
 26. **FABRICUS F-001–F-019**: names, one-liners and photos. Launch with placeholders for any not ready?
-27. **Portfolio**: is `TCDSS_Website` = p1 True Colours, and `PRRSL_Website` = p3 Pine Rivers RSL? Where is each p1–p5 site hosted (for the DNS list)? Consent status for `BlueVibes_Website` and `AustPathClub`? Any other built sites I don't know about?
+27. **Portfolio hosting**: where is each p1–p7 site hosted today (vps01, Pantheon, elsewhere)? Each `pN` record needs that target. And what happens to the old `tc/rb/pr/aa.it7q.com.au` names: keep, redirect to `pN`, or retire?
 28. **Public prices**: the build pack's public teasers include "from" prices (managed AV, TEMPESTAS). Show prices on public cards, or keep them gated?
+29. **p6/p7 display names**: how should BlueVibes and AustPathClub appear on their cards (full organisation names)? Is there a short one-liner for each?
 
 ---
 
@@ -424,4 +447,5 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
   - The Jan spec and Feb redesign transcripts were moved to `/srv/work/it7q-private` and git-ignored.
   - History was rewritten (authorised one-off) and force-pushed. `main` now has no commit containing them.
   - A backup bundle of the old history is in `/srv/work/it7q-private` (contains financials; delete once you're happy).
+  - The August build pack was moved to `/srv/work/it7q-private` and git-ignored. It was never committed, so no history change was needed.
   - **Pending (Chris):** GitHub still serves the old, now-unreferenced commit `b39954a` (and its parent) if fetched by exact SHA. Purging that needs a GitHub Support request (sensitive data removal: ask them to garbage-collect the repo and drop cached views). The alternative is deleting and recreating the repo, which needs the deploy key re-added.

@@ -1,5 +1,7 @@
-# Investor financials live in /srv/work/it7q-private, never in this repo
+# Investor financials and raw build pack live in /srv/work/it7q-private, never in this repo
 /_source/IT7Q comprehensive website design v1.0.0.md
 /_source/IT7Q website redesign with proposal integration.md
 IT7Q_Complete_Business_Plan.docx
 *.bundle
+/_source/it7q-website-build-pack.md
+it7q-website-build-pack.md
