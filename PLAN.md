@@ -1,71 +1,175 @@
 # IT7Q website rebuild — plan
 
-Status: **plan only, nothing built yet.** Drafted 26 Oct 2026 for Chris to review.
+Status: **plan only, nothing built yet.** v2, 26 Oct 2026. It folds in Chris's answers to Q1, Q2, Q12, Q13 and Q16 and the August build pack.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
 
 ## 0. Bottom line
 
-- **Multi-page static site** replacing v2's single page. We reuse v2's look (navy/cyan/amber, Rajdhani + DM Sans), its copy and its layout ideas. We rebuild the structure, the forms and the NDA gate.
-- **Division detail never ships in the static site.** Public pages hold a teaser and a thumbnail only. Full content lives server-side (Postgres, read by n8n) and only reaches the browser after an approved login. If anything goes wrong (n8n down, bad token, revoked, expired, odd response), the page stays locked.
-- **No secrets in the site.** Webhooks are protected by server-side checks in n8n, plus bot protection, rate limits and a Cloudflare-injected edge header. The site itself holds nothing worth stealing.
-- **Three new webhooks, not two.** Besides `nda-submission` and `nda-login`, I'm proposing `nda-content`, which serves gated content to a valid session, and `nda-review`, which handles Chris's approve/reject. See open question 1.
-- Everything server-side (n8n workflows, SQL, Cloudflare settings) gets written as **files in this repo for Chris to review and deploy**. I don't touch n8n, Docker or Cloudflare.
+- **Multi-page static site** on **Cloudflare Pages (free plan)**. It uses the locked brand from the August build pack. Copy and layout ideas come from v2. The structure, forms and NDA gate are rebuilt.
+- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory has about 45 projects so far (§2.1).
+- **Gated detail never ships in the static site.** It lives server-side (Postgres, read by n8n) and only reaches the browser after an approved login. Any failure keeps the page locked.
+- **No secrets in the site.** Protection comes from server-side checks in n8n, Turnstile, rate limits and a Cloudflare-injected edge header.
+- **Four NDA webhooks** (approved): `nda-submission`, `nda-login`, `nda-content`, `nda-review`.
+- **Portfolio** = every site IT7Q has built, each on its own `pN.it7q.com.au` link. Five are confirmed. Extra candidates need Chris's consent check first, and nothing is published without it.
+- **Investor financials are out of this repo.** The two source transcripts now live in `/srv/work/it7q-private` and are git-ignored. The business plan is read from there and is never copied in. No financial figures appear anywhere in this repo.
+- Server-side pieces (n8n workflows, SQL, Cloudflare steps, DNS list) are **files for Chris to review and deploy**. I don't touch n8n, Docker, Cloudflare or DNS.
 
 ---
 
-## 1. What the source material says
+## 1. Source material
 
-| Source | Date | What it gives us | Status |
+| Source | Where | Role | Notes |
 |---|---|---|---|
-| `_source/v2/` (zip) | May 2026 | Single-page site: hero, mission, 7 division cards, products tabs, portfolio (4), automations, contact form, NDA modal, cookie banner. ~40 KB HTML, 27 KB CSS, 5 KB JS. | Best base for look and copy. NDA and forms are **mock only**: `console.log` and nothing sent. The NDA **unlocks on ticking the box**, which is a fail-open gate. |
-| `IT7Q comprehensive website design v1.0.0.md` | Jan 2026 | Chat transcript. Multi-page static site: per-division pages, TEMPESTAS/FABRICUS "coming soon" teasers, about, contact, privacy and cookie policies, client portal login + dashboard, blog/social hub, portal user guide. Still has NEXUS (since replaced by OPUS). | Page structure and policy text are useful. The portal dashboard links straight to homelab services (jellyfin, n8n, portainer… `*.it7q.com.au`) and keeps JWTs in localStorage, so **we drop it**. |
-| `IT7Q website redesign with proposal integration.md` | Feb 2026 | Chat transcript. Feature list: look like proposal.nubius.com.au, add orange, hero = animated logo + row of division logos, NDA popup with T&C tick → emailed copy → login issued **on approval**, blog, enquiries page (pick service + division), client portal login, admin portal login, Neo website showcase + form, downloads page, plain English, **home users first, small business second**. NEXUS → OPUS. | Requirements still apply. The WordPress pivot in that chat is **superseded** by this brief (static only). |
+| `it7q-website-build-pack.md` (Aug 2026) | `_source/`, **untracked** for now (Q23) | **Primary**: brand (locked), NDA-wall pattern, full division/project map, portfolio p1–p4 | Newest source and the one that wins conflicts. Its "Detail (NDA)" blocks include internal ports, hostnames and security architecture, so they need sanitising before they become gated content (Q23). It assumed deploying on Pantheon, which Q2 replaces. |
+| `IT7Q_Complete_Business_Plan.docx` | `/srv/work/it7q-private/` **only** | **Secondary**: project discovery (TEMPESTAS tiers, PORTUS features, FABRICUS/DOMUS/MENTIS service lines) | Older: still has NEXUS, no OPUS. **Read in place; never copied, quoted for figures or committed.** |
+| `_source/v2/` + zip (May 2026) | repo | Look, copy, layout; v2 product list (extra project names) | NDA and forms are mock only, and the NDA fails open (unlocks on tick). |
+| Jan 2026 spec transcript | `/srv/work/it7q-private/` | Multi-page structure, policy page drafts | Moved out of the repo because it holds company financials. |
+| Feb 2026 redesign transcript | `/srv/work/it7q-private/` | Feature list (blog, enquiries, Neo showcase, downloads, portals), home users first, Feb-era OPUS products | Moved out of the repo because it holds investor projections. Its WordPress pivot is superseded. |
 
-Facts carried over: ABN 43 922 878 001, Kallangur QLD 4503, 0411 753 366 / WhatsApp, `enquiries@it7q.com.au` (v2) and `info@it7q.com.au` (Jan spec). See Q18.
+**Brand (locked by the build pack, replaces v2's tokens)**
+- Colours: navy `#0a1628`, cyan `#00b4cc`, lime `#7ec820`, purple `#8b5cf6`, orange `#f97316`
+- Logo: four interlocking circles
+- Fonts: Rajdhani (headings), Exo 2 (body)
+- Tagline: *Smart Tech. Simple Terms. Serious Security.*
+- Mission: *To make enterprise-grade technology accessible, affordable and understandable for homes, community organisations and small businesses across Queensland.*
+
+Division accent colours from v2 stay as secondary accents, checked for WCAG AA contrast.
+
+---
+
+## 1a. Decisions so far
+
+| Q | Decision |
+|---|---|
+| 1 | Yes to `nda-content` and `nda-review`. |
+| 2 | Cloudflare Pages, free plan. Registrar is HostPapa, and Chris will confirm the nameservers. §6.1 lists what's needed; I plan no DNS changes. |
+| 5 | Settled by the build pack: login + password emailed on manual approval. |
+| 12 | Every IT7Q-built site gets a thumbnail + `pN.it7q.com.au` link. p1–p5 confirmed (§2.2). Extra sites are listed as candidates pending consent. |
+| 13 / 16 | Content source is the build pack (primary) + business plan (secondary, private). OPUS = software products, per the build pack. Every project gets a card; full info is gated. |
+| 14 | Settled by the build pack: public card = image + one-line description + "why it's unique". No ports, source, schematics or security architecture. |
+| Fonts/colours | Build pack brand replaces v2's (DM Sans → Exo 2, new palette). |
 
 ---
 
 ## 2. Site map and pages
 
-Home users come first and small business second. Everything is in plain English.
+Home users first, small business second, all in plain English.
 
 ```
 /                         Home
 /about/                   About + mission
-/divisions/               All seven divisions (teaser cards)
+/divisions/               All seven divisions (teaser cards → division pages)
 /divisions/msp/           ┐
-/divisions/opus/          │
-/divisions/mentis/        │  Each page: public teaser + thumbnail,
-/divisions/tempestas/     │  then a locked panel. Full detail loads only
-/divisions/portus/        │  after an approved login (see §4).
-/divisions/fabricus/      │
+/divisions/opus/          │  Each page: division intro (public)
+/divisions/mentis/        │  + grid of project cards (public: image, one-liner, why unique)
+/divisions/tempestas/     │  + per-card "Full details" locked panel.
+/divisions/portus/        │  Gated detail loads per project after an approved
+/divisions/fabricus/      │  login (see §4).
 /divisions/domus/         ┘
-/portfolio/               Client websites (p1–p4 + Burpengary Jets)
+/portfolio/               Client websites, p1–p5 (+ more once consented)
 /services/                "How we can help": plain-English services + enquiry form (pick service & division)
 /contact/                 Contact details, WhatsApp/Messenger, short form
-/access/                  NDA: read the agreement, request access, log in, log out
-/investors/               Investor & partner area: shell page, all content gated (presentations, financials)
-/blog/                    Blog/social hub (static posts, links to socials/YouTube)
-/blog/<slug>/             Individual posts
-/downloads/               Recommended downloads (links + plain-English why)
-/legal/privacy/           Privacy policy (Australian Privacy Principles)
-/legal/cookies/           Cookie policy
-/legal/terms/             Website terms
-/legal/nda/               The current NDA text, public so people can read it before requesting access
+/access/                  NDA: read, request access, log in, log out
+/investors/               Investor & partner area: shell page, all content gated
+/blog/  /blog/<slug>/     Blog/social hub (static posts, links out to socials/YouTube)
+/downloads/               Recommended downloads
+/legal/privacy/  /legal/cookies/  /legal/terms/  /legal/nda/
 /404.html
 ```
 
-**Page-by-page notes**
+**Page notes**
+- **Home**: hero with the animated four-circle logo and a row of the seven division logos. Then the mission, a "how we help" strip (home → small business), a portfolio highlight, an investor/partner call to action to `/access/`, and contact.
+- **Division pages**: one template. The cards are generated by `tools/build.py` from a public data file (`src/data/projects.json`: names, one-liners, why-unique, status, image id). Gated detail is **not** in that file. Each card has a status badge: *Developed · In development · In design · Documented*.
+- **Services**: generic public services for home users. MSP specifics stay gated (Q15). The enquiry form has service and division selectors.
+- **Portfolio**: §2.2.
+- **Parked**: client portal dashboard, admin portal login, Neo evaluation workflow, WordPress (§9).
 
-- **Home**: hero with the animated IT7Q logo (Feb notes) and a row of the seven division logos underneath, linking to the teaser pages. Short mission line. A "how we help" strip (home users, then small business). Portfolio highlight. Investor/partner call to action pointing at `/access/`. Contact strip.
-- **Division pages**: one template, seven copies. Public: name, Latin meaning, 2–3 sentence teaser, thumbnail, a "Request full access" button, and a "Already approved? Log in" link. No product names, pricing, specs, roadmaps or financials in public HTML (Q14).
-- **Services**: the public, home-user-facing "what we can do for you" page. It's kept generic so it doesn't leak gated MSP detail (Q15). The enquiry form has a service selector and a division selector.
-- **Portfolio**: cards in the order p1 True Colours, p2 Red Bird, p3 Pine Rivers RSL, p4 The Artist Apron, then Burpengary Jets. Each has a screenshot placeholder and its hosted link labelled p1–p4 (Q12). Plus a "want a site like this?" call to action. That's the Neo showcase idea from the Feb notes. Neo's evaluation workflow is parked.
-- **Access**: request-access form (NDA modal content as a full page, so it works on mobile and without JS gimmicks), login form, and a status message area. It never says whether an email is known.
-- **Investors**: same gate as the divisions, with its own content blocks (presentations, consolidated financials).
-- **Not in this build (parked, see §9)**: client portal dashboard, admin portal login, WordPress version.
+### 2.1 Project inventory (public card list)
+
+Names and statuses come from the build pack unless marked otherwise. "Status" is my reading of the sources, and Chris confirms it before build. Items marked **?** need a placement or keep/drop decision (Q24). Each card gets an image ID `P-<div>-<nn>` (see §5).
+
+**MSP — Managed Services**
+| ID | Project | Status | Source |
+|---|---|---|---|
+| P-MSP-01 | Managed AV/EDR (working name SCUTUM, clashes with the TEMPESTAS tier name, Q25) | In development | build pack |
+| P-MSP-02 | MSP Companion App (one-click enrolment) | In development (pilot) | build pack |
+| P-MSP-03 | Managed security monitoring (Wazuh SIEM) | Developed | build pack |
+| P-MSP-04 | IT7Q Support Portal | In development | build pack, v2 |
+| P-MSP-05 ? | IT7Q SysMon (server health monitoring) | ? | v2 only |
+
+**OPUS — Software Products**
+| ID | Project | Status | Source |
+|---|---|---|---|
+| P-OPUS-01 | Athena Browser | Developed | build pack, v2 |
+| P-OPUS-02 | Hermes Mail | In development | build pack, v2 |
+| P-OPUS-03 | Calendis (consumer calendar) / Calendi IT7Q (project scheduler) | In development | build pack, v2 |
+| P-OPUS-04 | LexiScan (dyslexia/visual-stress screener) | In development | build pack |
+| P-OPUS-05 | Nexus (secure messaging) | In development | build pack, v2 |
+| P-OPUS-06 | Andromeda OS | In development | build pack |
+| P-OPUS-07 | Paideia OS (safe computer for kids) | Developed | build pack |
+| P-OPUS-08 | JANUS (one inbox for every channel) | In design | build pack, v2 |
+| P-OPUS-09 | Project Silo (private Workspace alternative) | In design | build pack, v2 |
+| P-OPUS-10 ? | Andromeda CE / Andromeda AI companion | ? | v2, Feb notes |
+| P-OPUS-11 ? | Aegir — SecureStart (Windows privacy/setup tool) | ? | v2 only |
+| P-OPUS-12 ? | FABRICUS App (offline order/catalogue PWA) | ? (OPUS or FABRICUS) | Feb notes |
+
+**MENTIS — AI & Automation**
+| ID | Project | Status | Source |
+|---|---|---|---|
+| P-MEN-01 | Project Persephone (AI agent workforce) | Developed (partly live) | build pack, v2 |
+| P-MEN-02 | MNEMOSYNE (AI memory layer) | In development | build pack |
+| P-MEN-03 | Neo (AI website builder) | In development | build pack |
+| P-MEN-04 ? | FORTUNA (investment-monitoring agent). Separate card, or inside Persephone? | ? | build pack (as agent), v2 (own card) |
+| P-MEN-05 ? | COLLOQUIUM (business chat/AI assistant service) | ? | Feb notes |
+| P-MEN-06 ? | v2 "AI Automations" set (patch mgmt, social pipeline, invoice/PABX, email triage, security alerting, compliance reporting). Cards, or a public services list? | ? | v2 |
+
+**TEMPESTAS — Cybersecurity Hardware**
+| ID | Project | Status | Source |
+|---|---|---|---|
+| P-TEM-01 | TEMPESTAS Shield appliance line (5 tiers; tier names Q25) | In development | build pack, business plan, v2 |
+| P-TEM-02 | TEMPESTAS T3 carrier board (v2's "Custom PCB Design", assumed the same) | In design | build pack, v2 |
+
+**PORTUS — Community Safety**
+| ID | Project | Status | Source |
+|---|---|---|---|
+| P-POR-01 | PORTUS community safety network (absorbs K.I.T.S.) | In design | build pack, business plan |
+| P-POR-02 ? | PORTUS App (separate card from the network?) | ? | v2 |
+| P-POR-03 ? | PORTUS Jnr (child-safe version) | ? | v2 only |
+
+**FABRICUS — Woodcraft & Digital Manufacturing**
+| ID | Project | Status | Source |
+|---|---|---|---|
+| P-FAB-001 … P-FAB-019 | Product range F-001 → F-019 (19 cards; names, one-liners and photos needed, Q26) | In development | build pack |
+| P-FAB-020 ? | TABULAE medal display boards (likely already within F-range) | ? | Feb notes, build pack |
+| P-FAB-021 ? | FORMAE custom 3D prints | ? | Feb notes |
+| P-FAB-022 ? | BIONICUS assistive body supports (Project Bionic) | ? | Feb notes |
+
+**DOMUS — Smart Home**
+| ID | Project | Status | Source |
+|---|---|---|---|
+| P-DOM-01 | Smart, segmented, private home setup | Documented / service | build pack, business plan |
+
+Retired, so no card unless Chris says otherwise: original single-tenant Calendi for Pine Rivers RSL, and the NEXUS division (3CX/NBN), which was replaced by OPUS.
+
+### 2.2 Portfolio
+
+| Label | Client | Link | Consent | Repo (Chris's GitHub) |
+|---|---|---|---|---|
+| p1 | True Colours | `p1.it7q.com.au` | Signed (contract clause) | `TCDSS_Website`? (Q27) |
+| p2 | Red Bird | `p2.it7q.com.au` | Signed (contract clause) | — |
+| p3 | Pine Rivers RSL | `p3.it7q.com.au` | Signed (contract clause) | `PRRSL_Website`? (Q27) |
+| p4 | The Artist Apron | `p4.it7q.com.au` | Signed | — |
+| p5 | Burpengary Jets | `p5.it7q.com.au` | Consented | — |
+
+**Candidates: NOT published until Chris confirms consent**
+| Candidate | Source | Status |
+|---|---|---|
+| `BlueVibes_Website` | Chris's GitHub | Consent check needed |
+| `AustPathClub` | Chris's GitHub | Consent check needed |
+
+The cards show the client name, thumbnail and outbound `pN` link. New consented sites take the next label (p6, p7…). The build data marks unconsented entries `published: false`, and `tools/check.py` fails if one appears in `dist/`.
 
 ---
 
@@ -73,261 +177,251 @@ Home users come first and small business second. Everything is in plain English.
 
 | Area | Decision | Notes |
 |---|---|---|
-| Colour tokens (`--navy`, `--cyan`, `--amber`, division colours) | **Reuse** | Add a brand orange token per the Feb notes. Check text contrast for WCAG AA. Add a light theme only if Chris wants one. |
-| Fonts (Rajdhani, DM Sans) | **Reuse, self-host** | Drop the Google Fonts link. Serve woff2 from `/assets/fonts/`. Better privacy, a tighter CSP, and no third party. |
-| Hero copy, mission text, division Latin meanings, footer/ABN | **Reuse, edit** | Trim division descriptions into teasers. Confirm the stats (Q18). |
-| Division card design, portfolio card design, nav (scroll state, mobile menu), scroll-in animation | **Reuse, refactor** | Move from inline `onclick` to `addEventListener` (needed for a strict CSP). Respect `prefers-reduced-motion`. |
-| NDA legal text | **Reuse as draft v1.0** | Needs review: it's titled "Mutual" but only names IT7Q as Disclosing Party, and it's scoped to "investment/partnership" rather than division content generally (Q10). |
-| Cookie banner | **Rebuild/simplify** | With no tracking cookies, show a privacy notice rather than a consent banner (Q20). |
-| Single-page layout | **Rebuild** | Multi-page (§2). |
-| Products tabs | **Remove from public** | Product detail belongs to divisions, so it moves behind the gate. v2's `showProdTab` also relies on the global `event`. |
-| NDA modal + `submitNDA()` | **Rebuild completely** | v2 unlocks client-side on tick. New flow: §4. |
-| Contact form `submitForm()` | **Rebuild** | v2 only logs to console and points at the dead `n8n.nubius.com.au`. New: `website-enquiry` webhook with the same protections as the NDA (Q19). |
-| `alert()` validation | **Rebuild** | Inline, accessible error messages. |
-| Emoji icons | **Replace** | Inline SVG icons. |
-| Modal accessibility | **Rebuild** | Focus trap, `aria-modal`, Esc, return focus. |
-| Jan spec: privacy/cookie policy text | **Reuse as draft** | Fill in `[Your ABN]` placeholders. Review against the APPs. |
-| Jan spec: portal dashboard, homelab links, JWT in localStorage | **Drop** | It advertises internal hostnames and doesn't fit the security rules. |
+| Colours, fonts | **Replace** with the build-pack brand | Self-host Rajdhani + Exo 2 (woff2), no Google Fonts. |
+| Hero copy, tagline | **Reuse** | Same tagline as the build pack. Use the build pack's mission text. Confirm stats (Q18). |
+| Division card / portfolio card design, nav, scroll animations | **Reuse, refactor** | `addEventListener` instead of inline `onclick` (strict CSP). Respect `prefers-reduced-motion`. |
+| v2 product list | **Mine for names only** | Folded into §2.1. Products tabs removed. Public detail is limited to the one-liner pattern. |
+| NDA legal text | **Reuse as draft v1.0** | Needs review (Q10). |
+| Cookie banner | **Simplify** | Privacy notice only if there are no tracking cookies (Q20). |
+| NDA modal, contact form, `alert()` validation, emoji icons, modal a11y | **Rebuild** | As in v1 of this plan. |
+| Jan spec portal dashboard | **Drop** | Advertises internal hostnames. |
 
-**Repo layout (proposed)**
-
+**Repo layout**
 ```
-src/                 page sources + partials (header, footer, gated-panel)
+src/                 page sources + partials
+  data/projects.json public card data only (no gated detail)
+  data/portfolio.json
   assets/css|js|fonts|img|video
-tools/build.py       stdlib-only Python: stitches partials → dist/ (Q21)
-tools/check.py       link check, HTML sanity, gated-content leak check
-dist/                build output = the only thing deployed (git-ignored)
-gated/               confidential division/investor content as JSON, NEVER in dist/
-n8n/workflows/       nda-submission, nda-login, nda-content, nda-review, website-enquiry (.json)
-n8n/sql/             001_schema.sql, 002_seed_gated.sql (generated from gated/)
-deploy/              step-by-step for Chris: Cloudflare, n8n import, Postgres, env vars
-docs/IMAGES.md       live image/photo checklist (mirrors §5)
+tools/build.py       stdlib-only Python: partials + data → dist/ (Q21)
+tools/check.py       links, HTML sanity, gated-content leak check, unconsented-portfolio check, financial-figure guard
+dist/                build output, the only thing deployed (git-ignored)
+gated/               sanitised gated detail per project as JSON, NEVER in dist/ (Q23 on where it lives)
+n8n/workflows/       nda-submission, nda-login, nda-content, nda-review, website-enquiry
+n8n/sql/             001_schema.sql, 002_seed_gated.sql (generated)
+deploy/              Cloudflare Pages, DNS record list, n8n import, Postgres, env vars
+docs/IMAGES.md       image checklist (mirrors §5)
 ```
 
-The leak check: every file in `gated/` carries a canary string. `tools/check.py` fails the build if the canary, or any gated paragraph, shows up anywhere in `dist/`.
+`tools/check.py` also refuses to build if any `$`-amount next to revenue/projection-style words appears in `src/` or `gated/`. It's a cheap guard against investor figures creeping back in.
 
 ---
 
 ## 4. NDA flow design
 
+Unchanged in principle from v1 of the plan. The changes: content is now **per project** rather than per division, and the build pack confirms the UX order (T&C tick → NDA modal + tick → email → emailed NDA copy → manual approval → emailed login + password → unlock).
+
 ### 4.1 Principles
+1. **Fail closed.** Locked is the default markup. Detail renders only on a 200 + valid JSON from `nda-content`. Everything else stays locked.
+2. **Signing grants nothing.** `nda-submission` only creates `pending`. Only `nda-review` approval enables login.
+3. **No gated content in public files**: not hidden, simply absent.
+4. **No secrets in the site.** Only the public Turnstile site key appears in it.
+5. **The server re-checks everything on every request.** Revocation takes effect on the next call.
+6. **No enumeration.** The same reply goes out for new, duplicate, rejected and unknown emails.
 
-1. **Fail closed.** The locked state is the default markup. Content appears only when `nda-content` returns 200 with valid JSON for that division. Every other outcome means locked: network error, timeout, 401/403/429/5xx, malformed JSON, or a missing token.
-2. **Signing grants nothing.** `nda-submission` only ever creates a `pending` record. Only Chris's approval moves it to `approved`, and only an approved login creates a session.
-3. **No confidential content in public files.** It isn't hidden with CSS or obfuscated in JS. It's simply not there. It sits in Postgres and goes out per request to a valid session.
-4. **No secrets in the site.** The Turnstile *site* key is public by design. Everything else lives in n8n credentials or Cloudflare.
-5. **The server checks everything, every time.** Each `nda-content` call re-checks session validity, approval status, revocation and NDA expiry. Revoking someone takes effect on their next request.
-6. **Don't leak who has applied.** The same response goes out for new, duplicate, rejected and unknown emails.
+### 4.2 Protection layers (all public webhooks)
+| Layer | What |
+|---|---|
+| Cloudflare edge header | A Transform Rule sets `X-IT7Q-Edge` on `hooks.nubius.com.au/webhook/*`, and n8n Header Auth checks it. This keeps the "header auth" rule with nothing secret in the site. |
+| CORS | Allowed origin `https://it7q.com.au` (+ the Pages preview origin while testing). |
+| Turnstile | Widget on forms. n8n verifies server-side (secret in an n8n credential) and checks hostname + action. Honeypot + min fill time as backup. |
+| Rate limits | Cloudflare WAF rule where the free plan allows, plus Postgres-backed per-IP/per-email counters in n8n. Login lockout: 5 fails/15 min. |
+| Validation | JSON only, ≤ 8 KB, strict allow-list, NDA version/hash must match. |
+| Least-privilege DB | Separate `it7q_web` database/role. |
+| No caching | Cloudflare bypass on `/webhook/*`; `Cache-Control: no-store`. |
+| Audit | Every event logged in `nda_audit`. |
 
-### 4.2 Protection layers (applied to all public webhooks)
+### 4.3 `nda-submission`
+1. The visitor reads NDA v1.0 (the page embeds its SHA-256). They give name, email, org, reason, divisions of interest, typed signature, NDA tick, T&C tick and Turnstile, with a hidden honeypot + timestamp.
+2. POST to `https://hooks.nubius.com.au/webhook/nda-submission`. Nothing unlocks.
+3. n8n checks: edge header → size/schema → honeypot/timing → Turnstile → rate limits.
+4. Upsert into `nda_requests` with status `pending`, server timestamp, IP, UA and NDA version/hash. No duplicate if one is already pending or approved.
+5. Email the signer a copy of the agreed NDA + acceptance record ("reviewed manually").
+6. Email **chris@it7q.com.au** a copy of the signed NDA + an approval alert with a Review link.
+7. Reply `202` with a neutral message.
 
-| Layer | Where | What it does |
-|---|---|---|
-| Cloudflare edge header | Cloudflare Transform Rule on `hooks.nubius.com.au/webhook/*` sets `X-IT7Q-Edge: <secret>`, which overwrites any client value | n8n Header Auth credential checks it. This satisfies the "header auth on /webhook/*" rule without the site knowing the value, and rejects anything reaching n8n by another path. |
-| CORS | n8n webhook "Allowed origins" = `https://it7q.com.au` (+ staging origin) | Stops other sites using a visitor's browser against the webhooks. It's not a security boundary on its own. |
-| Bot protection | Cloudflare Turnstile widget on forms; n8n verifies the token server-side (`siteverify`, secret in an n8n credential), checks `hostname` and `action` | Stops scripted submissions. In-house fallback: honeypot field + minimum fill time (Q3). |
-| Rate limits | Cloudflare WAF rate-limit rule on `/webhook/nda-*` (plan permitting), **plus** Postgres-backed counters in n8n per IP (`CF-Connecting-IP`) and per email | E.g. submissions: 3/hour/IP, 2/day/email. Login: 5 failures/15 min per email and per IP, then a 15-minute lockout. |
-| Input validation | n8n Code node | JSON only, body ≤ 8 KB, strict field allow-list, length limits, email format, ticks must be `true`, `nda_version`/`nda_sha256` must match the current NDA. |
-| Least privilege DB | Separate Postgres database/role `it7q_web` | n8n's web workflows can only touch NDA tables, not n8n's own DB or client data. |
-| No caching | Cloudflare cache rule: bypass `/webhook/*`; n8n responses `Cache-Control: no-store` | Gated JSON never lands in a cache. |
-| Audit log | `nda_audit` table | Every submission, approval, login (ok/fail), content fetch and revocation, with timestamp, IP and user agent. |
+### 4.4 `nda-review`
+- One-time token link (SHA-256 stored, 7-day expiry, single use). GET shows a confirm page; **only POST changes state**, so mail-scanner prefetch can't approve anyone.
+- Recommended: Cloudflare Access on `/webhook/nda-review*` for Chris's email only (Q4).
+- **Approve**: status `approved`, scope (Q6), `expires_at` = signed + NDA term. It generates a ≥ 16-char password, stores an scrypt hash only, and emails the login + `/access/` link.
+- **Reject / revoke / reset**: the same workflow. Revoke kills sessions immediately.
 
-### 4.3 `nda-submission`: request access
+### 4.5 `nda-login`
+1. Email + password + Turnstile, POSTed via Cloudflare.
+2. Edge header, Turnstile, lockout. Dummy scrypt for unknown emails. `timingSafeEqual`. Requires approved, not revoked, NDA not expired.
+3. Session token = 32 random bytes. Only its SHA-256 is stored. 8 h absolute / 1 h idle (Q7).
+4. One generic 401 for every failure.
+5. The token lives in `sessionStorage` only.
 
-```mermaid
-sequenceDiagram
-  participant V as Visitor (it7q.com.au/access/)
-  participant CF as Cloudflare
-  participant N as n8n nda-submission
-  participant DB as Postgres it7q_web
-  participant M as Mail
-  V->>CF: POST /webhook/nda-submission (JSON + Turnstile token)
-  CF->>N: + X-IT7Q-Edge (rate-limited)
-  N->>N: edge header, size/schema, honeypot, Turnstile verify, rate limits
-  N->>DB: upsert nda_requests (status = pending)
-  N->>M: signer: copy of agreed NDA + "pending review"
-  N->>M: chris@it7q.com.au: details + Review link
-  N-->>V: 202 "Thanks — we'll be in touch" (same reply in every case)
+### 4.6 `nda-content`
+1. A division page loads public cards with locked panels.
+2. With a token, one POST `{division}` returns the gated detail for **all granted projects in that division** (structured JSON, `no-store`). This avoids one call per card.
+3. n8n re-checks the session, approval, revocation, NDA expiry and division scope.
+4. Rendering uses DOM APIs only (no `innerHTML`), with a watermark: "Confidential — shared with <email> under NDA".
+5. 401/403 → clear the token and re-lock. Network/5xx → stay locked, "try again". No cached fallback.
+6. `{action:"logout"}` deletes the session server-side.
+
+Honest limits: an approved viewer can still copy or screenshot. The NDA, watermark, audit log and revocation are the controls for that.
+
+### 4.7 Data model (sketch)
+```
+nda_requests       id, email, name, org, reason, divisions[], nda_version, nda_sha256,
+                   signature_text, signed_at, signed_ip, signed_ua, status, approved_at,
+                   approved_divisions[], expires_at, password_hash, revoked_at, created_at
+nda_review_tokens  token_sha256, request_id, expires_at, used_at
+nda_sessions       token_sha256, request_id, created_at, last_seen_at, expires_at, ip, ua
+nda_content        division, project_id, version, body jsonb, updated_at   -- seeded from gated/
+nda_rate           key, window_start, count
+nda_audit          id, at, event, request_id, ip, ua, detail jsonb
 ```
 
-1. The visitor reads the NDA (versioned, e.g. `v1.0`; the page embeds its SHA-256). They fill in: full name, email, organisation (optional), role/reason, divisions of interest, typed full name as signature, "I agree to the NDA" tick, "I accept the website terms" tick, Turnstile. A honeypot field and a render timestamp are hidden.
-2. The browser POSTs JSON to `https://hooks.nubius.com.au/webhook/nda-submission`. The button disables and shows a spinner. Nothing unlocks.
-3. n8n checks, in order: edge header → method/content-type/size → honeypot empty and fill time ≥ 3 s → Turnstile `siteverify` (hostname `it7q.com.au`, action `nda_submit`) → schema → rate limits. Any failure gets a generic 400/429 and an audit row.
-4. n8n records the request: id (uuid), name, email (lower-cased), org, reason, divisions, `nda_version`, `nda_sha256`, typed signature, **server** timestamp, IP, user agent, status `pending`. If a `pending`/`approved` record already exists for that email, it doesn't create a duplicate. It just logs.
-5. n8n emails the signer their copy of the agreed NDA: the full text, the version/hash and the acceptance record (name, timestamp, IP). The email says access is reviewed manually and login details only follow if approved. Format is HTML email + attached `.html` record. PDF is optional (Q9).
-6. n8n emails `chris@it7q.com.au` the details and a **Review** link (§4.4).
-7. n8n responds `202 {"ok":true}` with a neutral message. The page shows "Request received — check your email for your copy of the NDA."
-
-### 4.4 Approval (`nda-review`)
-
-- The Review link carries a one-time random token (32 bytes). The DB stores only its SHA-256, bound to the request id, valid for 7 days and single use.
-- **GET** shows a small confirm page (request details + Approve / Reject buttons). **Only a POST changes state.** Mail scanners that prefetch links therefore can't approve anyone by accident.
-- Recommended extra layer: put `/webhook/nda-review*` behind **Cloudflare Access** so that only `chris@it7q.com.au` gets through (Q4). The alternative is doing approvals inside the n8n editor over WireGuard.
-- **On approve**: status → `approved`, `approved_at`, granted divisions (all by default, Q6), `expires_at` = signed date + 3 years (NDA term). It generates a random password (≥ 16 chars), stores only an **scrypt** hash (Node `crypto`), and emails the signer their login (email + password + link to `/access/`). The plaintext isn't stored or logged.
-- **On reject**: status → `rejected`, and a polite email goes out. Text is to be confirmed.
-- **Revoke / reset** are the same workflow with different actions. Revoke kills all of that person's sessions immediately. Reset issues a new password.
-
-### 4.5 `nda-login`: approved login
-
-```mermaid
-sequenceDiagram
-  participant V as Visitor (/access/)
-  participant N as n8n nda-login
-  participant DB as Postgres
-  V->>N: POST email + password + Turnstile (via Cloudflare + edge header)
-  N->>N: edge header, Turnstile, rate limit / lockout
-  N->>DB: fetch request by email
-  N->>N: scrypt + timingSafeEqual; status = approved; not revoked; NDA not expired
-  alt all good
-    N->>DB: insert nda_sessions (sha256(token), expires +8h)
-    N-->>V: 200 {token, expires, name, divisions}
-  else anything else
-    N-->>V: 401 "Email or password incorrect, or access not approved yet"
-  end
-```
-
-1. The user enters email + password (+ Turnstile) on `/access/`.
-2. n8n checks the edge header, Turnstile (action `nda_login`) and the rate limit/lockout. It looks up the email, and if the email doesn't exist it still runs a dummy scrypt so timing is equal. It compares with `crypto.timingSafeEqual`, then requires `status = approved`, `revoked_at IS NULL` and `now < expires_at`.
-3. On success it creates a session: token = 32 random bytes (base64url). It stores only `sha256(token)`, plus request id, created, `expires_at` (8 h absolute; idle timeout 1 h), IP and user agent. It returns `{token, expires, name, divisions}`. Every outcome is audited.
-4. Any failure returns one generic 401 message. There's no hint whether the email exists or is pending.
-5. The browser keeps the token in **`sessionStorage`**: tab-scoped, gone when the tab closes, never in a cookie or localStorage. Then it returns the user to the page they came from.
-
-### 4.6 `nda-content`: loading gated content (proposed third webhook)
-
-1. A division page loads with the public teaser and a locked panel. With no token, it stays locked and shows "Request access / Log in".
-2. With a token, JS POSTs `{division:"opus"}` with `Authorization: Bearer <token>` to `/webhook/nda-content`.
-3. n8n hashes the token and looks up the session. It requires: not expired or idle, request still `approved`, not revoked, NDA not expired, and the division granted. Then it returns that division's content as **structured JSON** (headings, paragraphs, lists, image data URIs) with `no-store`. It bumps `last_seen` and audits.
-4. The browser renders it with DOM APIs (`textContent`, `createElement`) and never `innerHTML`, so the CSP can forbid inline script. A subtle watermark shows "Confidential — shared with <name/email> under NDA" as a deterrent.
-5. On 401/403 the browser clears the token and re-locks. On network or 5xx errors it stays locked and shows "Couldn't load — try again". It never falls back to anything cached.
-6. `{action:"logout"}` on the same webhook deletes the session server-side, and the browser clears `sessionStorage`.
-
-**Honest limits**: once an approved person sees content, they can copy or screenshot it. The NDA, the watermark and the audit log are the controls for that. Approval and revocation are the real gate.
-
-**Option (Q7)**: if the webhooks were also reachable on a first-party path (e.g. `it7q.com.au/webhook/*` routed to the same tunnel), sessions could use an `HttpOnly; Secure; SameSite=Strict` cookie instead of a bearer token. That's stronger against XSS, but it adds a route. The default plan uses a bearer token + strict CSP, because `hooks.nubius.com.au` is cross-site and browsers block third-party cookies.
-
-### 4.7 Data model (sketch, final in `n8n/sql/001_schema.sql`)
-
-```
-nda_requests  id uuid pk, email citext unique-when-active, name, org, reason, divisions text[],
-              nda_version, nda_sha256, signature_text, signed_at, signed_ip inet, signed_ua,
-              status (pending|approved|rejected|revoked), approved_at, approved_divisions text[],
-              expires_at, password_hash, revoked_at, created_at
-nda_review_tokens  token_sha256 pk, request_id fk, expires_at, used_at
-nda_sessions  token_sha256 pk, request_id fk, created_at, last_seen_at, expires_at, ip, ua
-nda_content   division pk, version, body jsonb, updated_at        -- seeded from gated/
-nda_rate      key (ip:/email:), window_start, count
-nda_audit     id, at, event, request_id null, ip, ua, detail jsonb
-```
-
-### 4.8 Things Chris will need to set up (written up in `deploy/`, nothing done by me)
-
-- n8n credentials, **referenced by name only** in the workflow JSON: `IT7Q Edge Header`, `Turnstile secret`, `Postgres it7q_web`, `Mail sender`.
-- n8n env var so the Code node can use crypto: `NODE_FUNCTION_ALLOW_BUILTIN=crypto` (a compose change under `/opt/it7q`, so Chris does it).
-- Postgres: create the `it7q_web` DB + role, then run the SQL files.
-- Cloudflare: Transform Rule (edge header), cache bypass for `/webhook/*`, WAF rate-limit rule, Turnstile widget (site key into the site, secret into n8n), optional Access policy on `nda-review`.
+### 4.8 Chris's server-side setup (documented in `deploy/`, not done by me)
+- n8n credentials, referenced by name only: `IT7Q Edge Header`, `Turnstile secret`, `Postgres it7q_web`, `Mail sender`. The build pack names **MXRoute** for mail; the from-address is still open (Q8).
+- n8n env var `NODE_FUNCTION_ALLOW_BUILTIN=crypto` (compose change under `/opt/it7q`).
+- Postgres `it7q_web` DB + role, then run the SQL.
+- Cloudflare: Transform Rule, cache bypass, rate-limit rule, Turnstile widget, optional Access on `nda-review`.
 
 ---
 
 ## 5. Image and media list
 
-Every image starts as a visible placeholder: a dashed box reading `PLACEHOLDER IMG-xx — description (w×h)`, with matching `alt` text. `docs/IMAGES.md` tracks status. **Public images must not reveal gated detail** (no prototype hardware, product screens or financials).
+Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (w×h)` + matching `alt`). **Public images must not reveal gated detail**: no schematics, board close-ups, admin screens or architecture diagrams.
 
-| ID | Asset | Where | Size / format | Notes |
-|---|---|---|---|---|
-| IMG-01 | IT7Q animated logo | Home hero | webm + mp4 (~100–150 KB) + poster PNG | From Chris's Elementals animation (Feb notes had optimised files; probably lost) |
-| IMG-02 | IT7Q logo, static | Header, footer, fallback | SVG | |
-| IMG-03 | Favicon set | All pages | SVG, 32 px PNG, 180 px apple-touch | |
-| IMG-04 | Social share (Open Graph) image | All pages | 1200×630 JPG | |
-| IMG-05–11 | Division logos ×7: MSP, OPUS, MENTIS, TEMPESTAS, PORTUS, FABRICUS, DOMUS | Home hero row, division pages | SVG | Feb notes designed a set; need the originals |
-| IMG-12–18 | Division teaser thumbnails ×7 | Divisions index + each division page | 1200×750 WebP/JPG | Public-safe imagery only |
-| IMG-19 | Portfolio screenshot: True Colours (p1) | Portfolio, home | 1600×1000 desktop + 750×1334 mobile | |
-| IMG-20 | Portfolio screenshot: Red Bird (p2) | Portfolio | as above | |
-| IMG-21 | Portfolio screenshot: Pine Rivers RSL (p3) | Portfolio | as above | |
-| IMG-22 | Portfolio screenshot: The Artist Apron (p4) | Portfolio | as above | |
-| IMG-23 | Portfolio screenshot: Burpengary Jets | Portfolio | as above | Consented |
-| IMG-24–28 | Client logos ×5 (same clients) | Portfolio cards | SVG/PNG | Confirm logo use is covered by consent |
-| IMG-29 | Photo of Chris | About | 800×800 JPG | |
-| IMG-30 | Workshop / workspace photo | About, Services | 1600×900 JPG | Make sure no screens or hardware give away gated detail |
-| IMG-31 | Home-user help photo (e.g. helping someone at home) | Home, Services | 1600×900 JPG | Real photo, or licensed stock if Chris prefers |
-| IMG-32 | Small-business help photo | Services | 1600×900 JPG | |
-| IMG-33 | Blog post cover images | Blog | 1200×630 JPG, one per post | |
-| IMG-34 | Tutorial/short video thumbnails | Blog | 1280×720 JPG | Link to YouTube rather than embed (no third-party scripts) |
-| G-01–07 | **Gated** division detail images (product photos, renders, diagrams) ×7 sets | `nda-content` only | WebP, ≤ 300 KB each | Live in `gated/`, served as data URIs via n8n, never in `dist/` |
-| G-08 | **Gated** investor presentation assets | `/investors/` via `nda-content` | — | Feb notes mention per-division HTML decks |
+**Site-wide**
+| ID | Asset | Where | Size / format |
+|---|---|---|---|
+| IMG-01 | Animated four-circle logo (Elementals animation) | Home hero | webm + mp4 + poster |
+| IMG-02 | Static logo | Header, footer | SVG |
+| IMG-03 | Favicon set | All | SVG, 32 px, 180 px |
+| IMG-04 | Open Graph share image | All | 1200×630 |
+| IMG-05–11 | Division logos ×7 | Hero row, division pages | SVG |
+| IMG-12–18 | Division header thumbnails ×7 | Divisions index, division pages | 1200×750 |
+| IMG-29 | Photo of Chris | About | 800×800 |
+| IMG-30 | Workshop/workspace photo (no gated detail visible) | About, Services | 1600×900 |
+| IMG-31 | Helping a home user | Home, Services | 1600×900 |
+| IMG-32 | Helping a small business | Services | 1600×900 |
+| IMG-33 | Blog covers (one per post) | Blog | 1200×630 |
+| IMG-34 | Tutorial video thumbnails | Blog | 1280×720 |
+
+**Portfolio**
+| ID | Asset | Size |
+|---|---|---|
+| IMG-19 | p1 True Colours screenshot | 1600×1000 + mobile 750×1334 |
+| IMG-20 | p2 Red Bird screenshot | as above |
+| IMG-21 | p3 Pine Rivers RSL screenshot | as above |
+| IMG-22 | p4 The Artist Apron screenshot | as above |
+| IMG-23 | p5 Burpengary Jets screenshot | as above |
+| IMG-24–28 | Client logos p1–p5 (if consent covers logos) | SVG/PNG |
+| (later) | Screenshots for any newly consented sites | as above |
+
+**Project cards** (one public-safe image each, 800×500 WebP; render, photo, product shot or illustrative graphic)
+| IDs | Count | Notes |
+|---|---|---|
+| P-MSP-01…05 | 4–5 | UI mock-ups or illustrative graphics, not real admin screens |
+| P-OPUS-01…12 | 9–12 | App screenshots with dummy data |
+| P-MEN-01…06 | 3–6 | Illustrative (agent "team" graphic etc.) |
+| P-TEM-01…02 | 2 | Enclosure/product photo OK; **no PCB/schematic close-ups** |
+| P-POR-01…03 | 1–3 | Concept art/signage, no real locations of people's homes |
+| P-FAB-001…022 | 19–22 | Product photos of F-001–F-019 (+ TABULAE/FORMAE/BIONICUS if kept) |
+| P-DOM-01 | 1 | Generic smart-home photo |
+
+That's roughly **39–51 project images**, depending on Q24.
+
+**Gated** (served only via `nda-content`, never in `dist/`): G-<project-id> detail images where useful, ≤ 300 KB each, as data URIs. Investor presentation assets: G-INV-xx.
 
 ---
 
 ## 6. Deployment approach
 
-**Recommended: Cloudflare Pages for the public static site** (Q2).
-- It keeps the public website **off Pantheon** entirely, so nothing new is exposed from the home box. Pantheon only answers the n8n webhooks through the existing tunnel.
+**Cloudflare Pages, free plan** (decided).
 - Private repo → Pages builds with `python3 tools/build.py` → publishes `dist/` only. `gated/`, `n8n/`, `deploy/` and `_source/` never publish.
-- `dist/_headers` carries strict security headers:
-  - `Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' https://hooks.nubius.com.au; img-src 'self' data:; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'`
-  - plus HSTS, `X-Content-Type-Options`, `Referrer-Policy: strict-origin-when-cross-origin` and `Permissions-Policy`.
-- A preview deploy (`*.pages.dev` or `staging.it7q.com.au`) is used for testing. Those origins get added to the n8n CORS allow-list during testing only.
-- The alternatives were self-hosting on Pantheon (needs a new public service from the home box, so I'm not recommending it) and DigitalOcean vps01 (mentioned in the Feb notes). Both are open in Q2.
+- `_headers`: strict CSP (`default-src 'self'`; scripts from self + `challenges.cloudflare.com`; `connect-src` self + `https://hooks.nubius.com.au`; `img-src 'self' data:`; `frame-ancestors 'none'`), HSTS, `nosniff`, `Referrer-Policy` and `Permissions-Policy`.
+- Preview deploys on `<project>.pages.dev` for testing.
+- Free-plan limits worth knowing: 500 builds/month and a 20,000-file limit. Neither is an issue at this size.
+- Release flow: branch → PR → Chris reviews → merge to `main` → Pages deploys.
 
-**Server side**: n8n workflow JSON + SQL + a Cloudflare checklist, all in the repo. Chris reviews, imports and deploys them. I'll include a test checklist Chris can run afterwards.
+### 6.1 DNS: records needed (listed only; Chris decides and makes the changes)
 
-**Release flow**: feature branches → PR → Chris reviews → merge to `main` → Pages deploys. No force-pushes, small commits.
+Domain registered at HostPapa. Chris is confirming whether the nameservers are HostPapa's or Cloudflare's. **This matters.** Cloudflare Pages can only serve the **apex** `it7q.com.au` when the zone's nameservers are on Cloudflare. With HostPapa nameservers, only subdomains like `www` can point at Pages (via CNAME), and the apex would need a redirect at HostPapa.
 
-**Verification before go-live** (fail-closed test cases):
-1. Submit the NDA → still locked, signer gets a copy, Chris gets the review email.
+| Record | Purpose | Points to | Notes |
+|---|---|---|---|
+| `it7q.com.au` (apex) | Main site | Pages project (`<project>.pages.dev`) | Needs Cloudflare nameservers. Added via Pages → Custom domains |
+| `www.it7q.com.au` | Main site | CNAME `<project>.pages.dev` | Works with either nameserver setup. Redirect www → apex (or the reverse) |
+| `p1`–`p5.it7q.com.au` | Portfolio sites | Wherever each site is hosted (today's `tc/rb/pr/aa` hosts?) | Need the hosting target for each (Q27) |
+| `downloads.it7q.com.au` | Existing (build pack) | unchanged | Confirm it stays |
+| MX / SPF / DKIM / DMARC for the n8n sender | NDA emails deliverable | Mail provider (MXRoute per build pack) | Check SPF/DKIM cover the sending domain once Q8 is answered |
+| `hooks.nubius.com.au` | Webhooks | Existing cloudflared tunnel | Different domain (`nubius.com.au`); no change |
+
+Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www`, the preview origin).
+
+### 6.2 Verification before go-live (fail-closed tests)
+1. Submit the NDA → still locked; signer copy + Chris's alert both arrive.
 2. Log in while pending → generic refusal.
-3. Approve → login works, content loads.
-4. Revoke → the next content request locks the page.
-5. Tamper with the token / let it expire → locked.
-6. Webhook unreachable (n8n stopped) → locked, with a friendly error.
-7. POST without Turnstile or without going through Cloudflare → rejected.
+3. Approve → login works, gated detail loads for granted divisions only.
+4. Revoke → the next request locks.
+5. Tampered or expired token → locked.
+6. n8n down → locked, with a friendly error.
+7. No Turnstile / not via Cloudflare → rejected.
 8. Rate limits trigger and recover.
-9. `tools/check.py`: no gated canary or text anywhere in `dist/`. A view-source spot check of every public page.
-10. Lighthouse/axe accessibility pass, links, mobile layout.
+9. `tools/check.py`: no gated canary/text, no unconsented portfolio entry and no financial figures in `dist/`. View-source spot checks.
+10. Accessibility (axe/Lighthouse), links, mobile.
 
 ---
 
 ## 7. Build phases (one step at a time)
 
-0. ✅ Repo, source commit, this plan.
-1. Scaffold `src/`, build/check tools, design tokens, base CSS, header/footer, placeholder component, Home.
-2. Public pages: About, Divisions index + 7 teaser pages, Portfolio, Services, Contact, Legal.
-3. NDA front end (`/access/`, locked panel, renderer) against a local mock that also simulates failures.
-4. n8n workflows + SQL + `deploy/` docs for Chris to review and deploy.
+0. ✅ Repo, source, plan v1. ✅ Financials removed from repo + history (GitHub cache purge pending, §10). ✅ Plan v2.
+1. Scaffold `src/`, build/check tools, brand tokens, base CSS, header/footer, placeholder component, Home.
+2. Public pages: About, Divisions index + 7 division pages with project cards from `projects.json`, Portfolio, Services, Contact, Legal.
+3. NDA front end (`/access/`, locked panels, renderer) against a local mock with failure simulation.
+4. Gated content: sanitised `gated/` JSON (after Q23), n8n workflows, SQL, `deploy/` docs for Chris to review.
 5. Blog, Downloads, Investors shell.
-6. QA (§6 tests), preview deploy, Chris walk-through, go live.
+6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live.
 
 ---
 
 ## 8. Open questions for Chris
 
-1. **Extra webhooks**: OK to add `nda-content` (gated content + logout) and `nda-review` (approve/reject/revoke) alongside `nda-submission` and `nda-login`? Without something like `nda-content`, gated content can't reach the browser without being in the page source.
-2. **Hosting**: Cloudflare Pages (recommended), Pantheon, or vps01? Where does `it7q.com.au` live today, and is its DNS on Cloudflare?
-3. **Bot protection**: is Cloudflare Turnstile OK? Or in-house only (honeypot + timing + rate limits), which is weaker against scripted abuse?
-4. **Approvals**: an emailed review link with confirm step, behind Cloudflare Access for your email only (recommended)? Or approve inside n8n over WireGuard only?
-5. **Login style**: a generated password emailed on approval (as in the Feb notes)? Or a passwordless one-time code emailed at each login (nothing to store or leak)?
-6. **Scope of approval**: does one approval unlock all seven divisions and the investor area, or do you want to pick divisions per person?
-7. **Sessions**: 8 h max / 1 h idle, tab-only, OK? Want the first-party cookie option (`it7q.com.au/webhook/*` route) instead?
-8. **Email sending**: what does n8n send mail through, and from which address (e.g. `noreply@it7q.com.au`)? Signed NDAs go to `chris@it7q.com.au`, confirmed.
-9. **Signer's copy**: is an HTML email + attached HTML record enough, or do you need a PDF? PDF needs a renderer (e.g. Gotenberg), which means a new container on Pantheon.
-10. **NDA text**: v2's text says "Mutual" but only binds the visitor, and it's scoped to investment/partnership. Do you want it reviewed or reworded to cover all division content? Is the 3-year term right, and should access end when it lapses?
-11. **Retention**: how long do we keep NDA records, IPs and audit logs? This goes in the privacy policy.
-12. **Portfolio links**: what exactly are "p1–p4"? E.g. `p1.it7q.com.au` → True Colours, replacing v2's `tc/rb/pr/aa.it7q.com.au`? What are the exact display names (Red Bird vs "Redbird Studio", The Artist Apron vs "The Artist's Apron", "True Colours DSS")? Does Burpengary Jets have a URL/label (p5?)?
-13. **OPUS content**: v2 says OPUS = software (Athena, Calendi, Nexus Chat, Hermes, Andromeda CE, Project Silo). The Feb notes say OPUS = BIONICUS, TABULAE, COLLOQUIUM, FORMAE, ANDROMEDA, FABRICUS App. Which is current?
-14. **Public teasers**: can teasers name products (e.g. "TEMPESTAS security appliances"), or should they be one-line and generic? v2 listed products publicly. I've assumed they all move behind the gate.
-15. **MSP + home users**: MSP is gated, but home users need to see what you offer. Is a generic public Services page OK, with MSP specifics (tiers, pricing, SLAs) gated?
-16. **Gated content source**: where does the full division and investor content come from now (the Aug build is lost)? Do the investor decks (tempestas.html etc.) still exist? OK to keep the gated content in this private repo under `gated/`?
-17. **Earlier feature list**: for launch, in or out: blog, downloads, Neo website-evaluation form, client portal login, admin portal login? I'd recommend blog + downloads in, and both portal logins parked (no public admin login page).
-18. **Facts check**: are the hero stats still right (45+ clients, 25+ years, 20 AI agents)? Phone 0411 753 366? Main email `enquiries@` or `info@`? Is ABN 43 922 878 001 and Kallangur QLD 4503 OK to publish?
-19. **Enquiry form**: create `website-enquiry` on the new base URL with the same protections? Where should enquiries go?
-20. **Analytics**: none (simplest, no consent banner), or cookieless Cloudflare Web Analytics?
-21. **Build step**: OK with a small stdlib-only Python script that stitches shared header/footer into plain HTML? The output is still pure HTML/CSS/JS. The alternative is hand-duplicating the nav in ~25 files.
-22. **Logo files**: do you still have the Elementals MP4 and the division logo SVGs?
+**Answered**: 1, 2, 12, 13, 16 (Chris); 5, 14 (settled by build pack). See §1a.
+
+**Still open from v1**
+3. **Bot protection**: Cloudflare Turnstile OK, or in-house only?
+4. **Approvals**: emailed review link behind Cloudflare Access (recommended), or in n8n over WireGuard only?
+6. **Approval scope**: all seven divisions + investors, or picked per person?
+7. **Sessions**: 8 h / 1 h idle, tab-only OK?
+8. **Mail**: MXRoute per the build pack. Which from-address (e.g. `noreply@it7q.com.au`)?
+9. **Signer's copy**: HTML email + HTML record, or PDF (needs a renderer container)?
+10. **NDA text**: "Mutual" but one-way and investor-scoped. Review/reword? Term 3 years, with access ending when it lapses?
+11. **Retention** of NDA records, IPs and audit logs?
+15. **MSP + home users**: generic public Services page, with MSP specifics gated, OK?
+17. **Launch scope**: blog + downloads in, portal logins parked?
+18. **Facts**: hero stats, phone, `enquiries@` vs `info@`, and publishing the ABN + suburb.
+19. **Enquiry form**: `website-enquiry` webhook with the same protections? Where should enquiries go?
+20. **Analytics**: none, or cookieless Cloudflare Web Analytics?
+21. **Build step**: stdlib-only Python build script OK?
+22. **Logo files**: Elementals MP4 + division SVGs still around?
+
+**New**
+23. **Gated detail is too detailed.** The build pack's "Detail (NDA)" blocks include internal ports, hostnames, repo URLs, WireGuard bindings and security architecture. NDA signers are outsiders, and the box has been compromised once before. I recommend writing the gated detail at feature/business level and leaving infrastructure specifics out entirely. OK? Related: should the build pack itself be committed to this private repo, or moved to `/srv/work/it7q-private` like the financials? It's **untracked** until you decide.
+24. **Placement / keep-or-drop** for the **?** items in §2.1: IT7Q SysMon, Andromeda CE/companion, Aegir SecureStart, FABRICUS App, FORTUNA, COLLOQUIUM, v2 Automations, PORTUS App, PORTUS Jnr, TABULAE, FORMAE, BIONICUS. Also: do Persephone's named agents get their own cards?
+25. **TEMPESTAS tier names**: three sets exist (business plan: SCUTUM/PARMA/CLIPEUS/THUREOS/ASPIS; Jan spec: Buckler…Aegis; v2: Scout/Sentinel/Guard), and SCUTUM is also the MSP AV/EDR working name. Which is current?
+26. **FABRICUS F-001–F-019**: names, one-liners and photos. Launch with placeholders for any not ready?
+27. **Portfolio**: is `TCDSS_Website` = p1 True Colours, and `PRRSL_Website` = p3 Pine Rivers RSL? Where is each p1–p5 site hosted (for the DNS list)? Consent status for `BlueVibes_Website` and `AustPathClub`? Any other built sites I don't know about?
+28. **Public prices**: the build pack's public teasers include "from" prices (managed AV, TEMPESTAS). Show prices on public cards, or keep them gated?
 
 ---
 
 ## 9. Parked (pins)
-
-- Client portal dashboard / SSO to hosted services (Jan spec). It needs real auth design and shouldn't advertise internal hostnames.
-- Admin portal login (Google Workspace / dash.nubius.com.au links). Better as a bookmark behind Cloudflare Access than as a public page.
+- Client portal dashboard / SSO (Jan spec): needs its own auth design and shouldn't advertise internal hostnames.
+- Admin portal login: better as a bookmark behind Cloudflare Access.
 - Neo website-evaluation workflow.
-- WordPress version (Feb notes), superseded by the static brief.
+- WordPress version: superseded.
+
+---
+
+## 10. Repo housekeeping log
+- **26 Oct 2026: investor financials removed.**
+  - The Jan spec and Feb redesign transcripts were moved to `/srv/work/it7q-private` and git-ignored.
+  - History was rewritten (authorised one-off) and force-pushed. `main` now has no commit containing them.
+  - A backup bundle of the old history is in `/srv/work/it7q-private` (contains financials; delete once you're happy).
+  - **Pending (Chris):** GitHub still serves the old, now-unreferenced commit `b39954a` (and its parent) if fetched by exact SHA. Purging that needs a GitHub Support request (sensitive data removal: ask them to garbage-collect the repo and drop cached views). The alternative is deleting and recreating the repo, which needs the deploy key re-added.
