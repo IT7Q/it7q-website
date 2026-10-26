@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT7Q Cyber-Tech Services | Smart Tech. Simple Terms. Serious Security.</title>
+<meta name="description" content="IT7Q Cyber-Tech Services — Queensland-based MSP delivering cybersecurity, AI automation, software development, and smart technology solutions for homes, businesses, and communities.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <a href="#home" class="nav-logo">
+      <span class="logo-it">IT</span><span class="logo-7q">7Q</span>
+      <span class="logo-tagline">Cyber-Tech Services</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#divisions">Divisions</a></li>
+      <li><a href="#products">Products</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#automations">Automations</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <button class="btn-investor" onclick="openNDA()">Investor Portal</button>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="#home" onclick="toggleMobileNav()">Home</a>
+    <a href="#divisions" onclick="toggleMobileNav()">Divisions</a>
+    <a href="#products" onclick="toggleMobileNav()">Products</a>
+    <a href="#portfolio" onclick="toggleMobileNav()">Portfolio</a>
+    <a href="#automations" onclick="toggleMobileNav()">Automations</a>
+    <a href="#contact" onclick="toggleMobileNav()">Contact</a>
+    <button class="btn-investor" onclick="openNDA(); toggleMobileNav()">Investor Portal</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Queensland-Based · Kallangur QLD 4503</div>
+    <h1 class="hero-title">
+      Smart Tech.<br>
+      <span class="accent-cyan">Simple Terms.</span><br>
+      Serious Security.
+    </h1>
+    <p class="hero-sub">IT7Q Cyber-Tech Services delivers enterprise-grade cybersecurity, AI automation, custom software, and managed IT solutions — built for real Australians, not corporate boardrooms.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Get in Touch</a>
+      <a href="#divisions" class="btn-outline">Explore Divisions</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">45+</span><span class="stat-label">Managed Clients</span></div>
+      <div class="stat"><span class="stat-num">7</span><span class="stat-label">Divisions</span></div>
+      <div class="stat"><span class="stat-num">25+</span><span class="stat-label">Years Experience</span></div>
+      <div class="stat"><span class="stat-num">20</span><span class="stat-label">AI Agents Active</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hex-grid">
+      <div class="hex hex-1"><span>MENTIS</span></div>
+      <div class="hex hex-2"><span>OPUS</span></div>
+      <div class="hex hex-3"><span>TEMPESTAS</span></div>
+      <div class="hex hex-4"><span>PORTUS</span></div>
+      <div class="hex hex-5"><span>FABRICUS</span></div>
+      <div class="hex hex-6"><span>DOMUS</span></div>
+      <div class="hex hex-center"><span class="hex-it7q">IT7Q</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION STATEMENT -->
+<section class="mission" id="mission">
+  <div class="container">
+    <div class="mission-inner">
+      <div class="mission-accent"></div>
+      <h2 class="mission-title">Our Mission</h2>
+      <p class="mission-text">
+        At IT7Q Cyber-Tech Services, we believe technology should empower — not intimidate. Our mission is to deliver professional-grade cybersecurity, intelligent automation, and innovative software to everyday Australians, small businesses, community organisations, and homeowners who deserve the same protection and capability as the big end of town — without the corporate price tag or jargon.
+      </p>
+      <p class="mission-text">
+        We build in plain English. We support with patience. We secure without compromise. Whether you're a pensioner wanting to stay safe online, a small business needing smarter systems, or a community organisation protecting your members — IT7Q is your technology partner.
+      </p>
+      <div class="mission-pillars">
+        <div class="pillar"><div class="pillar-icon">🛡️</div><span>Security First</span></div>
+        <div class="pillar"><div class="pillar-icon">🤝</div><span>Community Focused</span></div>
+        <div class="pillar"><div class="pillar-icon">🇦🇺</div><span>Australian Made</span></div>
+        <div class="pillar"><div class="pillar-icon">💡</div><span>Plain English</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVISIONS -->
+<section class="divisions" id="divisions">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Our <span class="accent-cyan">Divisions</span></h2>
+      <p class="section-sub">Seven specialised divisions, one unified mission</p>
+    </div>
+    <div class="divisions-grid">
+
+      <div class="division-card" data-div="msp">
+        <div class="div-bar" style="background:#00BCD4"></div>
+        <div class="div-icon">🖥️</div>
+        <h3>IT7Q MSP</h3>
+        <p class="div-latin">Core Managed Services</p>
+        <p class="div-desc">Your full-service IT partner. Remote monitoring, helpdesk support, patch management, network management, and on-site assistance for businesses of all sizes across South-East Queensland.</p>
+        <div class="div-tags"><span>Remote Support</span><span>Network Management</span><span>Helpdesk</span></div>
+      </div>
+
+      <div class="division-card" data-div="mentis">
+        <div class="div-bar" style="background:#7C3AED"></div>
+        <div class="div-icon">🧠</div>
+        <h3>MENTIS</h3>
+        <p class="div-latin">Latin: Mind / Intelligence</p>
+        <p class="div-desc">AI development, custom software, and automation solutions. From n8n workflow automation to full AI agent ecosystems — we build intelligent systems that work while you sleep.</p>
+        <div class="div-tags"><span>AI Agents</span><span>Automation</span><span>Custom Dev</span></div>
+      </div>
+
+      <div class="division-card" data-div="opus">
+        <div class="div-bar" style="background:#F59E0B"></div>
+        <div class="div-icon">📦</div>
+        <h3>OPUS</h3>
+        <p class="div-latin">Latin: Work / Creation</p>
+        <p class="div-desc">Our software products division. Home of Athena Browser, Calendi, Nexus Chat, Hermes Mail, Andromeda CE, and the full Project Silo suite — privacy-first software built for real people.</p>
+        <div class="div-tags"><span>Software Products</span><span>SaaS</span><span>Privacy-First</span></div>
+      </div>
+
+      <div class="division-card" data-div="tempestas">
+        <div class="div-bar" style="background:#EF4444"></div>
+        <div class="div-icon">⚡</div>
+        <h3>TEMPESTAS</h3>
+        <p class="div-latin">Latin: Storm / Power</p>
+        <p class="div-desc">Cybersecurity hardware appliances. Five tiers of Australian-assembled, CM5-powered network defenders — from home users to enterprise — with medieval shield aesthetics and zero-compromise security.</p>
+        <div class="div-tags"><span>Hardware</span><span>Cybersecurity</span><span>Aussie-Made</span></div>
+      </div>
+
+      <div class="division-card" data-div="portus">
+        <div class="div-bar" style="background:#10B981"></div>
+        <div class="div-icon">🏘️</div>
+        <h3>PORTUS</h3>
+        <p class="div-latin">Latin: Haven / Safe Harbour</p>
+        <p class="div-desc">Community safety technology. Modernising Neighbourhood Watch with GPS-enabled safe havens, panic button integration, and verified community networks — protecting the people who matter most.</p>
+        <div class="div-tags"><span>Community Safety</span><span>GPS Tech</span><span>Neighbourhood Watch</span></div>
+      </div>
+
+      <div class="division-card" data-div="fabricus">
+        <div class="div-bar" style="background:#F97316"></div>
+        <div class="div-icon">🔩</div>
+        <h3>FABRICUS</h3>
+        <p class="div-latin">Latin: Craftsman / Maker</p>
+        <p class="div-desc">In-house 3D printing, CNC routing, and hardware manufacturing. We design and fabricate custom enclosures, prototypes, and components for TEMPESTAS and client projects.</p>
+        <div class="div-tags"><span>3D Printing</span><span>CNC Routing</span><span>Prototyping</span></div>
+      </div>
+
+      <div class="division-card" data-div="domus">
+        <div class="div-bar" style="background:#8B5CF6"></div>
+        <div class="div-icon">🏠</div>
+        <h3>DOMUS</h3>
+        <p class="div-latin">Latin: Home</p>
+        <p class="div-desc">Smart home technology and residential IT. Automation, security cameras, smart networking, and IoT integration — making your home work smarter without making your head hurt.</p>
+        <div class="div-tags"><span>Smart Home</span><span>Home Security</span><span>IoT</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products" id="products">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Our <span class="accent-amber">Products</span></h2>
+      <p class="section-sub">Built in-house. Built for Australians.</p>
+    </div>
+    <div class="products-tabs">
+      <button class="prod-tab active" onclick="showProdTab('software')">Software</button>
+      <button class="prod-tab" onclick="showProdTab('hardware')">Hardware</button>
+      <button class="prod-tab" onclick="showProdTab('ai')">AI Systems</button>
+      <button class="prod-tab" onclick="showProdTab('community')">Community</button>
+    </div>
+    <div class="products-grid" id="prod-software">
+      <div class="product-card">
+        <div class="prod-status live">Live</div>
+        <div class="prod-icon">🌐</div>
+        <h3>Athena Browser</h3>
+        <p>Privacy-first Electron browser with ad blocking, credential autofill via Vaultwarden, and embedded IT7Q apps. Windows + Android.</p>
+        <div class="prod-tags"><span>Electron</span><span>Privacy</span><span>Windows/Android</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status live">Live</div>
+        <div class="prod-icon">📅</div>
+        <h3>Calendi</h3>
+        <p>Shared calendar platform designed for organisations. Currently powering Pine Rivers RSL Sub Branch with JWT auth and ICS import.</p>
+        <div class="prod-tags"><span>React</span><span>Multi-User</span><span>ICS Sync</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status live">Live</div>
+        <div class="prod-icon">💬</div>
+        <h3>Nexus Chat</h3>
+        <p>Self-hosted internal communications platform. Real-time messaging, agent channels, webhook integration — your Google Chat alternative.</p>
+        <div class="prod-tags"><span>FastAPI</span><span>WebSocket</span><span>Self-Hosted</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status live">Live</div>
+        <div class="prod-icon">📧</div>
+        <h3>Hermes Mail</h3>
+        <p>Privacy-focused desktop email client. IMAP auto-detection, smart folder management, Nexus sidebar integration. Windows + Android.</p>
+        <div class="prod-tags"><span>Electron</span><span>IMAP</span><span>Privacy</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🔮</div>
+        <h3>Andromeda CE</h3>
+        <p>Consumer AI companion with multi-provider support (Claude, ChatGPT, Gemini). Four subscription tiers, aurora teal/amber theme.</p>
+        <div class="prod-tags"><span>Electron</span><span>Multi-AI</span><span>Consumer</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🏢</div>
+        <h3>Project Silo</h3>
+        <p>Privacy-first Google Workspace alternative suite. Mail, Calendar, Drive, Chat, Wiki, and Docs — all self-hosted, all unified.</p>
+        <div class="prod-tags"><span>Suite</span><span>Privacy</span><span>Self-Hosted</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status live">Live</div>
+        <div class="prod-icon">🎫</div>
+        <h3>IT7Q Support Portal</h3>
+        <p>Client helpdesk portal with ticket management, knowledge base, and AI agent integration. Flutter + FastAPI.</p>
+        <div class="prod-tags"><span>Flutter</span><span>FastAPI</span><span>Helpdesk</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status live">Live</div>
+        <div class="prod-icon">📊</div>
+        <h3>IT7Q SysMon</h3>
+        <p>Real-time server health monitoring with time-series PostgreSQL storage, Grafana dashboards, and Cloudflare Tunnel exposure.</p>
+        <div class="prod-tags"><span>FastAPI</span><span>Monitoring</span><span>Postgres</span></div>
+      </div>
+    </div>
+    <div class="products-grid hidden" id="prod-hardware">
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🛡️</div>
+        <h3>TEMPESTAS Tier 1 — Scout</h3>
+        <p>Entry-level home cybersecurity appliance. Raspberry Pi CM5-powered, Pi-hole DNS, basic firewall. Starting at $149 AUD.</p>
+        <div class="prod-tags"><span>CM5</span><span>Home</span><span>$149</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🛡️</div>
+        <h3>TEMPESTAS Tier 2 — Sentinel</h3>
+        <p>Small business firewall and VPN appliance. Dual GbE, OLED status display, WireGuard VPN, CrowdSec IDS. $299 AUD.</p>
+        <div class="prod-tags"><span>CM5</span><span>SMB</span><span>$299</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🛡️</div>
+        <h3>TEMPESTAS Tier 3 — Guard</h3>
+        <p>Advanced multi-site security appliance with 7" IPS touchscreen, Banana Pi BPI-R4, and full network management suite. $599 AUD.</p>
+        <div class="prod-tags"><span>BPI-R4</span><span>Enterprise</span><span>$599</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🔧</div>
+        <h3>Custom PCB Design</h3>
+        <p>Australian-designed carrier boards for Raspberry Pi CM5. KiCad-designed, JLCPCB prototyped — TEMPESTAS standardised compute platform.</p>
+        <div class="prod-tags"><span>KiCad</span><span>PCB</span><span>Aussie-Designed</span></div>
+      </div>
+    </div>
+    <div class="products-grid hidden" id="prod-ai">
+      <div class="product-card">
+        <div class="prod-status live">Active</div>
+        <div class="prod-icon">🤖</div>
+        <h3>Project Persephone</h3>
+        <p>20-agent AI ecosystem running on n8n. Named Matrix characters handle everything from patch management to social media, invoice processing to security monitoring.</p>
+        <div class="prod-tags"><span>n8n</span><span>20 Agents</span><span>Automated</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status live">Active</div>
+        <div class="prod-icon">📈</div>
+        <h3>FORTUNA</h3>
+        <p>Autonomous investment monitoring agent tracking copper and AI sector ETFs. 2-month monitoring phase, paper trading, transitioning to live July 2026.</p>
+        <div class="prod-tags"><span>Alpaca API</span><span>Trading</span><span>Autonomous</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🔗</div>
+        <h3>Project JANUS</h3>
+        <p>Unified messaging gateway connecting WhatsApp, Facebook Messenger, Instagram, Telegram, Discord, and Teams into one Nexus interface.</p>
+        <div class="prod-tags"><span>Meta API</span><span>Unified</span><span>Multi-Platform</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">🛡️</div>
+        <h3>Aegir — SecureStart</h3>
+        <p>Windows privacy and security setup tool. One-click telemetry removal, bloatware uninstall, driver updates, and guided software installation for non-technical users.</p>
+        <div class="prod-tags"><span>Electron</span><span>Windows</span><span>Privacy</span></div>
+      </div>
+    </div>
+    <div class="products-grid hidden" id="prod-community">
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">📍</div>
+        <h3>PORTUS App</h3>
+        <p>GPS-enabled community safety network. Verified safe havens, panic button with 000 integration, Blue Card verification, neighbourhood watch modernised for smartphones.</p>
+        <div class="prod-tags"><span>Flutter</span><span>GPS</span><span>Safety</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">👶</div>
+        <h3>PORTUS Jnr</h3>
+        <p>Child-safe version of PORTUS with simplified interface, parent monitoring, and school-aware safe zone alerts.</p>
+        <div class="prod-tags"><span>Flutter</span><span>Child Safety</span><span>School-Aware</span></div>
+      </div>
+      <div class="product-card">
+        <div class="prod-status dev">In Development</div>
+        <div class="prod-icon">📅</div>
+        <h3>Calendis</h3>
+        <p>Multi-tenant consumer calendar platform for sale. Self-registration, user-configurable calendars, generic event fields — the commercial version of Calendi.</p>
+        <div class="prod-tags"><span>Multi-Tenant</span><span>SaaS</span><span>Consumer</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section class="portfolio" id="portfolio">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Our <span class="accent-cyan">Portfolio</span></h2>
+      <p class="section-sub">Websites we've built and manage for Queensland clients</p>
+    </div>
+    <div class="portfolio-grid">
+
+      <div class="portfolio-card">
+        <div class="portfolio-img portfolio-pr">
+          <div class="port-overlay">
+            <a href="https://pr.it7q.com.au" target="_blank" class="port-visit">Visit Site →</a>
+          </div>
+          <div class="port-badge">Anchor Client</div>
+        </div>
+        <div class="portfolio-info">
+          <h3>Pine Rivers RSL Sub Branch</h3>
+          <p>Full managed services including custom calendar platform (Calendi), PABX management, 3CX telephony, cybersecurity, and ongoing IT support for Queensland's Pine Rivers RSL community.</p>
+          <div class="port-tags"><span>WordPress</span><span>Managed IT</span><span>3CX</span><span>Calendi</span></div>
+          <a href="https://pr.it7q.com.au" target="_blank" class="port-link">pr.it7q.com.au →</a>
+        </div>
+      </div>
+
+      <div class="portfolio-card">
+        <div class="portfolio-img portfolio-tc">
+          <div class="port-overlay">
+            <a href="https://tc.it7q.com.au" target="_blank" class="port-visit">Visit Site →</a>
+          </div>
+        </div>
+        <div class="portfolio-info">
+          <h3>True Colours DSS</h3>
+          <p>Website design, hosting, and managed IT services for this Queensland disability support services provider. Clean, accessible design focused on community connection.</p>
+          <div class="port-tags"><span>WordPress</span><span>Accessibility</span><span>Hosting</span></div>
+          <a href="https://tc.it7q.com.au" target="_blank" class="port-link">tc.it7q.com.au →</a>
+        </div>
+      </div>
+
+      <div class="portfolio-card">
+        <div class="portfolio-img portfolio-rb">
+          <div class="port-overlay">
+            <a href="https://rb.it7q.com.au" target="_blank" class="port-visit">Visit Site →</a>
+          </div>
+        </div>
+        <div class="portfolio-info">
+          <h3>Redbird Studio</h3>
+          <p>Creative studio website with portfolio showcase, booking integration, and brand-matched design. Hosted and managed by IT7Q.</p>
+          <div class="port-tags"><span>WordPress</span><span>Portfolio</span><span>Design</span></div>
+          <a href="https://rb.it7q.com.au" target="_blank" class="port-link">rb.it7q.com.au →</a>
+        </div>
+      </div>
+
+      <div class="portfolio-card">
+        <div class="portfolio-img portfolio-aa">
+          <div class="port-overlay">
+            <a href="https://aa.it7q.com.au" target="_blank" class="port-visit">Visit Site →</a>
+          </div>
+        </div>
+        <div class="portfolio-info">
+          <h3>The Artist's Apron</h3>
+          <p>E-commerce enabled art supply and workshop website. WooCommerce integration, inventory management, and mobile-responsive design.</p>
+          <div class="port-tags"><span>WordPress</span><span>WooCommerce</span><span>E-Commerce</span></div>
+          <a href="https://aa.it7q.com.au" target="_blank" class="port-link">aa.it7q.com.au →</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="portfolio-note">
+      <p>💡 All client sites are hosted as static HTML/CSS — fast, secure, and maintainable. No WordPress vulnerabilities, no plugin bloat.</p>
+      <a href="#contact" class="btn-outline-sm">Want a website like this? →</a>
+    </div>
+  </div>
+</section>
+
+<!-- AUTOMATIONS -->
+<section class="automations" id="automations">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">AI <span class="accent-amber">Automations</span></h2>
+      <p class="section-sub">Real automations we've built — and how they can save your business hours every week</p>
+    </div>
+    <div class="auto-grid">
+
+      <div class="auto-card">
+        <div class="auto-icon">🔄</div>
+        <h3>Automated Patch Management</h3>
+        <p class="auto-tagline">Save 6–8 hours per week</p>
+        <p>Our AI agents scan all managed clients daily at 6AM, vet every Windows update against known vulnerability databases, score risk levels automatically, and only alert a human when something genuinely needs attention. Approved patches deploy themselves.</p>
+        <div class="auto-benefit">
+          <span class="benefit-tag">🏢 Perfect for SMBs with multiple computers</span>
+        </div>
+      </div>
+
+      <div class="auto-card">
+        <div class="auto-icon">📱</div>
+        <h3>Social Media Content Pipeline</h3>
+        <p class="auto-tagline">Save 4–6 hours per week</p>
+        <p>Agents scrape weekly specials from suppliers, automatically write platform-specific ad copy (different tone for Facebook vs LinkedIn vs Instagram), queue drafts for your review, and post once approved. No copywriter needed.</p>
+        <div class="auto-benefit">
+          <span class="benefit-tag">🛒 Perfect for retail and trade businesses</span>
+        </div>
+      </div>
+
+      <div class="auto-card">
+        <div class="auto-icon">📋</div>
+        <h3>Invoice & PABX Processing</h3>
+        <p class="auto-tagline">Save 3–4 hours per month</p>
+        <p>Automatically parse phone company invoices, apply client-specific markup rules, calculate GST, and generate ready-to-send invoices in seconds. What used to take an hour per client now takes seconds per batch.</p>
+        <div class="auto-benefit">
+          <span class="benefit-tag">📞 Perfect for businesses with large phone bills</span>
+        </div>
+      </div>
+
+      <div class="auto-card">
+        <div class="auto-icon">📧</div>
+        <h3>Email Triage & Response</h3>
+        <p class="auto-tagline">Save 2–3 hours per day</p>
+        <p>AI reads incoming enquiries, categorises urgency, drafts responses in your business's tone, and routes to the right person. High-priority items get immediate alerts. Routine enquiries get professional auto-responses while you focus on real work.</p>
+        <div class="auto-benefit">
+          <span class="benefit-tag">📨 Perfect for service businesses with high email volume</span>
+        </div>
+      </div>
+
+      <div class="auto-card">
+        <div class="auto-icon">🔒</div>
+        <h3>Security Monitoring & Alerting</h3>
+        <p class="auto-tagline">24/7 protection, zero manual effort</p>
+        <p>Continuous monitoring of login attempts, network anomalies, and threat indicators across all managed systems. Automatic blocking of known bad actors via CrowdSec, with human-readable daily reports every morning.</p>
+        <div class="auto-benefit">
+          <span class="benefit-tag">🛡️ Perfect for any business with internet-connected systems</span>
+        </div>
+      </div>
+
+      <div class="auto-card">
+        <div class="auto-icon">📊</div>
+        <h3>Compliance & Reporting</h3>
+        <p class="auto-tagline">Never miss a deadline again</p>
+        <p>Automated monthly compliance reports, backup verification, service level agreement tracking, and client digest emails — all generated and delivered without lifting a finger. Board reports, incident summaries, health dashboards — automatic.</p>
+        <div class="auto-benefit">
+          <span class="benefit-tag">🏛️ Perfect for not-for-profits and community organisations</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="auto-cta">
+      <p>Interested in automation for your business? We can custom-build n8n workflows tailored to your specific processes.</p>
+      <a href="#contact" class="btn-primary">Book a Free Automation Review</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Get in <span class="accent-cyan">Touch</span></h2>
+      <p class="section-sub">No jargon. No pressure. Just a straight conversation about your tech.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Contact IT7Q</h3>
+        <div class="contact-item">
+          <div class="ci-icon">📧</div>
+          <div>
+            <p class="ci-label">Email</p>
+            <a href="mailto:enquiries@it7q.com.au">enquiries@it7q.com.au</a>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon">📍</div>
+          <div>
+            <p class="ci-label">Location</p>
+            <p>Kallangur, QLD 4503<br>Serving South-East Queensland</p>
+          </div>
+        </div>
+        <div class="contact-socials">
+          <p class="ci-label">Message Us Directly</p>
+          <div class="social-btns">
+            <a href="https://wa.me/61411753366" target="_blank" class="social-btn whatsapp">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+            <a href="https://m.me/IT7QCyberTech" target="_blank" class="social-btn messenger">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.654V24l4.088-2.242c1.092.301 2.246.464 3.443.464 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8l3.131 3.259L19.752 8l-6.561 6.963z"/></svg>
+              Facebook Messenger
+            </a>
+          </div>
+        </div>
+        <div class="contact-hours">
+          <p class="ci-label">Response Times</p>
+          <p>Email enquiries: within 4 business hours<br>Managed clients: 15-minute SLA</p>
+        </div>
+      </div>
+      <div class="contact-form-wrap">
+        <form class="contact-form" id="contactForm" onsubmit="submitForm(event)">
+          <h3>Send an Enquiry</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" id="fname" placeholder="Chris Smith" required>
+            </div>
+            <div class="form-group">
+              <label>Business Name</label>
+              <input type="text" id="fbiz" placeholder="Smith's Plumbing (optional)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="femail" placeholder="chris@yourbuisness.com.au" required>
+          </div>
+          <div class="form-group">
+            <label>What can we help with?</label>
+            <select id="ftype">
+              <option value="">Select a service...</option>
+              <option>Managed IT Services</option>
+              <option>Website Design & Hosting</option>
+              <option>Cybersecurity</option>
+              <option>Smart Home / IoT</option>
+              <option>AI Automation</option>
+              <option>Software Development</option>
+              <option>Investment / Partnership</option>
+              <option>General Enquiry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tell us more</label>
+            <textarea id="fmsg" rows="4" placeholder="Give us a brief description of what you're after..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary form-submit">Send Enquiry</button>
+          <p class="form-note">We typically respond within 4 business hours. No sales calls unless you ask.</p>
+          <div class="form-success hidden" id="formSuccess">✅ Message sent! We'll be in touch soon.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><span class="logo-it">IT</span><span class="logo-7q">7Q</span></div>
+        <p>IT7Q Cyber-Tech Services<br>ABN: 43 922 878 001<br>Kallangur QLD 4503</p>
+        <p class="footer-tagline">Smart Tech. Simple Terms. Serious Security.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Divisions</h4>
+        <ul>
+          <li>IT7Q MSP</li>
+          <li>MENTIS (Intelligence)</li>
+          <li>OPUS (Creation)</li>
+          <li>TEMPESTAS (Storm)</li>
+          <li>PORTUS (Haven)</li>
+          <li>FABRICUS (Craftsman)</li>
+          <li>DOMUS (Home)</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Products</h4>
+        <ul>
+          <li>Athena Browser</li>
+          <li>Calendi / Calendis</li>
+          <li>Nexus Chat</li>
+          <li>Hermes Mail</li>
+          <li>TEMPESTAS Hardware</li>
+          <li>PORTUS Safety App</li>
+          <li>Andromeda CE</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Portfolio</h4>
+        <ul>
+          <li><a href="https://pr.it7q.com.au" target="_blank">Pine Rivers RSL</a></li>
+          <li><a href="https://tc.it7q.com.au" target="_blank">True Colours DSS</a></li>
+          <li><a href="https://rb.it7q.com.au" target="_blank">Redbird Studio</a></li>
+          <li><a href="https://aa.it7q.com.au" target="_blank">The Artist's Apron</a></li>
+        </ul>
+        <h4 style="margin-top:1.5rem">Contact</h4>
+        <ul>
+          <li><a href="mailto:enquiries@it7q.com.au">enquiries@it7q.com.au</a></li>
+          <li><a href="https://wa.me/61411753366" target="_blank">WhatsApp</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 IT7Q Cyber-Tech Services. All rights reserved. ABN 43 922 878 001</p>
+      <div class="footer-legal">
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- NDA MODAL -->
+<div class="modal-overlay" id="ndaModal" onclick="closeNDAOnOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeNDA()">×</button>
+    <div class="modal-header">
+      <h2>Investor & Partner Portal</h2>
+      <p>Please review and accept our Mutual Non-Disclosure Agreement before accessing confidential investor materials.</p>
+    </div>
+
+    <div id="ndaStep1">
+      <div class="nda-text" id="ndaText">
+        <h3>MUTUAL NON-DISCLOSURE AGREEMENT</h3>
+        <p>This Mutual Non-Disclosure Agreement ("Agreement") is entered into as of the date of digital acceptance below, by and between:</p>
+        <p><strong>IT7Q Cyber-Tech Services</strong> (ABN: 43 922 878 001), of Kallangur, Queensland, Australia ("Disclosing Party")</p>
+        <p>AND</p>
+        <p>The individual or entity accepting this agreement electronically ("Receiving Party")</p>
+
+        <h4>1. PURPOSE</h4>
+        <p>The parties wish to explore a potential business relationship concerning investment, partnership, or commercial engagement with IT7Q Cyber-Tech Services and its divisions (the "Purpose"). In connection with the Purpose, either party may disclose Confidential Information to the other party.</p>
+
+        <h4>2. CONFIDENTIAL INFORMATION</h4>
+        <p>"Confidential Information" means any information disclosed by either party, including but not limited to: business plans, financial projections, product designs, technical specifications, customer lists, pricing strategies, marketing plans, trade secrets, intellectual property, and any materials marked as confidential.</p>
+
+        <h4>3. OBLIGATIONS</h4>
+        <p>Each party agrees to: (a) hold the other party's Confidential Information in strict confidence; (b) not disclose the Confidential Information to any third party without prior written consent; (c) use the Confidential Information solely for the Purpose; (d) protect the Confidential Information with at least the same degree of care used to protect its own confidential information, but no less than reasonable care.</p>
+
+        <h4>4. EXCLUSIONS</h4>
+        <p>These obligations do not apply to information that: (a) is or becomes publicly available through no breach of this Agreement; (b) was known to the Receiving Party before disclosure; (c) is independently developed without use of Confidential Information; (d) is required to be disclosed by law or court order.</p>
+
+        <h4>5. TERM</h4>
+        <p>This Agreement shall remain in effect for a period of three (3) years from the date of acceptance, or until the parties enter into a definitive agreement superseding this NDA.</p>
+
+        <h4>6. GOVERNING LAW</h4>
+        <p>This Agreement shall be governed by the laws of Queensland, Australia. Any disputes shall be subject to the exclusive jurisdiction of Queensland courts.</p>
+
+        <h4>7. DIGITAL ACCEPTANCE</h4>
+        <p>By entering your details and clicking "I Agree", you acknowledge that you have read, understood, and agree to be bound by the terms of this Agreement. Your name, email, and the date/time of acceptance will be recorded.</p>
+      </div>
+
+      <div class="nda-accept">
+        <div class="nda-fields">
+          <input type="text" id="ndaName" placeholder="Full Name *" required>
+          <input type="email" id="ndaEmail" placeholder="Email Address *" required>
+          <input type="text" id="ndaOrg" placeholder="Company / Organisation (optional)">
+        </div>
+        <label class="nda-checkbox">
+          <input type="checkbox" id="ndaCheck">
+          <span>I have read and agree to the Mutual Non-Disclosure Agreement above</span>
+        </label>
+        <button class="btn-primary nda-submit" onclick="submitNDA()">I Agree — Access Investor Portal</button>
+        <p class="nda-note">Your acceptance is recorded with timestamp and will be stored securely.</p>
+      </div>
+    </div>
+
+    <div id="ndaStep2" class="hidden">
+      <div class="investor-portal">
+        <div class="portal-welcome">
+          <div class="portal-check">✅</div>
+          <h3>NDA Accepted — Welcome to the IT7Q Investor Portal</h3>
+          <p>You now have access to our confidential investor materials. Please treat all documents in accordance with the NDA you have just accepted.</p>
+        </div>
+        <div class="portal-cards">
+          <a href="#" class="portal-doc" onclick="docPlaceholder(event)">
+            <div class="pd-icon">📋</div>
+            <div>
+              <h4>IT7Q Master Business Plan v1.0</h4>
+              <p>Full company overview, division plans, projections</p>
+            </div>
+            <span class="pd-arrow">→</span>
+          </a>
+          <a href="#" class="portal-doc" onclick="docPlaceholder(event)">
+            <div class="pd-icon">💰</div>
+            <div>
+              <h4>Financial Projections 2026–2029</h4>
+              <p>Three-year revenue model across all divisions</p>
+            </div>
+            <span class="pd-arrow">→</span>
+          </a>
+          <a href="#" class="portal-doc" onclick="docPlaceholder(event)">
+            <div class="pd-icon">🛡️</div>
+            <div>
+              <h4>TEMPESTAS Hardware Investor Deck</h4>
+              <p>Hardware roadmap, BOM, FCC positioning, supply chain</p>
+            </div>
+            <span class="pd-arrow">→</span>
+          </a>
+          <a href="#" class="portal-doc" onclick="docPlaceholder(event)">
+            <div class="pd-icon">🏘️</div>
+            <div>
+              <h4>PORTUS Grant Application Package</h4>
+              <p>Community safety platform — funding strategy</p>
+            </div>
+            <span class="pd-arrow">→</span>
+          </a>
+          <a href="#" class="portal-doc" onclick="docPlaceholder(event)">
+            <div class="pd-icon">📊</div>
+            <div>
+              <h4>IT7Q vs Market — Competitive Analysis</h4>
+              <p>Landscape positioning and differentiation</p>
+            </div>
+            <span class="pd-arrow">→</span>
+          </a>
+        </div>
+        <p class="portal-contact">To discuss investment or partnership opportunities directly: <a href="mailto:enquiries@it7q.com.au">enquiries@it7q.com.au</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+  <p>We use cookies to ensure this website works correctly. No tracking, no advertising cookies — just the essentials.</p>
+  <div class="cookie-btns">
+    <button onclick="acceptCookies()" class="btn-cookie-accept">Accept</button>
+    <button onclick="dismissCookies()" class="btn-cookie-dismiss">Dismiss</button>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
