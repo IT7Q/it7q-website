@@ -5,3 +5,6 @@ IT7Q_Complete_Business_Plan.docx
 *.bundle
 /_source/it7q-website-build-pack.md
 it7q-website-build-pack.md
+
+# Brand pack zips: extracted SVGs that are used go into src/assets/img/brand/
+/_brand/
