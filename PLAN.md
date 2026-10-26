@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **plan only, nothing built yet.** v3, 26 Oct 2026. It folds in Chris's answers to Q1, Q2, Q12, Q13, Q16 and Q23, the domain/nameserver facts, portfolio consent, and the August build pack.
+Status: **plan only, nothing built yet.** v4, 26 Oct 2026. It folds in Chris's answers to Q1, Q2, Q12, Q13, Q16, Q23 and Q25, the domain/nameserver facts, portfolio consent, and the August build pack.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -8,7 +8,7 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 ## 0. Bottom line
 
 - **Multi-page static site** on **Cloudflare Pages (free plan)**. It uses the locked brand from the August build pack. Copy and layout ideas come from v2. The structure, forms and NDA gate are rebuilt.
-- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory has about 45 projects so far (§2.1).
+- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory has about 50 projects so far (§2.1).
 - **Gated detail never ships in the static site.** It lives server-side (Postgres, read by n8n) and only reaches the browser after an approved login. Any failure keeps the page locked.
 - **No secrets in the site.** Protection comes from server-side checks in n8n, Turnstile, rate limits and a Cloudflare-injected edge header.
 - **Four NDA webhooks** (approved): `nda-submission`, `nda-login`, `nda-content`, `nda-review`.
@@ -24,7 +24,7 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 | Source | Where | Role | Notes |
 |---|---|---|---|
 | `it7q-website-build-pack.md` (Aug 2026) | `/srv/work/it7q-private/` **only** (never committed) | **Primary**: brand (locked), NDA-wall pattern, full division/project map, portfolio p1–p4 | Newest source and the one that wins conflicts. Its "Detail (NDA)" blocks are rewritten at feature level for `gated/`, with infrastructure detail dropped (Q23, §4.9). It assumed deploying on Pantheon, which Q2 replaces. |
-| `IT7Q_Complete_Business_Plan.docx` | `/srv/work/it7q-private/` **only** | **Secondary**: project discovery (TEMPESTAS tiers, PORTUS features, FABRICUS/DOMUS/MENTIS service lines) | Older: still has NEXUS, no OPUS. **Read in place; never copied, quoted for figures or committed.** |
+| `IT7Q_Complete_Business_Plan.docx` | `/srv/work/it7q-private/` **only** | **Secondary**: project discovery (TEMPESTAS tiers, whose shield names are now retired per Q25; PORTUS features, FABRICUS/DOMUS/MENTIS service lines) | Older: still has NEXUS, no OPUS. **Read in place; never copied, quoted for figures or committed.** |
 | `_source/v2/` + zip (May 2026) | repo | Look, copy, layout; v2 product list (extra project names) | NDA and forms are mock only, and the NDA fails open (unlocks on tick). |
 | Jan 2026 spec transcript | `/srv/work/it7q-private/` | Multi-page structure, policy page drafts | Moved out of the repo because it holds company financials. |
 | Feb 2026 redesign transcript | `/srv/work/it7q-private/` | Feature list (blog, enquiries, Neo showcase, downloads, portals), home users first, Feb-era OPUS products | Moved out of the repo because it holds investor projections. Its WordPress pivot is superseded. |
@@ -48,6 +48,7 @@ Division accent colours from v2 stay as secondary accents, checked for WCAG AA c
 | 2 | Cloudflare Pages, free plan. Registrar is HostPapa; nameservers are already on Cloudflare (`morgan` / `megan.ns.cloudflare.com`), so Pages can serve the bare `it7q.com.au`. §6.1 lists what's needed; I plan no DNS changes. |
 | 5 | Settled by the build pack: login + password emailed on manual approval. |
 | 12 | Every IT7Q-built site gets a thumbnail + `pN.it7q.com.au` link. Consent covers **all** IT7Q-built sites. p1–p7 known (§2.2). |
+| 25 | TEMPESTAS tiers (April 2026 line): **T1 Scout, T2 Sentinel, T3 Guard (hero), T4 Fortress, T5 Citadel**. T1–T4 on CM5, T5 on x86. Shield names (SCUTUM/PARMA/CLIPEUS/THUREOS/ASPIS) and the Jan-spec Buckler…Aegis names are retired. **SCUTUM** now means the MSP antivirus product only. Public tier cards: tier name, one-liner, who it's for. Prices and hardware specs are gated. |
 | 23 | All gated "Detail (NDA)" text is rewritten at feature level: no internal ports, hostnames, IPs, repo URLs, WireGuard or infrastructure details. The build pack moves to `/srv/work/it7q-private` and is not committed. |
 | 13 / 16 | Content source is the build pack (primary) + business plan (secondary, private). OPUS = software products, per the build pack. Every project gets a card; full info is gated. |
 | 14 | Settled by the build pack: public card = image + one-line description + "why it's unique". No ports, source, schematics or security architecture. |
@@ -95,7 +96,7 @@ Names and statuses come from the build pack unless marked otherwise. "Status" is
 **MSP — Managed Services**
 | ID | Project | Status | Source |
 |---|---|---|---|
-| P-MSP-01 | Managed AV/EDR (working name SCUTUM, clashes with the TEMPESTAS tier name, Q25) | In development | build pack |
+| P-MSP-01 | SCUTUM — managed antivirus/EDR (the name is now MSP-only, Q25) | In development | build pack |
 | P-MSP-02 | MSP Companion App (one-click enrolment) | In development (pilot) | build pack |
 | P-MSP-03 | Managed security monitoring (Wazuh SIEM) | Developed | build pack |
 | P-MSP-04 | IT7Q Support Portal | In development | build pack, v2 |
@@ -130,8 +131,14 @@ Names and statuses come from the build pack unless marked otherwise. "Status" is
 **TEMPESTAS — Cybersecurity Hardware**
 | ID | Project | Status | Source |
 |---|---|---|---|
-| P-TEM-01 | TEMPESTAS Shield appliance line (5 tiers; tier names Q25) | In development | build pack, business plan, v2 |
-| P-TEM-02 | TEMPESTAS T3 carrier board (v2's "Custom PCB Design", assumed the same) | In design | build pack, v2 |
+| P-TEM-01 | T1 Scout | In development | Chris (Q25), v2 |
+| P-TEM-02 | T2 Sentinel | In development | Chris (Q25), v2 |
+| P-TEM-03 | T3 Guard (**hero** product: featured card, first on the page and in the home hero row) | In development | Chris (Q25), v2 |
+| P-TEM-04 | T4 Fortress | In development | Chris (Q25) |
+| P-TEM-05 | T5 Citadel | In development | Chris (Q25) |
+| P-TEM-06 | TEMPESTAS T3 carrier board (v2's "Custom PCB Design", assumed the same) | In design | build pack, v2 |
+
+Tier statuses are my assumption; Chris to confirm. **Public tier cards show only the tier name, a one-liner and who it's for** (e.g. "for households", "for small offices"). Prices, hardware specs and the platform split (T1–T4 on CM5, T5 on x86) go in gated detail, kept at feature level per §4.9. The carrier board card stays generic in public ("our own Australian-designed board").
 
 **PORTUS — Community Safety**
 | ID | Project | Status | Source |
@@ -290,7 +297,7 @@ Gated detail tells an approved reader **what** a project does, how it helps, whe
 | Status, milestones, roadmap in general terms | WireGuard, tunnels, VPN layout, network topology |
 | General tech family where it helps understanding (e.g. "self-hosted", "runs on a Raspberry Pi compute module", "uses AI models") | Service/agent internals, enrolment mechanisms, auth tokens, retention/config values |
 | Integrations by product name (e.g. "works with Athena and Nexus") | Exact software versions or security-tool placement that maps the attack surface |
-| Pricing, if Chris approves (Q28) | Anything from the business plan's financials |
+| Pricing (TEMPESTAS tiers: gated, per Q25; others per Q28) | Anything from the business plan's financials |
 
 Process: I write each project's gated text from the private build pack into `gated/<division>.json` with those rules applied, and Chris reviews it before it's seeded into Postgres. `tools/check.py` scans `gated/` and fails on:
 - IPv4/IPv6 addresses
@@ -340,12 +347,12 @@ Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (
 | P-MSP-01…05 | 4–5 | UI mock-ups or illustrative graphics, not real admin screens |
 | P-OPUS-01…12 | 9–12 | App screenshots with dummy data |
 | P-MEN-01…06 | 3–6 | Illustrative (agent "team" graphic etc.) |
-| P-TEM-01…02 | 2 | Enclosure/product photo OK; **no PCB/schematic close-ups** |
+| P-TEM-01…06 | 6 | One per tier (T3 Guard gets a larger hero image, 1600×1000) + carrier board. Enclosure/product photos OK; **no PCB/schematic close-ups or spec labels** |
 | P-POR-01…03 | 1–3 | Concept art/signage, no real locations of people's homes |
 | P-FAB-001…022 | 19–22 | Product photos of F-001–F-019 (+ TABULAE/FORMAE/BIONICUS if kept) |
 | P-DOM-01 | 1 | Generic smart-home photo |
 
-That's roughly **39–51 project images**, depending on Q24.
+That's roughly **43–55 project images**, depending on Q24.
 
 **Gated** (served only via `nda-content`, never in `dist/`): G-<project-id> detail images where useful, ≤ 300 KB each, as data URIs. Investor presentation assets: G-INV-xx.
 
@@ -405,7 +412,7 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
 
 ## 8. Open questions for Chris
 
-**Answered**: 1, 2, 12, 13, 16, 23 (Chris); 5, 14 (settled by build pack). See §1a. Q27 is narrowed to hosting only.
+**Answered**: 1, 2, 12, 13, 16, 23, 25 (Chris); 5, 14 (settled by build pack). See §1a. Q27 is narrowed to hosting only.
 
 **Still open from v1**
 3. **Bot protection**: Cloudflare Turnstile OK, or in-house only?
@@ -426,10 +433,9 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
 
 **New**
 24. **Placement / keep-or-drop** for the **?** items in §2.1: IT7Q SysMon, Andromeda CE/companion, Aegir SecureStart, FABRICUS App, FORTUNA, COLLOQUIUM, v2 Automations, PORTUS App, PORTUS Jnr, TABULAE, FORMAE, BIONICUS. Also: do Persephone's named agents get their own cards?
-25. **TEMPESTAS tier names**: three sets exist (business plan: SCUTUM/PARMA/CLIPEUS/THUREOS/ASPIS; Jan spec: Buckler…Aegis; v2: Scout/Sentinel/Guard), and SCUTUM is also the MSP AV/EDR working name. Which is current?
 26. **FABRICUS F-001–F-019**: names, one-liners and photos. Launch with placeholders for any not ready?
 27. **Portfolio hosting**: where is each p1–p7 site hosted today (vps01, Pantheon, elsewhere)? Each `pN` record needs that target. And what happens to the old `tc/rb/pr/aa.it7q.com.au` names: keep, redirect to `pN`, or retire?
-28. **Public prices**: the build pack's public teasers include "from" prices (managed AV, TEMPESTAS). Show prices on public cards, or keep them gated?
+28. **Public prices (non-TEMPESTAS)**: TEMPESTAS prices are now gated (Q25). The build pack's SCUTUM teaser includes a "from" price. Show that one publicly, or gate all prices for consistency?
 29. **p6/p7 display names**: how should BlueVibes and AustPathClub appear on their cards (full organisation names)? Is there a short one-liner for each?
 
 ---
