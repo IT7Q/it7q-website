@@ -65,9 +65,13 @@ When your access ends, or whenever IT7Q asks, you will stop using the Confidenti
 
 ### 8. Term
 
-This agreement starts when you accept it and runs for **three (3) years**. Your obligations under clauses 4, 5 and 7 apply for that period.
+- (a) This agreement starts when you accept it and runs for **three (3) years** (the "**Term**"). Your access to the protected area ends when the Term ends, or earlier under clause 6.
+- (b) Your obligations under clauses 4, 5, 7, 9 and 10 **survive** the end of the Term (or any earlier end of your access):
+  - (i) for Confidential Information that is a **trade secret**, for as long as it remains a trade secret; and
+  - (ii) for all other Confidential Information, for **two (2) years** after the Term ends.
+- (c) Ending the Term or your access does not affect any rights either party already has, including for a breach that happened before then.
 
-> **[Reviewer note: decide whether to add a survival clause.]** As drafted, the confidentiality obligations end with the 3-year term, matching "3-year term, access ends when it lapses". A common alternative keeps them running for a further period (e.g. 2 years) after the term ends, or indefinitely for trade secrets. For example: *"Clauses 4, 5 and 7 survive for [two (2) years] after this agreement ends, and for as long as any information remains a trade secret."*
+> **[Reviewer note: survival period.]** Chris's instruction is that confidentiality must survive the Term: indefinitely for trade secrets, otherwise for a sensible period. I've drafted **2 years** after the Term, so the total is 5 years from acceptance. That lines up with the site's record retention (Term + 2 years). Please confirm the period suits, and see note 9 on keeping records long enough to enforce the trade-secret limb.
 
 ### 9. No other rights
 
@@ -81,7 +85,7 @@ You acknowledge that a breach could cause IT7Q harm that money alone can't fix, 
 
 ### 11. Your personal information
 
-IT7Q collects your name, email, organisation, reason for access, typed signature, acceptance time, IP address and browser details to manage this agreement and your access. We handle it under our Privacy Policy (it7q.com.au/legal/privacy/). We keep your acceptance record for the agreement's term plus two years, and IP addresses and access logs for 12 months.
+IT7Q collects your name, email, organisation, reason for access, typed signature, acceptance time, IP address and browser details to manage this agreement and your access. We handle it under our Privacy Policy (it7q.com.au/legal/privacy/). We keep your acceptance record for the Term plus two years, and IP addresses and access logs for 12 months.
 
 ### 12. General
 
@@ -100,9 +104,12 @@ By typing your name, ticking the box and selecting **"I agree"**, you sign this 
 
 1. **One-way** (IT7Q discloses only), replacing v2's "Mutual" wording. Section 1 states that the recipient isn't asked to disclose anything.
 2. **Scope**: the Purpose is broad (investment, partnership, customer/supplier dealings), because approval grants all seven divisions by default. Investor access is granted per person, but the same agreement covers it.
-3. **Term**: 3 years. Website access ends at the same time. The survival question is in clause 8.
+3. **Term and survival**: 3 years, and website access ends at the same time. Confidentiality survives (clause 8(b)): indefinitely for trade secrets, otherwise 2 years after the Term.
 4. **No-screenshot clause** (4(d)): is it enforceable or reasonable as worded? It backs up the watermark in the site.
 5. **Electronic signature**: relies on typed name + tick + click, with the record emailed to the signer. Please confirm this is adequate under the *Electronic Transactions (Queensland) Act 2001*.
 6. **Privacy** (clause 11): retention periods match PLAN.md §4.10. The privacy policy page must say the same.
 7. **Entity**: "IT7Q Cyber-Tech Services" with ABN 43 922 878 001, as in v2. Please confirm this is the correct legal name for that ABN.
 8. **Version**: when the text is final, the site embeds its SHA-256. Any later change gets a new version number, and existing signers stay on the version they accepted.
+9. **Records vs survival**: acceptance records are deleted at Term + 2 years (PLAN.md §4.10). That covers survival limb (ii), but not limb (i) (trade secrets, indefinite), or a claim brought within Queensland's 6-year limitation period. Should a minimal acceptance record (name, email, version, hash, date; no IP) be kept longer?
+
+**This draft needs a legal check before launch.**

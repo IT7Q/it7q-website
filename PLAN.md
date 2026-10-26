@@ -1,20 +1,21 @@
 # IT7Q website rebuild — plan
 
-Status: **plan only, nothing built yet.** v6, 27 Oct 2026. It adds the `_brand/` colour check (§1b, which found a conflict for Chris to decide: Q37), the FABRICUS register F-001–F-035, the Q32 answer and the completed GitHub purge.
+Status: **v7, 27 Oct 2026. Phase 1 built** (structure, styles, brand, animated logo, Home). v7 folds in Chris's answers to Q29 and Q33–Q39: brand = business card (Q37), statuses, hero stats, portfolio p8/p9, build-time image watermark, the coming-soon MSP service and NDA survival.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
 
 ## 0. Bottom line
 
-- **Multi-page static site** on **Cloudflare Pages (free plan)**. Brand = the **April 2026 business-card set** (§1). **The `_brand/` packs use a different palette, navy and taglines from the card** (§1b), so which one wins is Chris's call (Q37) before Phase 1. Copy and layout ideas come from v2. The structure, forms and NDA gate are rebuilt.
-- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory is **69 cards** (§2.1), 38 of them FABRICUS.
+- **Multi-page static site** on **Cloudflare Pages (free plan)**. Brand = the **April 2026 business card** (Q37): four circles in cyan/lime/purple/orange on navy `#0D1B2A`. The circle **shapes** come from the `_brand/` pack emblem; **none of the pack colours are used**. Copy and layout ideas come from v2. The structure, forms and NDA gate are rebuilt.
+- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory is **70 cards** (§2.1), all public, 38 of them FABRICUS.
+- **Every raster image is watermarked at build time** with the master mark (§5.1). Sources stay clean; `tools/check.py` fails on any unmarked image in `dist/`.
 - **Gated detail never ships in the static site.** It lives server-side (Postgres, read by n8n) and only reaches the browser after an approved login. Any failure keeps the page locked.
 - **No secrets in the site.** Protection comes from server-side checks in n8n, Turnstile, rate limits and a Cloudflare-injected edge header.
 - **Five webhooks**: four NDA (`nda-submission`, `nda-login`, `nda-content`, `nda-review`) + `website-enquiry` (Q19). All have the same protections. Review links sit behind Cloudflare Access.
 - **Mail goes out from a dedicated `noreply@it7q.com.au` MXRoute mailbox.** n8n never holds Chris's own credentials (Q8).
 - **Gated detail is written at feature level only.** Even behind the NDA there are no internal ports, hostnames, IPs, repo URLs, WireGuard or infrastructure details (Q23).
-- **Portfolio** = every IT7Q-built site, each a **static snapshot on its own Cloudflare Pages project** at `pN.it7q.com.au`. Old `tc/rb/pr/aa` names redirect (§6.3). No DNS changes yet.
+- **Portfolio**: p1–p7 are **archives**, each a noindex **static snapshot on its own Cloudflare Pages project** at `pN.it7q.com.au` with forms disabled and a "Portfolio snapshot built by IT7Q" banner. p8 Niuleaf links to its live domain. p9 Pro Energy Solutions is reserved and unpublished. Old `tc/rb/pr/aa` names redirect (§6.3). No DNS changes yet.
 - **Private material stays out of this repo.** The build pack, business plan and the two transcripts with financials all live in `/srv/work/it7q-private` and are git-ignored. No financial figures appear anywhere in this repo. The only public price is SCUTUM's "from" price (Q28).
 - Server-side pieces (n8n workflows, SQL, Cloudflare steps, DNS list) are **files for Chris to review and deploy**. I don't touch n8n, Docker, Cloudflare or DNS.
 
@@ -24,8 +25,8 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 | Source | Where | Role | Notes |
 |---|---|---|---|
-| **Business card (Apr 2026)** | Chris (values in this plan) | **Brand**: colours, tagline, badge names | Wins over the build pack on brand. Conflicts with the `_brand/` packs (§1b, Q37). |
-| **`_brand/` packs (Oct 2026)** | `_brand/` (IT7Q master + six division zips; **no separate MSP pack**, the master covers "Group & Managed Services"), git-ignored | **Logo artwork**: SVG logo + emblem ×5 variants, PNGs, favicons, 3D plaques per pack | Extracted 27 Oct into scratch folders outside the repo; all SVGs pass the safety scan. Same README in all seven. |
+| **Business card (Apr 2026)** | Chris (values in this plan) | **Brand**: colours, tagline, badge names | **Wins on brand** (Q37). |
+| **`_brand/` packs (Oct 2026)** | `_brand/` (IT7Q master + six division zips; no MSP pack exists, the master covers MSP), git-ignored | **Circle shapes only**: the four traced circle paths from the IT7Q emblem | Pack colours, navy, ring, wordmark and taglines are **not used** (Q37). |
 | FABRICUS register (Jul 2026 plan-sheet handover) | Chris (names in §2.1) | F-001–F-035 product names | Shop jigs/tools excluded (not retail). |
 | `it7q-website-build-pack.md` (Aug 2026) | `/srv/work/it7q-private/` **only** (never committed) | **Primary for content**: NDA-wall pattern, division/project map, portfolio p1–p4 | Its "Detail (NDA)" blocks are rewritten at feature level for `gated/`, with infrastructure detail dropped (§4.9). Its brand block (navy `#0a1628`, title-case tagline) is superseded by the business card. |
 | `IT7Q_Complete_Business_Plan.docx` | `/srv/work/it7q-private/` **only** | **Secondary**: project discovery | Older: still has NEXUS, no OPUS. **Read in place; never copied, quoted for figures or committed.** |
@@ -33,29 +34,32 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 | Jan 2026 spec transcript | `/srv/work/it7q-private/` | Multi-page structure, policy page drafts | Holds company financials. |
 | Feb 2026 redesign transcript | `/srv/work/it7q-private/` | Feature list, home users first, Feb-era OPUS products | Holds investor projections. Its WordPress pivot is superseded. |
 
-**Brand (April 2026 business card, replaces the build pack's brand block)**
-- Master mark: **four interlocking circles**, cyan `#00B4CC`, lime `#7EC820`, purple `#8B5CF6`, orange `#F97316`, on dark navy **`#0D1B2A`** (was `#0a1628` in the build pack).
-- Tagline: ***Smart tech. Simple terms. Serious security.*** (sentence case, as on the card).
-- Fonts: Rajdhani (headings), Exo 2 (body). Unchanged.
+**Brand (April 2026 business card, decided Q37)**
+- Master mark: **four interlocking circles**, cyan `#00B4CC`, lime `#7EC820`, purple `#8B5CF6`, orange `#F97316`, on dark navy **`#0D1B2A`**. The circle shapes are the four traced paths from the pack's IT7Q emblem (simplified by `tools/brand_mark.py` into `src/assets/img/brand/mark.svg`), coloured cyan (top-left), lime (top-right), purple (bottom-left) and orange (bottom-right).
+- **No pack colours anywhere** (no `#0E1326` navy, gold, crimson or pack orange); `tools/check.py` fails if any appears in `src/` or `dist/`.
+- Tagline: ***Smart tech. Simple terms. Serious security.***
+- Fonts: Rajdhani (headings), Exo 2 (body), self-hosted woff2. The font files aren't in the repo yet (no network from Pantheon), so the CSS falls back to system fonts until Chris drops them into `src/assets/fonts/` (Q40).
 - Mission: *To make enterprise-grade technology accessible, affordable and understandable for homes, community organisations and small businesses across Queensland.*
 
-**Division badges (business-card style): Latin name + translation, each in its own colour**
+**Division badges**: the same four circle shapes in the division colour (two tones, so the interlock still reads), with the Latin name and translation under each. MSP uses the master shapes too; there's no separate MSP artwork.
 
-| Division | Badge translation | Colour (card) | Pack colours (light · mid · deep) | Match? | Page subtitle (descriptive) |
+| Division | Badge translation | Card colour | Hex used | On navy | Page subtitle (descriptive) |
 |---|---|---|---|---|---|
-| MSP | Managed Services | blue | no MSP pack; master = gold `#EAAE40` · orange `#DF6D2E` · crimson `#BB2949` | ❌ | Managed IT, plain English |
-| OPUS | Works & Projects | orange | gold `#F2C14E` · teal `#22A89C` · deep teal `#0E7470` | ❌ | Software products |
-| MENTIS | Mind & Intelligence | purple | cyan `#3FC8DB` · pink `#D5479F` · purple `#7A2AC8` | ⚠️ partly | AI & automation |
-| TEMPESTAS | Storm & Hardware | cyan | sky `#7FB8EA` · blue `#3A86CF` · deep blue `#1C4F9C` | ❌ blue, not cyan | Cybersecurity hardware |
-| PORTUS | Harbour & Gateway | lavender/violet (not teal) | lavender `#C3A6EC` · violet `#8B5CC9` · deep violet `#5E3496` | ✅ | Community safety |
-| FABRICUS | Craft & Making | amber | amber `#E8B04A` · copper `#C8662A` · brown `#8A3B12` | ✅ | Woodcraft & digital manufacturing |
-| DOMUS | Home & Dwelling | green | light green `#A6D86E` · green `#43A867` · deep green `#22704A` | ✅ | Smart home |
+| MSP | Managed Services | blue | `#4F8EF7` (provisional) | 5.4 | Managed IT, plain English |
+| OPUS | Works & Projects | orange | `#F97316` (master orange) | 6.2 | Software products |
+| MENTIS | Mind & Intelligence | purple | `#8B5CF6` (master purple); text tint `#A98BFA` | 4.1 / 6.4 | AI & automation |
+| TEMPESTAS | Storm & Hardware | cyan | `#00B4CC` (master cyan) | 7.0 | Cybersecurity hardware |
+| PORTUS | Harbour & Gateway | lavender/violet | `#C4A7F5` (provisional) | 8.4 | Community safety |
+| FABRICUS | Craft & Making | amber | `#F5B53D` (provisional) | 9.6 | Woodcraft & digital manufacturing |
+| DOMUS | Home & Dwelling | green | `#3FBF5F` (provisional) | 7.3 | Smart home |
 
-### 1b. Brand colour check (27 Oct, against the extracted packs)
+The card names a colour for each division, but only the four master colours came with hex values. I picked the four **provisional** ones to be clearly distinct from each other and from the master colours, all ≥ 4.5 contrast on navy. Send the card's exact hex values if they differ (Q41). They live in one place: `src/assets/css/tokens.css`.
 
-**Bottom line: the packs are a different colour system from the business card.** The emblem shape is the same family: four interlocking circles, one navy plus three accents, inside a navy ring with the name arched on top and a tagline arched below. But the master's colours, the navy, every tagline, and three of the seven division colours don't match the card. Only PORTUS, FABRICUS and DOMUS line up.
+### 1b. Brand colour check (27 Oct) — resolved by Q37
 
-**Mismatches**
+Kept for the record. The packs used a different palette from the card; Chris chose the card. Pack shapes are used, pack colours aren't.
+
+**Mismatches found**
 
 | # | Item | Business card | `_brand/` packs | Notes |
 |---|---|---|---|---|
@@ -71,18 +75,9 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 | 10 | FABRICUS | amber | amber/copper/brown | ✅ |
 | 11 | DOMUS | green | greens | ✅ |
 
-**Colour contrast** (as text or thin line on the card navy `#0D1B2A`; AA needs 4.5 for body text, 3.0 for large text and UI):
-- Every pack's **light** accent passes easily (8.2–10.5).
-- **Mid** accents mostly pass at 4.3–5.9. PORTUS `#8B5CC9` is 3.7, so it's large text only.
-- **Deep** accents fail on navy (2.0–3.1). They suit white backgrounds; on dark, the badge row uses the reverse-on-dark artwork.
-- Card master colours: 4.1–8.4. Purple `#8B5CF6` is 4.1, large text only.
+**Contrast**: card master colours on navy are 4.1–8.4. Purple `#8B5CF6` (4.1) is used for shapes and large text only; small purple text uses the `#A98BFA` tint.
 
-**Safety scan**: all 70 SVGs are clean (no `<script>`, `on*` handlers, `<foreignObject>`, external or `data:` references, DOCTYPE or entities). Each zip was extracted with path-traversal and symlink checks into its own scratch folder. Nothing has been copied into the repo yet; only SVGs actually used get copied into `src/assets/img/brand/` in Phase 1. The zips stay git-ignored. The 3D plaque files and PNGs aren't needed for the site.
-
-**Ways to settle it (Q37)** — my recommendation is the first:
-1. **Packs win for artwork, card wins for words.** Use the pack SVGs as-is and take the site palette from them (navy `#0E1326`, each division's mid accent as its colour). Keep the card's tagline and Latin translations as HTML text under the emblems. MSP uses the master emblem. Fastest, and the logo on the site matches what's printed and 3D-plaqued.
-2. **Card wins everywhere.** The packs get recoloured to the card palette (new SVGs from Chris or the designer). An MSP pack and new taglines would be needed. Slower.
-3. **Mix**: pack artwork, but recolour only the mismatched divisions (master, MSP, OPUS, TEMPESTAS).
+**Safety scan**: all 70 pack SVGs are clean (no `<script>`, `on*` handlers, `<foreignObject>`, external or `data:` references, DOCTYPE or entities). Each zip was extracted with path-traversal and symlink checks into its own scratch folder outside the repo. Only the derived, colourless `mark.svg` is committed. The zips stay git-ignored.
 
 ---
 
@@ -106,19 +101,25 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 | 14 | Public card = image + one-liner + "why it's unique" (build pack). |
 | 15 | **Public plain-English Services page.** Internal tooling (what IT7Q runs behind the scenes) stays gated. |
 | 17 | **Blog + Downloads launch only if 2–3 blog posts are ready at launch.** Otherwise both wait for a later release. Portal logins parked. |
-| 18 | **Public facts**: phone **0411 753 366**, ABN **43 922 878 001**, **Kallangur QLD 4503**, contact **info@it7q.com.au** (Chris creates it). **No numeric hero stats** until Chris supplies ones that are true today. |
+| 18 / 34 | **Public facts**: phone **0411 753 366**, ABN **43 922 878 001**, **Kallangur QLD 4503**, contact **info@it7q.com.au**. **Hero stats** (Chris, Q34): **"7 divisions"**, **"50+ projects"**, **"Australian owned & operated"**, **"Est. 2020"**. Any other stat is proposed for approval first, never published straight off (§2, "Proposed stats"). |
 | 19 | **Enquiry form** → `website-enquiry` webhook, same protections as the NDA hooks, emails **chris@it7q.com.au** (sent from noreply@). |
 | 20 | **Cloudflare Web Analytics** (cookieless). **No cookie banner.** |
-| 21 | Stdlib-only Python build: yes. |
-| 22 | Logos from `_brand/` (§1). The Elementals MP4 is gone; the hero logo is an **animated SVG**. |
+| 21 | Stdlib-only Python build: yes. (This includes the watermarking, §5.1.) |
+| 22 / 37 | **Brand = business card.** Circle shapes from the `_brand/` emblem, recoloured; no pack colours anywhere. No MSP pack exists; MSP uses the master shapes. The hero logo is an **animated SVG**. |
 | 23 | Gated text at feature level only (§4.9). |
 | 24 | Every project placed (§2.1). |
 | 25 | TEMPESTAS tiers T1 Scout → T5 Citadel; prices/specs gated; SCUTUM = MSP antivirus only. |
-| 26 | **FABRICUS**: launch with names/one-liners + **photo placeholders**. |
-| 27 | **Portfolio**: each `pN` site becomes a **static snapshot on its own Pages project**. WordPress sites get exported to static HTML first. Old `tc/rb/pr/aa` names **redirect** to `pN`. Steps in §6.3; no DNS changes yet. |
+| 26 | **FABRICUS**: launch with names/one-liners + **photo placeholders**. Real photos arrive the week of 2 Nov 2026. |
+| 27 / 33 | **Portfolio**: p1–p7 are archives, each a **static snapshot on its own Pages project**: noindex, forms disabled with a short "portfolio copy" note, and a small "Portfolio snapshot built by IT7Q" banner. WordPress sites to export: **True Colours (p1), Red Bird (p2), The Artist Apron (p4), Aussie Pathtag Club (p7)**. **p8 = Niuleaf**, the only current live site, linking straight to its live domain (no snapshot). **p9 = Pro Energy Solutions**, reserved and unpublished until Chris says it's live. Old `tc/rb/pr/aa` names **redirect** to `pN`. Steps in §6.3; no DNS changes yet. |
 | 28 | **SCUTUM's "from" price is public.** Every other product/hardware price is gated. |
-| 31 | **FABRICUS register**: F-001–F-035 from the July 2026 plan-sheet handover. I write the public one-liners. F-016 is the TABULAE medal board. F-020–F-023 and F-031 are marked **to verify** (F-031 may duplicate F-020). Shop-use jigs and tools are excluded (not retail). |
+| 29 | **p6 = "BlueVibes Music"**, **p7 = "Aussie Pathtag Club"**. One-liners in §2.2. |
+| 31 | **FABRICUS register**: F-001–F-035 from the July 2026 plan-sheet handover. I write the public one-liners. F-016 is the TABULAE medal board. Shop-use jigs and tools are excluded (not retail). |
 | 32 | Requests that never become an NDA (pending too long, or rejected) are kept **12 months**. |
+| 35 / 38 | **Statuses**: every FABRICUS item is public with status **In development**. F-031 is a separate product from F-020; nothing is held back. Every former TBC project shows **In development** (table in §2.1 for Chris to correct later). |
+| 36 | **NDA**: confidentiality **survives** the 3-year term: indefinitely for trade secrets, otherwise for a set period after it ends. Still needs a legal check before launch. |
+| 39 | Chris checks the FABRICUS one-liners in the Phase 1 preview. |
+| — | **Watermark**: every raster image on the site (photos, thumbnails, portfolio screenshots) gets a subtle master-mark watermark, applied by `tools/build.py`. Sources stay unwatermarked outside `dist/`; `tools/check.py` fails on any unmarked image (§5.1). |
+| — | **Coming soon (MSP)**: "AI-powered security hardening for your small business and home". A card on the MSP page plus a teaser on Home. Public wording follows §4.9 (no WireGuard, tunnels, Agent Smith or internal tooling). |
 
 ---
 
@@ -137,7 +138,7 @@ Home users first, small business second, all in plain English.
 /divisions/portus/        │  Gated detail loads per division after an approved
 /divisions/fabricus/      │  login (see §4).
 /divisions/domus/         ┘
-/portfolio/               Client websites, p1–p7 (every IT7Q-built site)
+/portfolio/               Client websites: p1–p7 archives + p8 Niuleaf (live); p9 reserved
 /services/                "How we can help": plain-English services + enquiry form
 /contact/                 Phone, info@, WhatsApp/Messenger, short form
 /access/                  NDA: read, request access, log in, log out
@@ -152,9 +153,20 @@ Home users first, small business second, all in plain English.
 
 **Page notes**
 - **Home**:
-  1. Hero: the **animated master logo** (inline SVG, CSS animation of the four circles; static under `prefers-reduced-motion`) + tagline. **No numeric stats** until Chris supplies true ones (Q18).
+  1. Hero: the **animated master logo** (inline SVG, CSS animation of the four circles; static under `prefers-reduced-motion`) + tagline + the four **hero stats**: 7 divisions · 50+ projects · Australian owned & operated · Est. 2020 (Q34).
   2. **Badge row**: seven division badges in business-card style, each in its colour, with the Latin name and translation under it (MSP Managed Services · OPUS Works & Projects · MENTIS Mind & Intelligence · TEMPESTAS Storm & Hardware · PORTUS Harbour & Gateway · FABRICUS Craft & Making · DOMUS Home & Dwelling). Each badge links to its division page.
-  3. Then mission, a "how we help" strip (home → small business), a T3 Guard feature, a portfolio highlight, an investor/partner call to action to `/access/`, and contact.
+  3. **Coming-soon teaser**: "AI-powered security hardening for your small business and home", linking to the MSP page.
+  4. Then mission, a "how we help" strip (home → small business), a T3 Guard feature, a portfolio highlight, an investor/partner call to action to `/access/`, and contact.
+
+**Proposed stats (for Chris's approval; not published)**. Each is verifiable from the sources and true today:
+
+| Stat | Source |
+|---|---|
+| "8 client websites built" | Portfolio p1–p8 (p9 not live yet) |
+| "35 handmade product designs" | FABRICUS register F-001–F-035 |
+| "5 security appliance tiers" | TEMPESTAS T1–T5 (Q25) |
+| "21 AI agents in our back office" | Build pack's public Persephone teaser ("21 specialised agents") |
+| "Based in Kallangur, QLD" | Q18 public facts |
 - **Division pages**: one template. Header = the division badge + descriptive subtitle (§1). Cards come from `src/data/projects.json` via `tools/build.py`. Gated detail is **not** in that file. Status badge per card: *Developed · In development · In design · Documented*.
 - **MENTIS page** also carries a plain-English **"AI automations we can set up"** services list (from v2: patch management, social media pipeline, invoice/phone-system automation, email triage, security alerting, compliance reporting). It's a list, not cards (Q24).
 - **Services**: plain-English public services for homes and small business. How IT7Q delivers them internally (tooling, stack) is gated (Q15). The enquiry form has service and division selectors.
@@ -164,7 +176,22 @@ Home users first, small business second, all in plain English.
 
 ### 2.1 Project inventory (public card list)
 
-Names and statuses come from the build pack unless marked otherwise. "Status" is my reading of the sources; Chris confirms before build (**TBC** = no source gives one). Each card gets an image ID `P-<div>-<nn>` (§5).
+Names and statuses come from the build pack unless marked otherwise. Each card gets an image ID `P-<div>-<nn>` (§5). Status values: *Developed · In development · In design · Documented · Coming soon*.
+
+**Set to "In development" by default (Q35), for Chris to correct later**
+
+| ID | Project | Status now | Correct to |
+|---|---|---|---|
+| P-MSP-05 | IT7Q SysMon | In development | |
+| P-OPUS-10 | Andromeda CE / AI companion | In development | |
+| P-OPUS-11 | Aegir — SecureStart | In development | |
+| P-MEN-04 | FORTUNA | In development | |
+| P-MEN-05 | COLLOQUIUM | In development | |
+| P-POR-02 | PORTUS App | In development | |
+| P-POR-03 | PORTUS Jnr | In development | |
+| P-FAB-101 | FABRICUS App | In development | |
+| P-FAB-102 | FORMAE | In development | |
+| P-FAB-103 | BIONICUS | In development | |
 
 **MSP — Managed Services**
 | ID | Project | Status | Source |
@@ -173,7 +200,10 @@ Names and statuses come from the build pack unless marked otherwise. "Status" is
 | P-MSP-02 | MSP Companion App (one-click enrolment) | In development (pilot) | build pack |
 | P-MSP-03 | Managed security monitoring | Developed | build pack |
 | P-MSP-04 | IT7Q Support Portal | In development | build pack, v2 |
-| P-MSP-05 | IT7Q SysMon (server health monitoring) | TBC | v2 |
+| P-MSP-05 | IT7Q SysMon (server health monitoring) | In development | v2 |
+| P-MSP-06 | **AI-powered security hardening for your small business and home** (featured on Home) | **Coming soon** | Chris (27 Oct) |
+
+P-MSP-06 public wording is plain English only: what it does for the customer (finds and fixes weak security settings, with AI help). It never names tooling, agents, tunnels or WireGuard (§4.9). `tools/check.py` enforces this on all of `dist/` (§3, public-wording guard).
 
 **OPUS — Works & Projects (software products)**
 | ID | Project | Status | Source |
@@ -187,8 +217,8 @@ Names and statuses come from the build pack unless marked otherwise. "Status" is
 | P-OPUS-07 | Paideia OS (safe computer for kids) | Developed | build pack |
 | P-OPUS-08 | JANUS (one inbox for every channel) | In design | build pack, v2 |
 | P-OPUS-09 | Project Silo (private Workspace alternative) | In design | build pack, v2 |
-| P-OPUS-10 | Andromeda CE / Andromeda AI companion | TBC | v2, Feb notes |
-| P-OPUS-11 | Aegir — SecureStart (Windows privacy/setup tool) | TBC | v2 |
+| P-OPUS-10 | Andromeda CE / Andromeda AI companion | In development | v2, Feb notes |
+| P-OPUS-11 | Aegir — SecureStart (Windows privacy/setup tool) | In development | v2 |
 
 **MENTIS — Mind & Intelligence (AI & automation)**
 | ID | Project | Status | Source |
@@ -196,8 +226,8 @@ Names and statuses come from the build pack unless marked otherwise. "Status" is
 | P-MEN-01 | Project Persephone (AI agent workforce). Its named agents appear **only in Persephone's gated detail**, with no cards of their own | Developed (partly live) | build pack, v2 |
 | P-MEN-02 | MNEMOSYNE (AI memory layer) | In development | build pack |
 | P-MEN-03 | Neo (AI website builder) | In development | build pack |
-| P-MEN-04 | FORTUNA (investment-monitoring agent). Own card, labelled **"Part of Persephone"** | TBC | build pack, v2 |
-| P-MEN-05 | COLLOQUIUM (business chat/AI assistant service) | TBC | Feb notes |
+| P-MEN-04 | FORTUNA (investment-monitoring agent). Own card, labelled **"Part of Persephone"** | In development | build pack, v2 |
+| P-MEN-05 | COLLOQUIUM (business chat/AI assistant service) | In development | Feb notes |
 | — | v2 "AI Automations" → **services list on the MENTIS page**, not cards | — | v2 |
 
 **TEMPESTAS — Storm & Hardware (cybersecurity hardware)**
@@ -216,17 +246,17 @@ Public tier cards show only the tier name, a one-liner and who it's for. Prices,
 | ID | Project | Status | Source |
 |---|---|---|---|
 | P-POR-01 | PORTUS community safety network (absorbs K.I.T.S.) | In design | build pack, business plan |
-| P-POR-02 | PORTUS App | TBC | v2 |
-| P-POR-03 | PORTUS Jnr (child-safe version) | TBC | v2 |
+| P-POR-02 | PORTUS App | In development | v2 |
+| P-POR-03 | PORTUS Jnr (child-safe version) | In development | v2 |
 
 **FABRICUS — Craft & Making (woodcraft & digital manufacturing)**
 | ID | Project | Status | Source |
 |---|---|---|---|
-| P-FAB-101 | FABRICUS App (offline order/catalogue PWA) | TBC | Feb notes |
-| P-FAB-102 | FORMAE custom 3D prints | TBC | Feb notes |
-| P-FAB-103 | BIONICUS assistive body supports (Project Bionic) | TBC | Feb notes |
+| P-FAB-101 | FABRICUS App (offline order/catalogue PWA) | In development | Feb notes |
+| P-FAB-102 | FORMAE custom 3D prints | In development | Feb notes |
+| P-FAB-103 | BIONICUS assistive body supports (Project Bionic) | In development | Feb notes |
 
-**FABRICUS product range** (Q31). Source: July 2026 plan-sheet handover. Card ID = `P-FAB-` + the F-number (e.g. F-007 → `P-FAB-007`). Status for all: In development. All launch with photo placeholders (Q26). Public one-liners are mine, in plain English, and Chris checks them. **To verify** items are held out of the public build until Chris confirms them (Q38); `tools/check.py` fails if a `verify: true` card reaches `dist/`.
+**FABRICUS product range** (Q31). Source: July 2026 plan-sheet handover. Card ID = `P-FAB-` + the F-number (e.g. F-007 → `P-FAB-007`). **All public, all "In development"** (Q38). Photo placeholders until the real photos arrive (week of 2 Nov). Public one-liners are mine, in plain English; Chris checks them in the Phase 1 preview (Q39).
 
 | F-no. | Name | Public one-liner (draft) | Note |
 |---|---|---|---|
@@ -249,10 +279,10 @@ Public tier cards show only the tier name, a one-liner and who it's for. Prices,
 | F-017 | Solid timber TV entertainment unit | A solid timber entertainment unit for the TV and everything that goes with it. | |
 | F-018 | LED TV feature wall with slats & shelves | A slatted TV feature wall with shelves and LED accent lighting. | |
 | F-019 | Simple workbench | A sturdy, no-fuss workbench for the shed or garage. | |
-| F-020 | Stepped bedside table with asymmetric hutch | A bedside table with stepped levels and an off-centre hutch for books and bits. | **to verify** |
-| F-021 | House-shaped wall key holders (3 variants) | Little house-shaped key holders for the wall, in three styles. | **to verify** |
-| F-022 | Illuminated shadow-box frame planters | Shadow-box frames that double as planters, with built-in lighting. | **to verify** |
-| F-023 | Serving trays (standard & elevated) | Timber serving trays, flat or raised, for entertaining. | **to verify** |
+| F-020 | Stepped bedside table with asymmetric hutch | A bedside table with stepped levels and an off-centre hutch for books and bits. | |
+| F-021 | House-shaped wall key holders (3 variants) | Little house-shaped key holders for the wall, in three styles. | |
+| F-022 | Illuminated shadow-box frame planters | Shadow-box frames that double as planters, with built-in lighting. | |
+| F-023 | Serving trays (standard & elevated) | Timber serving trays, flat or raised, for entertaining. | |
 | F-024 | Cap display rack | A wall rack that shows off a cap collection neatly. | |
 | F-025 | LED wall clock with shelf | A wall clock with LED lighting and a small display shelf. | |
 | F-026 | Honeycomb hex shelf | Hexagon shelves that fit together in a honeycomb on the wall. | |
@@ -260,7 +290,7 @@ Public tier cards show only the tier name, a one-liner and who it's for. Prices,
 | F-028 | Diagonal mug shelf | A diagonal wall shelf that shows off a mug collection. | |
 | F-029 | Live-edge wine rack | A wine rack cut from live-edge timber, so each piece is one of a kind. | |
 | F-030 | Bedside valet / dock | A bedside tidy for your phone, watch, wallet and keys. | |
-| F-031 | Nightstand with hutch | A nightstand with a hutch on top for a lamp, books and the alarm clock. | **to verify** (may duplicate F-020) |
+| F-031 | Nightstand with hutch | A nightstand with a hutch on top for a lamp, books and the alarm clock. | Separate product from F-020 (Q38) |
 | F-032 | Standing bird table | A free-standing bird table for the backyard. | |
 | F-033 | Asymmetric geometric wall shelf | A geometric wall shelf with an off-beat, modern shape. | |
 | F-034 | Arched slat-panel shelf | An arched shelf with a slatted back panel, for display or storage. | |
@@ -273,7 +303,7 @@ Shared "why it's unique" for the range (from the build pack): *bespoke, maker's-
 |---|---|---|---|
 | P-DOM-01 | Smart, segmented, private home setup | Documented / service | build pack, business plan |
 
-**Totals**: MSP 5 · OPUS 11 · MENTIS 5 · TEMPESTAS 6 · PORTUS 3 · FABRICUS 38 (35 range + 3) · DOMUS 1 = **69 cards**. 64 of them are public at launch while the 5 to-verify items are held back (Q38).
+**Totals**: MSP 6 · OPUS 11 · MENTIS 5 · TEMPESTAS 6 · PORTUS 3 · FABRICUS 38 (35 range + 3) · DOMUS 1 = **70 cards**, all public.
 
 Retired, so no card: original single-tenant Calendi for Pine Rivers RSL, and the NEXUS division (3CX/NBN), replaced by OPUS.
 
@@ -288,10 +318,26 @@ Consent is on file for **all** IT7Q-built sites.
 | p3 | Pine Rivers RSL | `p3.it7q.com.au` | `pr.it7q.com.au` | `PRRSL_Website` |
 | p4 | The Artist Apron | `p4.it7q.com.au` | `aa.it7q.com.au` | — |
 | p5 | Burpengary Jets | `p5.it7q.com.au` | — | — |
-| p6 | BlueVibes (placeholder name, Q29) | `p6.it7q.com.au` | — | `BlueVibes_Website` |
-| p7 | AustPathClub (placeholder name, Q29) | `p7.it7q.com.au` | — | `AustPathClub` |
+| p6 | BlueVibes Music | `p6.it7q.com.au` | — | `BlueVibes_Website` |
+| p7 | Aussie Pathtag Club | `p7.it7q.com.au` | — | `AustPathClub` |
+| p8 | Niuleaf | **its live domain** (Q42) | — | — |
+| p9 | Pro Energy Solutions | live domain when launched | — | — |
 
-The cards show client name, thumbnail and outbound `pN` link. Future sites take p8…. The `published` flag in `portfolio.json` stays, and `tools/check.py` fails if an unpublished entry appears in `dist/`. Hosting steps: §6.3.
+| Label | Kind | Source today | Snapshot | Card one-liner (draft, Chris checks) |
+|---|---|---|---|---|
+| p1 | Archive | WordPress | export → static | A welcoming website for a disability support service. |
+| p2 | Archive | WordPress | export → static | A website for Red Bird. |
+| p3 | Archive | static | copy → snapshot | A community website for the Pine Rivers RSL Sub Branch. |
+| p4 | Archive | WordPress | export → static | A website for The Artist Apron. |
+| p5 | Archive | static | copy → snapshot | A club website for the Burpengary Jets. |
+| p6 | Archive | static | copy → snapshot | A music website for BlueVibes Music. |
+| p7 | Archive | WordPress | export → static | A club website for Aussie Pathtag Club, a community of pathtag collectors and traders. |
+| p8 | **Live** | live site | **none**, link goes straight to the live domain | A live website for Niuleaf. |
+| p9 | **Reserved** | coming soon | none | `published: false` until Chris says it's live |
+
+One-liners for p2, p4 and p8 say little because the sources don't say what those businesses do; Chris to supply a few words each (Q42). The p7 one-liner assumes "pathtag" means the collectable trading tags; Chris to confirm.
+
+The cards show client name, thumbnail and outbound link. Archive cards say "Portfolio snapshot". The `published` flag in `portfolio.json` stays, and `tools/check.py` fails if an unpublished entry (p9 today) appears in `dist/`. Hosting steps: §6.3.
 
 ---
 
@@ -299,8 +345,8 @@ The cards show client name, thumbnail and outbound `pN` link. Future sites take 
 
 | Area | Decision | Notes |
 |---|---|---|
-| Colours, fonts, logo | **Replace** with the business-card brand + `_brand/` SVGs | Self-host Rajdhani + Exo 2 (woff2), no Google Fonts. |
-| Hero copy, tagline | **Reuse, re-case** | Card's sentence-case tagline + build pack mission. **No stats** (Q18). |
+| Colours, fonts, logo | **Replace** with the business-card brand; circle shapes from `_brand/` | Self-host Rajdhani + Exo 2 (woff2), no Google Fonts. |
+| Hero copy, tagline | **Reuse, re-case** | Card's sentence-case tagline + build pack mission + Chris's four stats (Q34). |
 | Division card / portfolio card design, nav, scroll animations | **Reuse, refactor** | `addEventListener` instead of inline `onclick` (strict CSP). Respect `prefers-reduced-motion`. |
 | v2 product list | **Mine for names only** | Folded into §2.1. v2 automations become the MENTIS services list. |
 | NDA legal text | **Rewrite** | One-way, 3-year draft in `docs/nda-draft.md` (Q10). |
@@ -311,13 +357,22 @@ The cards show client name, thumbnail and outbound `pN` link. Future sites take 
 **Repo layout**
 ```
 src/                 page sources + partials
-  data/projects.json public card data only (no gated detail)
-  data/portfolio.json
+  pages/             one .html per route (front matter + body)
+  partials/          layout, header, footer, sprite
+  data/site.json     public facts, hero stats, nav
+  data/divisions.json  seven divisions: Latin name, translation, colour token, subtitle
+  data/projects.json public card data only (no gated detail)   [Phase 2]
+  data/portfolio.json                                           [Phase 2]
   assets/css|js|fonts|img
-  assets/img/brand/  sanitised SVGs from _brand/ (only those used)
-tools/build.py       stdlib-only Python: partials + data → dist/ (Q21)
+  assets/img/brand/mark.svg  four circle shapes, derived from the pack emblem, no colours
+  _headers           security headers for Pages
+tools/build.py       stdlib-only Python: partials + data → dist/ (Q21), watermarks rasters
+tools/pngmark.py     stdlib PNG decode/encode + watermark + marker verification (§5.1)
+tools/brand_mark.py  one-off: pack emblem SVG → simplified mark.svg
 tools/check.py       links, HTML sanity, gated-content leak check, infrastructure guard on gated/,
-                     unpublished-portfolio check, financial-figure guard, price guard, SVG sanitiser check
+                     unpublished-portfolio check, financial-figure guard, price guard, SVG check,
+                     watermark check, pack-colour guard, public-wording guard
+tools/tests/         unit tests for the build tools (python3 -m unittest)
 dist/                build output, the only thing deployed (git-ignored)
 gated/               feature-level gated detail per division as JSON, NEVER in dist/ (§4.9)
 n8n/workflows/       nda-submission, nda-login, nda-content, nda-review, website-enquiry, nda-retention (scheduled)
@@ -333,6 +388,9 @@ _brand/              brand pack zips (git-ignored)
 - **Price guard** (Q28): the only `$` amount allowed in public files is SCUTUM's "from" price, kept as one named field in `projects.json`. Any other price in `src/` fails.
 - **Infrastructure guard** (§4.9) on `gated/`.
 - **SVG check**: no `<script>`, `on*` attributes, `<foreignObject>` or external references in any committed SVG.
+- **Watermark check** (§5.1): every raster in `dist/` must be a PNG carrying a valid IT7Q watermark marker. Anything else fails.
+- **Pack-colour guard** (Q37): none of the pack hex values may appear in `src/` or `dist/`.
+- **Public-wording guard** (§4.9): `dist/` must not mention WireGuard, `wg0`, tunnels, cloudflared, Agent Smith, Wazuh, Velociraptor, ClamAV, n8n or internal hostnames (`*.nubius.com.au`). The webhook origin is allowed only in `_headers` and the JS config once Phase 3 adds it.
 
 ---
 
@@ -440,6 +498,8 @@ A scheduled n8n workflow, `nda-retention` (daily, not a webhook), handles it:
 
 Trade-off: once the IP is nulled at 12 months, the record still holds name, email, typed signature, time, version and hash, but not the IP. Chris chose this; the privacy page states all of these periods.
 
+**Retention vs NDA survival (Q36, for the legal check)**: confidentiality now survives 2 years past the 3-year term, and indefinitely for trade secrets. The acceptance record is kept for term + 2 years, which covers the general survival period but not trade secrets, and not a claim brought later within Queensland's 6-year contract limitation period. The lawyer should say whether to keep a minimal acceptance record (name, email, version, hash, date; no IP) for longer.
+
 ### 4.11 Chris's server-side setup (documented in `deploy/`, not done by me)
 - Mailboxes: **`noreply@it7q.com.au`** (MXRoute, sending only) and **`info@it7q.com.au`**. SPF/DKIM/DMARC for `it7q.com.au` must cover MXRoute.
 - n8n credentials, referenced by name only: `IT7Q Edge Header`, `Turnstile secret`, `Postgres it7q_web`, `Mail sender (noreply@)`.
@@ -451,16 +511,25 @@ Trade-off: once the IP is nulled at 12 months, the record still holds name, emai
 
 ## 5. Image and media list
 
-Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (w×h)` + matching `alt`). **Public images must not reveal gated detail**: no schematics, board close-ups, admin screens or architecture diagrams.
+Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (w×h)`, `role="img"` + matching `aria-label`), drawn in HTML/CSS so it isn't a raster. **Public images must not reveal gated detail**: no schematics, board close-ups, admin screens or architecture diagrams.
+
+### 5.1 Watermark (build time)
+
+- **What**: the business-card master mark (four circles), bottom-right, about 12% of the image width (48–160 px), ~30% opacity, with a margin. No text.
+- **Where**: every raster image that ends up in `dist/`: photos, thumbnails, product shots, portfolio screenshots. SVG artwork (logo, badges) isn't watermarked.
+- **How**: `tools/build.py` reads the clean source from `src/assets/img/`, composites the mark with `tools/pngmark.py` (pure stdlib: zlib + PNG chunk handling, no Pillow) and writes the result to `dist/` only. Sources are never changed.
+- **Not covering the subject**: bottom-right by default. If the subject sits there, `src/data/images.json` can move the mark for that image (`"corner": "bl" | "tr" | "tl"`). Chris checks placement in the preview.
+- **Proof**: the build adds a PNG `tEXt` chunk `IT7Q-Watermark` holding the SHA-256 of the final pixels. `tools/check.py` decodes each image, recomputes the hash and fails if the marker is missing or doesn't match (e.g. a raw image copied in after the build).
+- **Format limit**: Python's standard library can't decode JPEG or WebP, so with a stdlib-only build **sources must be PNG** and the build fails closed on any other raster. Photos as PNG are heavier (roughly 1–2 MB at 1600 px instead of ~200 KB). Before the real photos land next week, Chris picks: keep PNG-only, or allow one pinned build dependency (Pillow) so photos can be JPEG/WebP (Q43).
 
 **Site-wide**
 | ID | Asset | Where | Size / format |
 |---|---|---|---|
-| IMG-01 | **Animated master logo**: inline SVG from the IT7Q master pack (`IT7Q_logo_reverse-on-dark.svg`, or the emblem), animated with CSS on the four circle paths (static when reduced motion is on) | Home hero | SVG |
-| IMG-02 | Static master logo | Header, footer | SVG (`_brand/`) |
-| IMG-03 | Favicon set | All | From the pack: `favicon.ico`, 32 px, 180 px, 192/512 px |
+| IMG-01 | **Animated master logo**: the four circle shapes from `mark.svg` in the card colours, inline, animated with CSS (static when reduced motion is on) | Home hero | SVG |
+| IMG-02 | Static master mark + IT7Q wordmark in Rajdhani | Header, footer | SVG + text |
+| IMG-03 | Favicon | All | SVG favicon in card colours (Phase 1). PNG touch icons later, watermark-exempt as they *are* the mark |
 | IMG-04 | Open Graph share image | All | 1200×630 |
-| IMG-05–11 | Division badges ×7: pack **emblem** (reverse-on-dark) + Latin name and translation as HTML text | Home badge row, divisions index, division pages | SVG (`_brand/` division packs; MSP uses the master, Q37) |
+| IMG-05–11 | Division badges ×7: the four circle shapes in the division colour + Latin name and translation as HTML text | Home badge row, divisions index, division pages | SVG (built from `mark.svg`) |
 | IMG-12–18 | Division header thumbnails ×7 | Divisions index, division pages | 1200×750 |
 | IMG-29 | Photo of Chris | About | 800×800 |
 | IMG-30 | Workshop/workspace photo (no gated detail visible) | About, Services | 1600×900 |
@@ -477,8 +546,10 @@ Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (
 | IMG-21 | p3 Pine Rivers RSL screenshot | as above |
 | IMG-22 | p4 The Artist Apron screenshot | as above |
 | IMG-23 | p5 Burpengary Jets screenshot | as above |
-| IMG-35 | p6 screenshot | as above |
-| IMG-36 | p7 screenshot | as above |
+| IMG-35 | p6 BlueVibes Music screenshot | as above |
+| IMG-36 | p7 Aussie Pathtag Club screenshot | as above |
+| IMG-39 | p8 Niuleaf screenshot (from the live site) | as above |
+| IMG-40 | p9 Pro Energy Solutions screenshot (when live) | as above |
 | IMG-24–28, IMG-37–38 | Client logos p1–p7 (if consent covers logos) | SVG/PNG |
 
 Screenshots are taken from the static snapshots (§6.3), so they match what the link shows.
@@ -486,15 +557,15 @@ Screenshots are taken from the static snapshots (§6.3), so they match what the 
 **Project cards** (one public-safe image each, 800×500 WebP; render, photo, product shot or illustrative graphic)
 | IDs | Count | Notes |
 |---|---|---|
-| P-MSP-01…05 | 5 | UI mock-ups or illustrative graphics, not real admin screens |
+| P-MSP-01…06 | 6 | UI mock-ups or illustrative graphics, not real admin screens |
 | P-OPUS-01…11 | 11 | App screenshots with dummy data |
 | P-MEN-01…05 | 5 | Illustrative (agent "team" graphic etc.) |
 | P-TEM-01…06 | 6 | One per tier (T3 Guard gets a larger hero image, 1600×1000) + carrier board. **No PCB/schematic close-ups or spec labels** |
 | P-POR-01…03 | 3 | Concept art/signage, no real locations of people's homes |
-| P-FAB-001…035, P-FAB-101…103 | 38 | F-001–F-035 product photos (placeholders at launch, Q26) + FABRICUS App, FORMAE, BIONICUS |
+| P-FAB-001…035, P-FAB-101…103 | 38 | F-001–F-035 product photos (real photos week of 2 Nov) + FABRICUS App, FORMAE, BIONICUS |
 | P-DOM-01 | 1 | Generic smart-home photo |
 
-That's **69 project images** (64 needed for launch while the 5 to-verify items are held back).
+That's **70 project images**, all watermarked at build (§5.1).
 
 **Gated** (served only via `nda-content`, never in `dist/`): G-<project-id> detail images where useful, ≤ 300 KB each, as data URIs. Investor presentation assets: G-INV-xx.
 
@@ -518,7 +589,7 @@ Nameservers are already on Cloudflare, so the zone is managed there. Adding a cu
 |---|---|---|---|
 | `it7q.com.au` (apex) | Main site | Pages project | CNAME at the apex (Cloudflare flattens it). Check what the apex points at today first |
 | `www.it7q.com.au` | Main site | Pages project | Redirect www → apex (or the reverse; Chris's pick) |
-| `p1`–`p7.it7q.com.au` | Portfolio snapshots | One Pages project each (§6.3) | Created by Pages → Custom domains |
+| `p1`–`p7.it7q.com.au` | Portfolio snapshots (archives) | One Pages project each (§6.3) | Created by Pages → Custom domains. p8/p9 need no record: they link to the clients' own domains |
 | `tc` / `rb` / `pr` / `aa.it7q.com.au` | Old portfolio names | Proxied placeholder record + redirect rule → `p1`–`p4` | §6.3 step 7 |
 | `downloads.it7q.com.au` | Existing (build pack) | unchanged | Confirm it stays |
 | MX / SPF / DKIM / DMARC | noreply@ and info@ on MXRoute | MXRoute | Check SPF/DKIM cover MXRoute's sending hosts |
@@ -543,17 +614,21 @@ Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www
 
 ### 6.3 Portfolio snapshots on Pages (Q27, plan only)
 
-Each `pN` site becomes a frozen static copy on its own Pages project. Steps, one site at a time, starting with p1:
+p1–p7 are archives (Q33). Each becomes a frozen static copy on its own Pages project. p8 Niuleaf stays on its live host and is only linked; p9 isn't touched until it's live. Steps, one site at a time, starting with p1:
 
-1. **Inventory** (me, read-only, with Chris): for each site, record the current host, whether it's WordPress or already static, and any dynamic bits a snapshot will break (contact forms, search, logins, booking/calendar widgets).
-2. **Export** (WordPress sites): mirror the live site to static HTML with `wget --mirror --convert-links --adjust-extension --page-requisites --no-parent`. That's in-house, with nothing installed on the client's WordPress. Then strip `wp-json`, `xmlrpc`, `?ver=` query strings, oEmbed and login links. Already-static sites (likely the ones with GitHub repos: p1, p3, p6, p7) skip this step if their repo matches what's live.
-3. **Fix dynamic bits**: forms become a `mailto:` link or are removed (Q33). No external form services.
-4. **Repo per snapshot**: a private repo per site (e.g. `IT7Q/p1-snapshot`), or the existing repo where it's already static. No build command; output directory is the site root. Add a `_headers` with a basic CSP and `X-Robots-Tag` if needed (Q33).
+1. **Inventory** (me, read-only, with Chris): for each site, record the current host and any dynamic bits a snapshot will break (contact forms, search, logins, booking/calendar widgets).
+2. **Export** the four WordPress sites (**p1 True Colours, p2 Red Bird, p4 The Artist Apron, p7 Aussie Pathtag Club**): mirror each to static HTML with `wget --mirror --convert-links --adjust-extension --page-requisites --no-parent`. That's in-house, with nothing installed on the client's WordPress. Then strip `wp-json`, `xmlrpc`, `?ver=` query strings, oEmbed and login links. The static sites (p3, p5, p6) are copied from their repo or current host as-is.
+3. **Archive treatment** on every snapshot page, applied by one small post-processing script:
+   - `<meta name="robots" content="noindex">` on every page, plus `X-Robots-Tag: noindex` in `_headers`;
+   - every `<form>` disabled (fields and submit `disabled`, `action` removed) with a short note: *"This is a portfolio copy, so this form is switched off."*;
+   - a small fixed banner: *"Portfolio snapshot built by IT7Q"*, linking to `https://it7q.com.au/portfolio/`;
+   - a basic CSP in `_headers`.
+4. **Repo per snapshot**: a private repo per site (e.g. `IT7Q/p1-snapshot`). No build command; output directory is the site root.
 5. **Pages project** `it7q-pN` (Chris creates it), connected to that repo. Check it on `it7q-pN.pages.dev`: pages, images, links, mobile.
 6. **Custom domain** `pN.it7q.com.au` added in Pages (Chris, at go-live). Pages creates the DNS record.
 7. **Old names** (`tc`→p1, `rb`→p2, `pr`→p3, `aa`→p4): keep a proxied DNS record on each old name, and add one Cloudflare **Single Redirect** rule per name: `301` to `https://pN.it7q.com.au` with path and query kept. Test with `curl -I` on a few deep links.
 8. **Retire old hosting** for each site once its `pN` and redirect are verified (Chris).
-9. **Screenshots** for IMG-19–23/35–36 are taken from the snapshots.
+9. **Screenshots** for IMG-19–23/35–36 are taken from the snapshots; IMG-39 from Niuleaf's live site.
 
 Nothing in §6.3 touches DNS until Chris does steps 6–8.
 
@@ -562,7 +637,7 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 ## 7. Build phases (one step at a time)
 
 0. ✅ Repo, source, plan v1. ✅ Financials removed from repo + history, GitHub purge done (§10). ✅ Plans v2–v6. ✅ NDA draft for review. ✅ Brand packs extracted and checked.
-1. Scaffold `src/`, build/check tools, brand tokens, base CSS, header/footer, placeholder component, Home (animated logo + badge row). **Needs the brand decision first (Q37).**
+1. ✅ **Phase 1 (27 Oct)**: `src/` structure with stub pages for every route, build/check tools with unit tests, watermark pipeline, brand tokens, base CSS, header/footer, placeholder component, animated logo, Home (hero stats, badge row, coming-soon teaser). Preview: §7.1.
 2. Public pages: About, Divisions index + 7 division pages with cards from `projects.json`, MENTIS services list, Portfolio, Services, Contact, Legal.
 3. NDA front end (`/access/`, locked panels, renderer) and enquiry form against a local mock with failure simulation.
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
@@ -570,28 +645,27 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live.
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
 
+### 7.1 Previewing locally
+From `/srv/work/it7q-website` on Pantheon:
+```
+python3 tools/build.py && python3 tools/check.py
+python3 -m http.server 8080 --bind 127.0.0.1 --directory dist
+```
+Then open <http://localhost:8080/> in a browser on the Windows side (WSL2 forwards localhost). It's bound to 127.0.0.1, so nothing is exposed to the network. `Ctrl+C` stops it. `_headers` (CSP etc.) only applies on Cloudflare Pages, not in this local preview.
+
 ---
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–28 except 29; 30 (packs supplied); 31 (FABRICUS register); 32 (12 months). See §1a.
+**Answered**: 1–39 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later; Q39 is checked in the Phase 1 preview.
 
 **Still open**
-29. **p6/p7 display names**: how should BlueVibes and AustPathClub appear on their cards? Is there a one-liner for each? Placeholders stay until then.
-33. **Snapshot details (§6.3)**: (a) which p1–p7 sites are WordPress and where each is hosted today; (b) do any clients still edit their site? A frozen snapshot would stop that; (c) are any `pN` sites copies of a client's own live domain? If so, the snapshot should carry `noindex` or a canonical link to avoid duplicate-content issues; (d) are forms on snapshots dropped, or replaced with a `mailto:` link?
-34. **Hero stats**: none at launch. Send the true-today numbers whenever you want them added.
-35. **Project statuses** marked TBC in §2.1 (SysMon, Andromeda CE, Aegir, FORTUNA, COLLOQUIUM, PORTUS App/Jnr, FABRICUS App, FORMAE, BIONICUS), and a quick confirm of the rest.
-36. **NDA draft** (`docs/nda-draft.md`): your review, then a legal check. The reviewer should look at the flagged points in its notes, especially whether confidentiality should outlast the 3-year term.
-
-**New**
-37. **Brand conflict (blocks Phase 1)**: the packs don't match the business card on master colours, navy, taglines, MSP, OPUS or TEMPESTAS (§1b). Pick one:
-    1. pack artwork + pack palette, card words as HTML text (recommended);
-    2. card wins, packs get recoloured;
-    3. pack artwork with only the mismatched divisions recoloured.
-
-    Also: is there meant to be a separate **MSP** pack, or does MSP use the IT7Q master?
-38. **To-verify FABRICUS items** (F-020–F-023, F-031): hold them out of the public build until verified (my default), or show them now? And is F-031 a duplicate of F-020?
-39. **FABRICUS one-liners** (§2.1): check my drafts. They're kept to what the names say, with no materials, sizes or prices assumed.
+36. **NDA legal check** before launch (`docs/nda-draft.md`, now with a survival clause).
+40. **Font files**: Pantheon has no network access, so I couldn't fetch Rajdhani and Exo 2. Please drop these woff2 files (Google Fonts / OFL) into `src/assets/fonts/`: `rajdhani-500.woff2`, `rajdhani-600.woff2`, `rajdhani-700.woff2`, `exo2-400.woff2`, `exo2-600.woff2`, plus `OFL.txt`. The `@font-face` rules switch on once they exist; until then system fonts are used.
+41. **Division hex values**: MSP blue, PORTUS violet, FABRICUS amber and DOMUS green are my provisional picks (§1). Send the card's exact values if they differ.
+42. **Portfolio details**: Niuleaf's live domain (p8), and a few words on what Red Bird, The Artist Apron and Niuleaf do, for their one-liners. Is "pathtag collectors and traders" right for Aussie Pathtag Club, and "disability support service" right for True Colours DSS?
+43. **Photo format** (§5.1): stdlib-only means the watermark step can only handle PNG. Keep PNG-only (heavier pages), or allow Pillow as one pinned build dependency so photos can be JPEG/WebP? Needed before the real photos arrive next week.
+44. **Proposed extra stats** (§2): approve any of the five, or none.
 
 ---
 
@@ -613,3 +687,4 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
   - **GitHub purge done (26 Oct, Chris):** the repo was deleted and recreated. Fetching `b39954a` by SHA now returns "not our ref". Nothing pending.
 - **26 Oct 2026: plan v5.** `_brand/` zips git-ignored.
 - **27 Oct 2026: plan v6.** Brand packs extracted (outside the repo) and colour-checked. FABRICUS register F-001–F-035 added.
+- **27 Oct 2026: plan v7 + Phase 1.** Brand = business card. Phase 1 scaffold, tools and Home committed.
