@@ -1,14 +1,14 @@
 # IT7Q website rebuild — plan
 
-Status: **plan only, nothing built yet.** v5, 26 Oct 2026. It folds in Chris's answers to every §8 question except Q29, plus the brand update (business-card logo, `_brand/` packs, home badge row).
+Status: **plan only, nothing built yet.** v6, 27 Oct 2026. It adds the `_brand/` colour check (§1b, which found a conflict for Chris to decide: Q37), the FABRICUS register F-001–F-035, the Q32 answer and the completed GitHub purge.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
 
 ## 0. Bottom line
 
-- **Multi-page static site** on **Cloudflare Pages (free plan)**. Brand = the **April 2026 business-card set** (§1), with SVGs from the `_brand/` packs. Copy and layout ideas come from v2. The structure, forms and NDA gate are rebuilt.
-- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. Q24 placed every project; the inventory is **53 cards** (§2.1).
+- **Multi-page static site** on **Cloudflare Pages (free plan)**. Brand = the **April 2026 business-card set** (§1). **The `_brand/` packs use a different palette, navy and taglines from the card** (§1b), so which one wins is Chris's call (Q37) before Phase 1. Copy and layout ideas come from v2. The structure, forms and NDA gate are rebuilt.
+- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory is **69 cards** (§2.1), 38 of them FABRICUS.
 - **Gated detail never ships in the static site.** It lives server-side (Postgres, read by n8n) and only reaches the browser after an approved login. Any failure keeps the page locked.
 - **No secrets in the site.** Protection comes from server-side checks in n8n, Turnstile, rate limits and a Cloudflare-injected edge header.
 - **Five webhooks**: four NDA (`nda-submission`, `nda-login`, `nda-content`, `nda-review`) + `website-enquiry` (Q19). All have the same protections. Review links sit behind Cloudflare Access.
@@ -24,8 +24,10 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 | Source | Where | Role | Notes |
 |---|---|---|---|
-| **Business card (Apr 2026) + `_brand/` packs (Oct 2026)** | `_brand/` (IT7Q master + six division zips) | **Brand**: logo, colours, tagline, division badges | Wins over the build pack on brand. **`_brand/` is empty as of 26 Oct** (root-owned folder, no zips in it). See Q30. |
-| `it7q-website-build-pack.md` (Aug 2026) | `/srv/work/it7q-private/` **only** (never committed) | **Primary for content**: NDA-wall pattern, division/project map, portfolio p1–p4 | Its "Detail (NDA)" blocks are rewritten at feature level for `gated/`, with infrastructure detail dropped (§4.9). Its brand block (navy `#0a1628`, title-case tagline) is superseded by the business card. It has **no F-001–F-019 names or one-liners** (Q31). |
+| **Business card (Apr 2026)** | Chris (values in this plan) | **Brand**: colours, tagline, badge names | Wins over the build pack on brand. Conflicts with the `_brand/` packs (§1b, Q37). |
+| **`_brand/` packs (Oct 2026)** | `_brand/` (IT7Q master + six division zips; **no separate MSP pack**, the master covers "Group & Managed Services"), git-ignored | **Logo artwork**: SVG logo + emblem ×5 variants, PNGs, favicons, 3D plaques per pack | Extracted 27 Oct into scratch folders outside the repo; all SVGs pass the safety scan. Same README in all seven. |
+| FABRICUS register (Jul 2026 plan-sheet handover) | Chris (names in §2.1) | F-001–F-035 product names | Shop jigs/tools excluded (not retail). |
+| `it7q-website-build-pack.md` (Aug 2026) | `/srv/work/it7q-private/` **only** (never committed) | **Primary for content**: NDA-wall pattern, division/project map, portfolio p1–p4 | Its "Detail (NDA)" blocks are rewritten at feature level for `gated/`, with infrastructure detail dropped (§4.9). Its brand block (navy `#0a1628`, title-case tagline) is superseded by the business card. |
 | `IT7Q_Complete_Business_Plan.docx` | `/srv/work/it7q-private/` **only** | **Secondary**: project discovery | Older: still has NEXUS, no OPUS. **Read in place; never copied, quoted for figures or committed.** |
 | `_source/v2/` + zip (May 2026) | repo | Look, copy, layout; v2 product list | NDA and forms are mock only, and the NDA fails open. v2 has **no per-division colours** (only navy/cyan/amber/green/purple/red tokens). |
 | Jan 2026 spec transcript | `/srv/work/it7q-private/` | Multi-page structure, policy page drafts | Holds company financials. |
@@ -39,35 +41,48 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 **Division badges (business-card style): Latin name + translation, each in its own colour**
 
-| Division | Badge translation | Colour (card) | Hex | Page subtitle (descriptive) |
+| Division | Badge translation | Colour (card) | Pack colours (light · mid · deep) | Match? | Page subtitle (descriptive) |
+|---|---|---|---|---|---|
+| MSP | Managed Services | blue | no MSP pack; master = gold `#EAAE40` · orange `#DF6D2E` · crimson `#BB2949` | ❌ | Managed IT, plain English |
+| OPUS | Works & Projects | orange | gold `#F2C14E` · teal `#22A89C` · deep teal `#0E7470` | ❌ | Software products |
+| MENTIS | Mind & Intelligence | purple | cyan `#3FC8DB` · pink `#D5479F` · purple `#7A2AC8` | ⚠️ partly | AI & automation |
+| TEMPESTAS | Storm & Hardware | cyan | sky `#7FB8EA` · blue `#3A86CF` · deep blue `#1C4F9C` | ❌ blue, not cyan | Cybersecurity hardware |
+| PORTUS | Harbour & Gateway | lavender/violet (not teal) | lavender `#C3A6EC` · violet `#8B5CC9` · deep violet `#5E3496` | ✅ | Community safety |
+| FABRICUS | Craft & Making | amber | amber `#E8B04A` · copper `#C8662A` · brown `#8A3B12` | ✅ | Woodcraft & digital manufacturing |
+| DOMUS | Home & Dwelling | green | light green `#A6D86E` · green `#43A867` · deep green `#22704A` | ✅ | Smart home |
+
+### 1b. Brand colour check (27 Oct, against the extracted packs)
+
+**Bottom line: the packs are a different colour system from the business card.** The emblem shape is the same family: four interlocking circles, one navy plus three accents, inside a navy ring with the name arched on top and a tagline arched below. But the master's colours, the navy, every tagline, and three of the seven division colours don't match the card. Only PORTUS, FABRICUS and DOMUS line up.
+
+**Mismatches**
+
+| # | Item | Business card | `_brand/` packs | Notes |
 |---|---|---|---|---|
-| MSP | Managed Services | blue | from `_brand/` | Managed IT, plain English |
-| OPUS | Works & Projects | orange | from `_brand/` | Software products |
-| MENTIS | Mind & Intelligence | purple | from `_brand/` | AI & automation |
-| TEMPESTAS | Storm & Hardware | cyan | from `_brand/` | Cybersecurity hardware |
-| PORTUS | Harbour & Gateway | **lavender/violet (not teal)** | from `_brand/` | Community safety |
-| FABRICUS | Craft & Making | amber | from `_brand/` | Woodcraft & digital manufacturing |
-| DOMUS | Home & Dwelling | green | from `_brand/` | Smart home |
+| 1 | **Master circles** | cyan `#00B4CC`, lime `#7EC820`, purple `#8B5CF6`, orange `#F97316` (four colours) | navy `#0E1326` + gold `#EAAE40`, orange `#DF6D2E`, crimson `#BB2949` | Different palette. None of the card's four colours appears in any pack. |
+| 2 | **Navy** | `#0D1B2A` | `#0E1326` (all seven packs) | Close to the eye (both very dark) but not the same hex. The build pack had a third value, `#0a1628`. |
+| 3 | **Master tagline** | "Smart tech. Simple terms. Serious security." | "CYBER - TECH SERVICES" arched in the logo | The card line can still sit beside the logo as text. |
+| 4 | **Division taglines** | Latin translation (Works & Projects, Storm & Hardware…) | English descriptor (SOFTWARE STUDIO, CYBER SECURITY, COMMUNITY SAFETY, WOODCRAFT & MAKING, SMART HOME, ARTIFICIAL INTELLIGENCE) | The pack README marks OPUS's and FABRICUS's as placeholders. The badge row can put the card translation in HTML under the **emblem** (which has no text) and sidestep this. |
+| 5 | **MSP** | blue | no MSP pack; the README says the master pack is "Group & Managed Services" (warm palette) | MSP has no blue artwork anywhere. |
+| 6 | **OPUS** | orange | teal + gold | This is the teal in the family, not PORTUS. |
+| 7 | **TEMPESTAS** | cyan | blues | Card MSP = blue and TEMPESTAS = cyan; the packs have TEMPESTAS blue. |
+| 8 | **MENTIS** | purple | purple deep accent, but with cyan and pink | Purple carries the name and tagline, so it reads purple-ish overall. |
+| 9 | PORTUS | lavender/violet | lavender/violet | ✅ |
+| 10 | FABRICUS | amber | amber/copper/brown | ✅ |
+| 11 | DOMUS | green | greens | ✅ |
 
-Hex values get filled from the pack SVGs, then checked against this table (§1b). Every division colour also gets a WCAG AA check as text on `#0D1B2A`, with a lighter tint used for small text where needed.
+**Colour contrast** (as text or thin line on the card navy `#0D1B2A`; AA needs 4.5 for body text, 3.0 for large text and UI):
+- Every pack's **light** accent passes easily (8.2–10.5).
+- **Mid** accents mostly pass at 4.3–5.9. PORTUS `#8B5CC9` is 3.7, so it's large text only.
+- **Deep** accents fail on navy (2.0–3.1). They suit white backgrounds; on dark, the badge row uses the reverse-on-dark artwork.
+- Card master colours: 4.1–8.4. Purple `#8B5CF6` is 4.1, large text only.
 
-### 1b. Brand colour check (mismatches so far)
+**Safety scan**: all 70 SVGs are clean (no `<script>`, `on*` handlers, `<foreignObject>`, external or `data:` references, DOCTYPE or entities). Each zip was extracted with path-traversal and symlink checks into its own scratch folder. Nothing has been copied into the repo yet; only SVGs actually used get copied into `src/assets/img/brand/` in Phase 1. The zips stay git-ignored. The 3D plaque files and PNGs aren't needed for the site.
 
-The packs aren't in `_brand/` yet, so I can't check the division SVGs. Against the sources I do have:
-
-| # | Item | Old source says | Business card says | Action |
-|---|---|---|---|---|
-| 1 | Navy background | `#0a1628` (build pack) | `#0D1B2A` | Use `#0D1B2A` |
-| 2 | Tagline casing | "Smart Tech. Simple Terms. Serious Security." (build pack, v2) | "Smart tech. Simple terms. Serious security." | Use the card's sentence case |
-| 3 | Division colours | none defined (build pack, v2) | the seven above | Plan v4 wrongly said "division accents from v2". v2 has none, so the card + packs are the only source |
-| 4 | v2 cyan / purple / amber | `#00BCD4`, `#7C3AED`, `#F59E0B` | master `#00B4CC`, `#8B5CF6`; FABRICUS amber from pack | Drop the v2 values |
-
-Watch-outs for when the packs land:
-- **MSP blue vs TEMPESTAS cyan** and **MENTIS purple vs PORTUS violet** sit close together. Both pairs need to stay clearly distinct side by side in the badge row.
-- **OPUS orange vs FABRICUS amber** is the same story.
-- If any pack SVG uses teal for PORTUS, or a different hex from the master mark for a shared colour, I list it for Chris rather than "fixing" the SVG.
-
-**Pack handling**: the zips are untrusted input. Each one gets extracted into its own new, empty folder outside the repo tree. SVGs are checked for `<script>`, `on*` handlers, `<foreignObject>` and external `href`s before any of them is copied into `src/assets/img/brand/`. Only the SVGs actually used are committed. The zips stay git-ignored.
+**Ways to settle it (Q37)** — my recommendation is the first:
+1. **Packs win for artwork, card wins for words.** Use the pack SVGs as-is and take the site palette from them (navy `#0E1326`, each division's mid accent as its colour). Keep the card's tagline and Latin translations as HTML text under the emblems. MSP uses the master emblem. Fastest, and the logo on the site matches what's printed and 3D-plaqued.
+2. **Card wins everywhere.** The packs get recoloured to the card palette (new SVGs from Chris or the designer). An MSP pack and new taglines would be needed. Slower.
+3. **Mix**: pack artwork, but recolour only the mismatched divisions (master, MSP, OPUS, TEMPESTAS).
 
 ---
 
@@ -99,9 +114,11 @@ Watch-outs for when the packs land:
 | 23 | Gated text at feature level only (§4.9). |
 | 24 | Every project placed (§2.1). |
 | 25 | TEMPESTAS tiers T1 Scout → T5 Citadel; prices/specs gated; SCUTUM = MSP antivirus only. |
-| 26 | **FABRICUS F-001–F-019**: launch with names/one-liners + **photo placeholders**. (The build pack has no per-item names yet: Q31.) |
+| 26 | **FABRICUS**: launch with names/one-liners + **photo placeholders**. |
 | 27 | **Portfolio**: each `pN` site becomes a **static snapshot on its own Pages project**. WordPress sites get exported to static HTML first. Old `tc/rb/pr/aa` names **redirect** to `pN`. Steps in §6.3; no DNS changes yet. |
 | 28 | **SCUTUM's "from" price is public.** Every other product/hardware price is gated. |
+| 31 | **FABRICUS register**: F-001–F-035 from the July 2026 plan-sheet handover. I write the public one-liners. F-016 is the TABULAE medal board. F-020–F-023 and F-031 are marked **to verify** (F-031 may duplicate F-020). Shop-use jigs and tools are excluded (not retail). |
+| 32 | Requests that never become an NDA (pending too long, or rejected) are kept **12 months**. |
 
 ---
 
@@ -205,17 +222,58 @@ Public tier cards show only the tier name, a one-liner and who it's for. Prices,
 **FABRICUS — Craft & Making (woodcraft & digital manufacturing)**
 | ID | Project | Status | Source |
 |---|---|---|---|
-| P-FAB-001 … P-FAB-019 | Product range F-001 → F-019 (19 cards, photo placeholders at launch, Q26). **TABULAE medal display boards fold into this range**: the build pack's F-range already covers medal-display boards, so no separate card | In development | build pack |
-| P-FAB-020 | FABRICUS App (offline order/catalogue PWA) | TBC | Feb notes |
-| P-FAB-021 | FORMAE custom 3D prints | TBC | Feb notes |
-| P-FAB-022 | BIONICUS assistive body supports (Project Bionic) | TBC | Feb notes |
+| P-FAB-101 | FABRICUS App (offline order/catalogue PWA) | TBC | Feb notes |
+| P-FAB-102 | FORMAE custom 3D prints | TBC | Feb notes |
+| P-FAB-103 | BIONICUS assistive body supports (Project Bionic) | TBC | Feb notes |
+
+**FABRICUS product range** (Q31). Source: July 2026 plan-sheet handover. Card ID = `P-FAB-` + the F-number (e.g. F-007 → `P-FAB-007`). Status for all: In development. All launch with photo placeholders (Q26). Public one-liners are mine, in plain English, and Chris checks them. **To verify** items are held out of the public build until Chris confirms them (Q38); `tools/check.py` fails if a `verify: true` card reaches `dist/`.
+
+| F-no. | Name | Public one-liner (draft) | Note |
+|---|---|---|---|
+| F-001 | Toilet roll holder with shelf & planter nook | A toilet roll holder with a handy shelf on top and a little nook for a plant. | |
+| F-002 | Towel rail with shelf | A wall towel rail with a shelf above for the bits you reach for every day. | |
+| F-003 | Tea-towel ladder rack with roll holder | A ladder-style rack for tea towels, with a paper-towel roll built in. | |
+| F-004 | L-shape spice rack with paper towel holder | A corner-friendly spice rack that keeps the paper towel within reach too. | |
+| F-005 | Wall pantry rack with paper towel holder | Wall-mounted pantry shelving that frees up bench space, with a paper towel holder. | |
+| F-006 | Bathroom cubby unit (3 x 3) | Nine open cubbies to keep towels, toiletries and bits sorted. | |
+| F-007 | Rustic mini wall dresser, 2 drawers | A small rustic dresser that hangs on the wall, with two drawers for odds and ends. | |
+| F-008 | Spice cabinet with towel rail, curved legs | A free-standing spice cabinet on curved legs, with a towel rail on the side. | |
+| F-009 | Slatted arch mail & key holder | An arched, slatted organiser by the door for mail and keys. | |
+| F-010 | Shield key holder with shelf & peg keyrings | A shield-shaped key holder with a small shelf and matching peg keyrings. | |
+| F-011 | Horse planter | A horse-shaped planter that brings a bit of character to the garden or veranda. | |
+| F-012 | Market cart / flower wagon planter | A little market-cart planter for flowers, herbs or a front-porch display. | |
+| F-013 | Heart phone stand | A heart-shaped stand that holds your phone upright on a desk or bedside. | |
+| F-014 | Automotive wall clock | A wall clock with a motoring theme, for the garage, shed or games room. | |
+| F-015 | LED-lit sign plaque (custom text) | A personalised sign plaque with your own text, softly lit by LEDs. | |
+| F-016 | Medal display shadow box with photo | A shadow box that displays medals alongside a photo, made to honour service and achievement. | **TABULAE** medal board |
+| F-017 | Solid timber TV entertainment unit | A solid timber entertainment unit for the TV and everything that goes with it. | |
+| F-018 | LED TV feature wall with slats & shelves | A slatted TV feature wall with shelves and LED accent lighting. | |
+| F-019 | Simple workbench | A sturdy, no-fuss workbench for the shed or garage. | |
+| F-020 | Stepped bedside table with asymmetric hutch | A bedside table with stepped levels and an off-centre hutch for books and bits. | **to verify** |
+| F-021 | House-shaped wall key holders (3 variants) | Little house-shaped key holders for the wall, in three styles. | **to verify** |
+| F-022 | Illuminated shadow-box frame planters | Shadow-box frames that double as planters, with built-in lighting. | **to verify** |
+| F-023 | Serving trays (standard & elevated) | Timber serving trays, flat or raised, for entertaining. | **to verify** |
+| F-024 | Cap display rack | A wall rack that shows off a cap collection neatly. | |
+| F-025 | LED wall clock with shelf | A wall clock with LED lighting and a small display shelf. | |
+| F-026 | Honeycomb hex shelf | Hexagon shelves that fit together in a honeycomb on the wall. | |
+| F-027 | Kids' tree bookshelf | A tree-shaped bookshelf that makes kids' books part of the room. | |
+| F-028 | Diagonal mug shelf | A diagonal wall shelf that shows off a mug collection. | |
+| F-029 | Live-edge wine rack | A wine rack cut from live-edge timber, so each piece is one of a kind. | |
+| F-030 | Bedside valet / dock | A bedside tidy for your phone, watch, wallet and keys. | |
+| F-031 | Nightstand with hutch | A nightstand with a hutch on top for a lamp, books and the alarm clock. | **to verify** (may duplicate F-020) |
+| F-032 | Standing bird table | A free-standing bird table for the backyard. | |
+| F-033 | Asymmetric geometric wall shelf | A geometric wall shelf with an off-beat, modern shape. | |
+| F-034 | Arched slat-panel shelf | An arched shelf with a slatted back panel, for display or storage. | |
+| F-035 | Guitar stand & media station | A stand for your guitar with room for the amp, music and gear. | |
+
+Shared "why it's unique" for the range (from the build pack): *bespoke, maker's-marked, made in-house on IT7Q's own CNC and 3D printer.* TABULAE is no longer a separate project name in the inventory; it's F-016.
 
 **DOMUS — Home & Dwelling (smart home)**
 | ID | Project | Status | Source |
 |---|---|---|---|
 | P-DOM-01 | Smart, segmented, private home setup | Documented / service | build pack, business plan |
 
-**Totals**: MSP 5 · OPUS 11 · MENTIS 5 · TEMPESTAS 6 · PORTUS 3 · FABRICUS 22 · DOMUS 1 = **53 cards**.
+**Totals**: MSP 5 · OPUS 11 · MENTIS 5 · TEMPESTAS 6 · PORTUS 3 · FABRICUS 38 (35 range + 3) · DOMUS 1 = **69 cards**. 64 of them are public at launch while the 5 to-verify items are held back (Q38).
 
 Retired, so no card: original single-tenant Calendi for Pine Rivers RSL, and the NEXUS division (3CX/NBN), replaced by OPUS.
 
@@ -378,7 +436,7 @@ A scheduled n8n workflow, `nda-retention` (daily, not a webhook), handles it:
 | `nda_audit`, `nda_rate`, `enquiries` | **12 months** | Deleted |
 | `nda_sessions` | Until expiry | Deleted |
 | `nda_review_tokens` | Until used or expired | Deleted |
-| Pending/rejected requests that never became an NDA | Proposed: **12 months** | Deleted (Q32) |
+| Pending/rejected requests that never became an NDA | **12 months** (Q32) | Deleted |
 
 Trade-off: once the IP is nulled at 12 months, the record still holds name, email, typed signature, time, version and hash, but not the IP. Chris chose this; the privacy page states all of these periods.
 
@@ -398,11 +456,11 @@ Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (
 **Site-wide**
 | ID | Asset | Where | Size / format |
 |---|---|---|---|
-| IMG-01 | **Animated master logo**: inline SVG from the IT7Q master pack, animated with CSS (static when reduced motion is on) | Home hero | SVG |
+| IMG-01 | **Animated master logo**: inline SVG from the IT7Q master pack (`IT7Q_logo_reverse-on-dark.svg`, or the emblem), animated with CSS on the four circle paths (static when reduced motion is on) | Home hero | SVG |
 | IMG-02 | Static master logo | Header, footer | SVG (`_brand/`) |
-| IMG-03 | Favicon set | All | SVG, 32 px, 180 px |
+| IMG-03 | Favicon set | All | From the pack: `favicon.ico`, 32 px, 180 px, 192/512 px |
 | IMG-04 | Open Graph share image | All | 1200×630 |
-| IMG-05–11 | Division badges ×7, business-card style | Home badge row, divisions index, division pages | SVG (`_brand/` division packs) |
+| IMG-05–11 | Division badges ×7: pack **emblem** (reverse-on-dark) + Latin name and translation as HTML text | Home badge row, divisions index, division pages | SVG (`_brand/` division packs; MSP uses the master, Q37) |
 | IMG-12–18 | Division header thumbnails ×7 | Divisions index, division pages | 1200×750 |
 | IMG-29 | Photo of Chris | About | 800×800 |
 | IMG-30 | Workshop/workspace photo (no gated detail visible) | About, Services | 1600×900 |
@@ -433,10 +491,10 @@ Screenshots are taken from the static snapshots (§6.3), so they match what the 
 | P-MEN-01…05 | 5 | Illustrative (agent "team" graphic etc.) |
 | P-TEM-01…06 | 6 | One per tier (T3 Guard gets a larger hero image, 1600×1000) + carrier board. **No PCB/schematic close-ups or spec labels** |
 | P-POR-01…03 | 3 | Concept art/signage, no real locations of people's homes |
-| P-FAB-001…022 | 22 | F-001–F-019 product photos (placeholders at launch, Q26) + FABRICUS App, FORMAE, BIONICUS |
+| P-FAB-001…035, P-FAB-101…103 | 38 | F-001–F-035 product photos (placeholders at launch, Q26) + FABRICUS App, FORMAE, BIONICUS |
 | P-DOM-01 | 1 | Generic smart-home photo |
 
-That's **53 project images**.
+That's **69 project images** (64 needed for launch while the 5 to-verify items are held back).
 
 **Gated** (served only via `nda-content`, never in `dist/`): G-<project-id> detail images where useful, ≤ 300 KB each, as data URIs. Investor presentation assets: G-INV-xx.
 
@@ -503,8 +561,8 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 
 ## 7. Build phases (one step at a time)
 
-0. ✅ Repo, source, plan v1. ✅ Financials removed from repo + history (GitHub cache purge pending, §10). ✅ Plans v2–v5. ✅ NDA draft for review.
-1. Scaffold `src/`, build/check tools, brand tokens (business-card set), base CSS, header/footer, placeholder component, Home (animated logo + badge row). **Needs the `_brand/` packs first (Q30).**
+0. ✅ Repo, source, plan v1. ✅ Financials removed from repo + history, GitHub purge done (§10). ✅ Plans v2–v6. ✅ NDA draft for review. ✅ Brand packs extracted and checked.
+1. Scaffold `src/`, build/check tools, brand tokens, base CSS, header/footer, placeholder component, Home (animated logo + badge row). **Needs the brand decision first (Q37).**
 2. Public pages: About, Divisions index + 7 division pages with cards from `projects.json`, MENTIS services list, Portfolio, Services, Contact, Legal.
 3. NDA front end (`/access/`, locked panels, renderer) and enquiry form against a local mock with failure simulation.
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
@@ -516,19 +574,24 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–28 except 29. See §1a.
+**Answered**: 1–28 except 29; 30 (packs supplied); 31 (FABRICUS register); 32 (12 months). See §1a.
 
 **Still open**
 29. **p6/p7 display names**: how should BlueVibes and AustPathClub appear on their cards? Is there a one-liner for each? Placeholders stay until then.
-
-**New**
-30. **`_brand/` is empty.** The folder exists (owned by root) but has no zips in it, so I couldn't extract the SVGs or check the division colours. Please copy the seven packs in (as `chris`, e.g. `cp ~/path/to/IT7Q-*.zip /srv/work/it7q-website/_brand/`). Then I'll extract them, check every colour against §1 and list the mismatches. Phase 1 needs this.
-31. **F-001–F-019 names and one-liners aren't in the build pack.** It has only the range-level teaser and a note to "add the individual specs/photos as you finalise them". I need the 19 names + one-liners (and which F-number is the TABULAE medal board) before the FABRICUS page can go past "F-001 … F-019" placeholders.
-32. **Retention for requests that never became an NDA** (pending too long, or rejected): 12 months (my proposal), or something else?
 33. **Snapshot details (§6.3)**: (a) which p1–p7 sites are WordPress and where each is hosted today; (b) do any clients still edit their site? A frozen snapshot would stop that; (c) are any `pN` sites copies of a client's own live domain? If so, the snapshot should carry `noindex` or a canonical link to avoid duplicate-content issues; (d) are forms on snapshots dropped, or replaced with a `mailto:` link?
 34. **Hero stats**: none at launch. Send the true-today numbers whenever you want them added.
 35. **Project statuses** marked TBC in §2.1 (SysMon, Andromeda CE, Aegir, FORTUNA, COLLOQUIUM, PORTUS App/Jnr, FABRICUS App, FORMAE, BIONICUS), and a quick confirm of the rest.
 36. **NDA draft** (`docs/nda-draft.md`): your review, then a legal check. The reviewer should look at the flagged points in its notes, especially whether confidentiality should outlast the 3-year term.
+
+**New**
+37. **Brand conflict (blocks Phase 1)**: the packs don't match the business card on master colours, navy, taglines, MSP, OPUS or TEMPESTAS (§1b). Pick one:
+    1. pack artwork + pack palette, card words as HTML text (recommended);
+    2. card wins, packs get recoloured;
+    3. pack artwork with only the mismatched divisions recoloured.
+
+    Also: is there meant to be a separate **MSP** pack, or does MSP use the IT7Q master?
+38. **To-verify FABRICUS items** (F-020–F-023, F-031): hold them out of the public build until verified (my default), or show them now? And is F-031 a duplicate of F-020?
+39. **FABRICUS one-liners** (§2.1): check my drafts. They're kept to what the names say, with no materials, sizes or prices assumed.
 
 ---
 
@@ -547,5 +610,6 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
   - History was rewritten (authorised one-off) and force-pushed. `main` now has no commit containing them.
   - A backup bundle of the old history is in `/srv/work/it7q-private` (contains financials; delete once you're happy).
   - The August build pack was moved to `/srv/work/it7q-private` and git-ignored. It was never committed.
-  - **Pending (Chris):** GitHub still serves the old, now-unreferenced commit `b39954a` (and its parent) if fetched by exact SHA. Purging that needs a GitHub Support request (sensitive data removal: ask them to garbage-collect the repo and drop cached views). The alternative is deleting and recreating the repo, which needs the deploy key re-added.
+  - **GitHub purge done (26 Oct, Chris):** the repo was deleted and recreated. Fetching `b39954a` by SHA now returns "not our ref". Nothing pending.
 - **26 Oct 2026: plan v5.** `_brand/` zips git-ignored.
+- **27 Oct 2026: plan v6.** Brand packs extracted (outside the repo) and colour-checked. FABRICUS register F-001–F-035 added.
