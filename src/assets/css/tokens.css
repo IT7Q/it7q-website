@@ -1,0 +1,38 @@
+/* IT7Q brand tokens: April 2026 business card (PLAN.md §1, Q37).
+   Pack colours are banned here; tools/check.py enforces it. */
+:root {
+  /* Master */
+  --navy: #0D1B2A;
+  --navy-2: #13263A;      /* raised surfaces */
+  --navy-3: #1B324B;      /* borders, alt sections */
+  --cyan: #00B4CC;
+  --lime: #7EC820;
+  --purple: #8B5CF6;
+  --purple-text: #A98BFA; /* purple for small text: 6.4:1 on navy */
+  --orange: #F97316;
+
+  /* Divisions (card colour names; MSP, PORTUS, FABRICUS, DOMUS hex provisional, Q41) */
+  --c-msp: #4F8EF7;
+  --c-opus: var(--orange);
+  --c-mentis: var(--purple);
+  --c-mentis-text: var(--purple-text);
+  --c-tempestas: var(--cyan);
+  --c-portus: #C4A7F5;
+  --c-fabricus: #F5B53D;
+  --c-domus: #3FBF5F;
+
+  /* Text */
+  --text: #E8EEF4;
+  --text-muted: #A9B8C8;  /* 8.6:1 on navy */
+  --focus: #FFFFFF;
+
+  /* Type */
+  --font-head: "Rajdhani", "Bahnschrift", "DIN Alternate", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Exo 2", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  /* Layout */
+  --wrap: 72rem;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --radius: 0.75rem;
+  --space: clamp(3rem, 8vw, 6rem);
+}

@@ -1,0 +1,70 @@
+{
+  "name": "IT7Q Cyber-Tech Services",
+  "short_name": "IT7Q",
+  "tagline": "Smart tech. Simple terms. Serious security.",
+  "mission": "To make enterprise-grade technology accessible, affordable and understandable for homes, community organisations and small businesses across Queensland.",
+  "phone": "0411 753 366",
+  "phone_href": "tel:+61411753366",
+  "email": "info@it7q.com.au",
+  "abn": "43 922 878 001",
+  "locality": "Kallangur QLD 4503",
+  "year": "2026",
+  "stats": [
+    {
+      "value": "7",
+      "label": "divisions"
+    },
+    {
+      "value": "50+",
+      "label": "projects"
+    },
+    {
+      "value": "Australian",
+      "label": "owned & operated"
+    },
+    {
+      "value": "Est. 2020",
+      "label": ""
+    }
+  ],
+  "nav": [
+    {
+      "key": "home",
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "key": "divisions",
+      "label": "Divisions",
+      "href": "/divisions/"
+    },
+    {
+      "key": "services",
+      "label": "Services",
+      "href": "/services/"
+    },
+    {
+      "key": "portfolio",
+      "label": "Portfolio",
+      "href": "/portfolio/"
+    },
+    {
+      "key": "about",
+      "label": "About",
+      "href": "/about/"
+    },
+    {
+      "key": "contact",
+      "label": "Contact",
+      "href": "/contact/"
+    }
+  ],
+  "coming_soon": {
+    "id": "P-MSP-06",
+    "title": "AI-powered security hardening for your small business and home",
+    "status": "Coming soon",
+    "summary": "A new service that finds weak security settings on your computers and home or office network, and helps put them right. Plain English, no jargon.",
+    "cta": "Tell me when it's ready",
+    "cta_href": "/contact/"
+  }
+}

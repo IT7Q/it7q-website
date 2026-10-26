@@ -1,0 +1,9 @@
+[
+  {"slug": "msp", "latin": "MSP", "translation": "Managed Services", "subtitle": "Managed IT, plain English", "intro": "Managed IT and security for Queensland homes, community groups and small businesses, explained in plain terms."},
+  {"slug": "opus", "latin": "OPUS", "translation": "Works & Projects", "subtitle": "Software products", "intro": "Our own software: private, practical apps for everyday people and small organisations."},
+  {"slug": "mentis", "latin": "MENTIS", "translation": "Mind & Intelligence", "subtitle": "AI & automation", "intro": "AI and automation that takes the busywork off your plate."},
+  {"slug": "tempestas", "latin": "TEMPESTAS", "translation": "Storm & Hardware", "subtitle": "Cybersecurity hardware", "intro": "Australian-designed security hardware that protects your network."},
+  {"slug": "portus", "latin": "PORTUS", "translation": "Harbour & Gateway", "subtitle": "Community safety", "intro": "Technology that helps communities look out for each other."},
+  {"slug": "fabricus", "latin": "FABRICUS", "translation": "Craft & Making", "subtitle": "Woodcraft & digital manufacturing", "intro": "Custom timber and digitally made pieces, made in-house."},
+  {"slug": "domus", "latin": "DOMUS", "translation": "Home & Dwelling", "subtitle": "Smart home", "intro": "A smarter, safer, better-connected home."}
+]

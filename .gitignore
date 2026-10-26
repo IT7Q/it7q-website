@@ -8,3 +8,7 @@ it7q-website-build-pack.md
 
 # Brand pack zips: extracted SVGs that are used go into src/assets/img/brand/
 /_brand/
+
+# Build output and Python caches
+/dist/
+__pycache__/

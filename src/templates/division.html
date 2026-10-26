@@ -1,0 +1,21 @@
+---
+title: {{d.latin}}: {{d.translation}}
+description: {{d.intro}}
+nav: divisions
+---
+<section class="section page-head d-{{d.slug}}">
+  <div class="wrap division-head">
+{{> badge_large}}
+    <div>
+      <p class="eyebrow">{{d.subtitle}}</p>
+      <h1>{{d.latin}} <span class="division-head__tr">{{d.translation}}</span></h1>
+      <p class="section__lead">{{d.intro}}</p>
+    </div>
+  </div>
+</section>
+<section class="section section--tight">
+  <div class="wrap">
+{{> division_featured}}
+{{> stub}}
+  </div>
+</section>
