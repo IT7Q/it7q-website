@@ -1,12 +1,25 @@
 ---
 title: Services
-description: Plain-English tech help and security for homes and small businesses.
+description: Plain-English tech help and security for Queensland homes, community groups and small businesses.
 nav: services
 ---
 <section class="section page-head">
-  <div class="wrap narrow">
-    <h1>Services</h1>
-    <p class="section__lead">Plain-English tech help and security for homes and small businesses.</p>
-{{> stub}}
+  <div class="wrap">
+    <h1>How we can help</h1>
+    <p class="section__lead">Friendly tech help and serious security for homes, community groups and small businesses. No jargon, no pressure.</p>
+  </div>
+</section>
+{{> services}}
+<section class="section section--alt" aria-labelledby="steps-heading">
+  <div class="wrap">
+    <h2 id="steps-heading" class="section__title">How it works</h2>
+{{> service_steps}}
+  </div>
+</section>
+<section class="section" aria-labelledby="svc-contact">
+  <div class="wrap narrow centre">
+    <h2 id="svc-contact" class="section__title">Let's talk</h2>
+    <p>Call <a href="{{site.phone_href}}">{{site.phone}}</a> or email <a href="mailto:{{site.email}}">{{site.email}}</a>, and tell us what's going on.</p>
+    <a class="btn" href="/contact/">Contact us</a>
   </div>
 </section>

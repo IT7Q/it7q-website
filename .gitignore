@@ -12,3 +12,4 @@ it7q-website-build-pack.md
 # Build output and Python caches
 /dist/
 __pycache__/
+/.venv/

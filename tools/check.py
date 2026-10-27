@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Pre-deploy checks for the IT7Q site (PLAN.md §3, §4.9, §5.1, §6.2).
+"""Pre-deploy checks for the IT7Q site (PLAN.md §2.3, §3, §4.9, §5.1, §6.2).
 
     python3 tools/check.py [dist_dir]
 
 Exits non-zero if anything fails. tools/build.py runs this after every build,
 so a failing check also fails the Cloudflare Pages deploy.
 """
+import datetime
+import html
 import json
 import re
 import sys
@@ -13,13 +15,15 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import pngmark  # noqa: E402
+import rastermark  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
 GATED = ROOT / "gated"
 
 RASTER_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".bmp", ".tif", ".tiff", ".ico"}
+FONT_EXT = {".ttf", ".otf", ".woff", ".woff2"}
+CONSENT_METHODS = ("email", "written", "form", "sms")
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 
 # Brand-pack colours that must never be used (Q37): navy, and every pack accent
@@ -46,7 +50,7 @@ FINANCIAL = re.compile(
     r"[^.\n]{0,60}\$\s?\d",
     re.I,
 )
-PRICE = re.compile(r"\$\s?\d")
+PRICE = re.compile(r"\$\s?\d[\d,.]*")
 
 
 def rel(path):
@@ -190,7 +194,7 @@ def check_pages(dist, r):
                 r.fail(where, "insecure link %s" % href)
 
 
-def check_text_guards(dist, r, allowed_prices=()):
+def check_text_guards(dist, r, allowed_prices=frozenset()):
     public = [p for p in dist.rglob("*") if p.is_file() and p.suffix in (".html", ".css", ".js", ".svg", ".json", ".txt")]
     for f in public:
         where = str(f.relative_to(dist))
@@ -200,9 +204,9 @@ def check_text_guards(dist, r, allowed_prices=()):
             if m:
                 r.fail(where, "public-wording guard: %r must not appear (§4.9)" % m.group(0))
         for m in PRICE.finditer(text):
-            snippet = text[m.start():m.start() + 24]
-            if not any(snippet.startswith(p) for p in allowed_prices):
-                r.fail(where, "price guard: %r is not an approved public price (Q28)" % snippet.strip())
+            amount = m.group(0).rstrip(".,").replace(" ", "")
+            if amount not in allowed_prices:
+                r.fail(where, "price guard: %r is not an approved public price (Q28)" % amount)
         if FINANCIAL.search(text):
             r.fail(where, "financial guard: money figure next to a financial term")
     for base in (SRC, dist):
@@ -232,13 +236,61 @@ def check_svgs(dist, r):
 def check_rasters(dist, r):
     for f in dist.rglob("*"):
         if f.is_file() and f.suffix.lower() in RASTER_EXT:
-            where = str(f.relative_to(dist))
-            if f.suffix.lower() != ".png":
-                r.fail(where, "raster is not a watermarked PNG (§5.1)")
-                continue
-            ok, why = pngmark.verify(f.read_bytes())
+            ok, why = rastermark.verify(f.read_bytes(), f.suffix)
             if not ok:
-                r.fail(where, "watermark check: %s" % why)
+                r.fail(str(f.relative_to(dist)), "watermark check: %s" % why)
+
+
+def check_fonts(dist, r):
+    for f in dist.rglob("*"):
+        if f.is_file() and f.suffix.lower() in FONT_EXT:
+            family = f.name.split("-")[0]
+            if not (f.parent / ("%s-OFL.txt" % family)).exists():
+                r.fail(str(f.relative_to(dist)), "font licence guard: %s-OFL.txt must ship beside it (Q40)" % family)
+
+
+def testimonial_problems(entry, today=None):
+    """Reasons an entry can't be kept (§2.3). Empty list = fine. Shared with build.py."""
+    if not isinstance(entry, dict):
+        return ["is not an object"]
+    problems = []
+    if not str(entry.get("quote", "")).strip():
+        problems.append("has no quote")
+    if not (str(entry.get("name", "")).strip() or str(entry.get("business", "")).strip()):
+        problems.append("needs a name or a business")
+    consent = entry.get("consent") if isinstance(entry.get("consent"), dict) else {}
+    try:
+        recorded = datetime.date.fromisoformat(str(consent.get("recorded", "")))
+    except ValueError:
+        problems.append("lacks recorded consent: consent.recorded must be a YYYY-MM-DD date")
+    else:
+        if recorded > (today or datetime.date.today()):
+            problems.append("consent.recorded is in the future")
+    if consent.get("method") not in CONSENT_METHODS:
+        problems.append("lacks recorded consent: consent.method must be one of %s" % ", ".join(CONSENT_METHODS))
+    if entry.get("approved") not in (True, False):
+        problems.append("approved must be true or false")
+    return problems
+
+
+def check_testimonials(dist, r, path=None):
+    path = path or SRC / "data/testimonials.json"
+    if not path.exists():
+        return
+    where = rel(path)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    entries = data.get("entries") if isinstance(data, dict) else None
+    if not isinstance(entries, list):
+        r.fail(where, 'needs an "entries" list')
+        return
+    public_text = html.unescape("\n".join(f.read_text(encoding="utf-8") for f in dist.rglob("*.html")))
+    for i, entry in enumerate(entries, 1):
+        for problem in testimonial_problems(entry):
+            r.fail(where, "consent guard: entry %d %s" % (i, problem))
+        if isinstance(entry, dict) and entry.get("approved") is not True:
+            quote = str(entry.get("quote", "")).strip()
+            if quote and quote in public_text:
+                r.fail(where, "consent guard: unapproved entry %d appears in dist/" % i)
 
 
 def gated_strings(obj):
@@ -276,17 +328,25 @@ def check_portfolio(dist, r):
     path = SRC / "data/portfolio.json"
     if not path.exists():
         return
-    public_text = "\n".join(f.read_text(encoding="utf-8") for f in dist.rglob("*.html"))
+    public_text = html.unescape("\n".join(
+        f.read_text(encoding="utf-8", errors="replace")
+        for f in dist.rglob("*") if f.is_file() and f.suffix in (".html", ".js", ".json", ".txt")
+    ))
     for entry in json.loads(path.read_text(encoding="utf-8")):
         if not entry.get("published", False) and entry.get("name") and entry["name"] in public_text:
             r.fail("portfolio.json", "unpublished entry %r appears in dist/" % entry["name"])
 
 
 def approved_prices():
+    """Dollar amounts named in projects.json public_price fields (Q28: SCUTUM only)."""
     path = SRC / "data/projects.json"
     if not path.exists():
-        return ()
-    return tuple(p["public_price"] for p in json.loads(path.read_text(encoding="utf-8")) if p.get("public_price"))
+        return set()
+    return {
+        amount.rstrip(".,").replace(" ", "")
+        for p in json.loads(path.read_text(encoding="utf-8")) if p.get("public_price")
+        for amount in PRICE.findall(p["public_price"])
+    }
 
 
 def run(dist):
@@ -298,8 +358,10 @@ def run(dist):
     check_text_guards(dist, r, approved_prices())
     check_svgs(dist, r)
     check_rasters(dist, r)
+    check_fonts(dist, r)
     check_gated(dist, r)
     check_portfolio(dist, r)
+    check_testimonials(dist, r)
     return r
 
 
@@ -315,7 +377,7 @@ def main(argv):
             print("  - " + f, file=sys.stderr)
         return 1
     pages = len(list(dist.rglob("*.html")))
-    print("check passed: %d pages, links, CSP, wording, prices, pack colours, SVGs, watermarks" % pages)
+    print("check passed: %d pages, links, CSP, wording, prices, pack colours, SVGs, watermarks, fonts, consent" % pages)
     return 0
 
 

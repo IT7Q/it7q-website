@@ -1,0 +1,106 @@
+{
+ "groups": [
+  {
+   "key": "home",
+   "title": "For your home",
+   "items": [
+    {
+     "title": "Computer and phone help",
+     "text": "Slow computer, a new laptop to set up, a printer that won't print. We fix it and explain what happened.",
+     "division": "msp"
+    },
+    {
+     "title": "Staying safe online",
+     "text": "Protection for your devices, help with scam emails and texts, and a plain-English check-up of your accounts.",
+     "division": "msp"
+    },
+    {
+     "title": "Home Wi-Fi and network",
+     "text": "Strong Wi-Fi in every room, with work, kids' and smart devices kept apart.",
+     "division": "domus"
+    },
+    {
+     "title": "Smart home setup",
+     "text": "Lights, cameras and gadgets that work together, without handing your home over to someone's cloud.",
+     "division": "domus"
+    }
+   ]
+  },
+  {
+   "key": "business",
+   "title": "For small business and community groups",
+   "items": [
+    {
+     "title": "Managed IT and support",
+     "text": "We look after your computers, updates and backups, with a real person to call when something breaks.",
+     "division": "msp"
+    },
+    {
+     "title": "Security monitoring",
+     "text": "Round-the-clock monitoring and protection, explained in plain English.",
+     "division": "msp"
+    },
+    {
+     "title": "Websites",
+     "text": "Websites designed, built and looked after for clubs, community groups and small businesses.",
+     "division": "portfolio"
+    },
+    {
+     "title": "AI and automation",
+     "text": "Take the busywork off your plate: email sorting, reports, invoices and more.",
+     "division": "mentis"
+    },
+    {
+     "title": "Custom software",
+     "text": "Apps and tools built for the way you actually work.",
+     "division": "opus"
+    },
+    {
+     "title": "Security hardware",
+     "text": "Our own TEMPESTAS appliances to protect your office network.",
+     "division": "tempestas"
+    }
+   ]
+  }
+ ],
+ "steps": [
+  {
+   "title": "Have a chat",
+   "text": "Tell us what's going on. No jargon, no pressure."
+  },
+  {
+   "title": "Get a plain-English plan",
+   "text": "We explain what we'd do and what it costs before anything starts."
+  },
+  {
+   "title": "We set it up and look after it",
+   "text": "We do the work, show you how it fits together, and stay on call."
+  }
+ ],
+ "automations": [
+  {
+   "title": "Updates handled for you",
+   "text": "Updates are checked for known problems before they're installed, so you only hear about the ones that need a decision."
+  },
+  {
+   "title": "Social media posts",
+   "text": "Draft posts for each platform, queued for your OK before anything goes out."
+  },
+  {
+   "title": "Invoices and phone bills",
+   "text": "Supplier bills read automatically and turned into ready-to-send invoices, GST included."
+  },
+  {
+   "title": "Email sorting and replies",
+   "text": "Incoming email sorted by urgency, with draft replies in your business's tone and urgent items flagged straight away."
+  },
+  {
+   "title": "Security alerts",
+   "text": "Suspicious logins and network activity watched around the clock, with a plain-English summary each morning."
+  },
+  {
+   "title": "Reports on autopilot",
+   "text": "Monthly compliance, backup and service reports, put together and sent without anyone lifting a finger."
+  }
+ ]
+}

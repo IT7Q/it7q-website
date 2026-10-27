@@ -1,0 +1,15 @@
+{
+ "_how_to": "Add real testimonials to entries (never invented or reworded). Every entry needs consent.recorded (YYYY-MM-DD) and consent.method (email, written, form or sms), or tools/check.py fails. Only approved: true entries appear on the Home page; with none, the section is left out. PLAN.md §2.3.",
+ "_example": {
+  "quote": "The client's exact words go here.",
+  "name": "Client's name (optional if business is given)",
+  "business": "Business or organisation (optional if name is given)",
+  "consent": {
+   "recorded": "2026-10-28",
+   "method": "email",
+   "note": "Where the consent record is kept"
+  },
+  "approved": false
+ },
+ "entries": []
+}

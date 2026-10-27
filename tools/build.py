@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the IT7Q site: src/ -> dist/ (stdlib only, PLAN.md §3).
+"""Build the IT7Q site: src/ -> dist/ (PLAN.md §3).
 
     python3 tools/build.py            build, then run tools/check.py
     python3 tools/build.py --no-check build only (for debugging)
@@ -9,32 +9,42 @@ Pages are src/pages/**/*.html with a small front-matter block. Templating:
     {{> component}}            generated HTML block (see COMPONENTS)
     <x-ph id w h>text</x-ph>   visible image placeholder
 Anything unresolved fails the build. Raster images are watermarked on the way
-to dist/ (§5.1); sources in src/ are never modified.
+to dist/ (§5.1); sources in src/ are never modified. Stdlib only, except that
+JPEG/WebP sources need Pillow (requirements.txt, Q43).
 """
 import html
 import json
 import re
 import shutil
 import sys
+from math import gcd
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import check  # noqa: E402
 import pngmark  # noqa: E402
+import rastermark  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
 RASTER_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".bmp", ".tif", ".tiff", ".ico"}
-FONT_FILES = [  # (file, family, weight)
-    ("rajdhani-500.woff2", "Rajdhani", 500),
-    ("rajdhani-600.woff2", "Rajdhani", 600),
-    ("rajdhani-700.woff2", "Rajdhani", 700),
-    ("exo2-400.woff2", "Exo 2", 400),
-    ("exo2-600.woff2", "Exo 2", 600),
+FONT_EXT = {".ttf", ".otf", ".woff", ".woff2"}
+FONT_FILES = [  # (file, family, weight, style): only these ship (Q40)
+    ("Rajdhani-Medium.ttf", "Rajdhani", "500", "normal"),
+    ("Rajdhani-SemiBold.ttf", "Rajdhani", "600", "normal"),
+    ("Rajdhani-Bold.ttf", "Rajdhani", "700", "normal"),
+    ("Exo2-wght.ttf", "Exo 2", "100 900", "normal"),
+    ("Exo2-Italic-wght.ttf", "Exo 2", "100 900", "italic"),
 ]
 PH_RATIOS = {(16, 9): "16x9", (8, 5): "16x10", (1, 1): "1x1", (40, 21): "og"}
 MASTER_COLOURS = {"tl": "#00B4CC", "tr": "#7EC820", "bl": "#8B5CF6", "br": "#F97316"}
+STATUS_CLASS = {
+    "Developed": "done", "In development": "dev", "In design": "design",
+    "Documented": "doc", "Coming soon": "soon",
+}
+PROJECT_FIELDS = {"id", "division", "name", "status", "one_liner", "why", "who", "note",
+                  "featured", "public_price", "group"}
 
 
 class BuildError(Exception):
@@ -63,6 +73,44 @@ def parse_page(text, where):
     return meta, text[m.end():]
 
 
+# ---------------------------------------------------------------- data checks
+
+def check_projects(projects, divisions):
+    slugs = {d["slug"]: d for d in divisions}
+    seen = set()
+    for p in projects:
+        pid = p.get("id", "?")
+        unknown = set(p) - PROJECT_FIELDS
+        if unknown:
+            raise BuildError("projects.json %s: unknown field(s) %s" % (pid, ", ".join(sorted(unknown))))
+        for field in ("id", "division", "name", "status", "one_liner"):
+            if not p.get(field):
+                raise BuildError("projects.json %s: missing %s" % (pid, field))
+        if pid in seen:
+            raise BuildError("projects.json: duplicate id %s" % pid)
+        seen.add(pid)
+        if p["division"] not in slugs:
+            raise BuildError("projects.json %s: unknown division %r" % (pid, p["division"]))
+        if p["status"] not in STATUS_CLASS:
+            raise BuildError("projects.json %s: status must be one of %s" % (pid, ", ".join(STATUS_CLASS)))
+        groups = {g["key"] for g in slugs[p["division"]].get("groups", [])}
+        if groups and p.get("group") not in groups:
+            raise BuildError("projects.json %s: group must be one of %s" % (pid, ", ".join(sorted(groups))))
+    for d in divisions:
+        if not any(p["division"] == d["slug"] for p in projects):
+            raise BuildError("projects.json: division %s has no projects" % d["slug"])
+
+
+def approved_testimonials(data):
+    entries = data.get("entries", []) if isinstance(data, dict) else []
+    approved = [e for e in entries if isinstance(e, dict) and e.get("approved") is True]
+    for i, e in enumerate(approved, 1):
+        problems = check.testimonial_problems(e)
+        if problems:  # never publish a quote without recorded consent (§2.3)
+            raise BuildError("testimonials.json: approved entry %d %s" % (i, "; ".join(problems)))
+    return approved
+
+
 # ---------------------------------------------------------------- components
 
 def mark_svg(css_class, label=None, uses=None):
@@ -75,6 +123,10 @@ def mark_svg(css_class, label=None, uses=None):
 def badge_svg(extra=""):
     uses = [("tl", "badge__t1"), ("tr", "badge__t2"), ("bl", "badge__t2"), ("br", "badge__t1")]
     return mark_svg(("badge__mark " + extra).strip(), uses=uses)
+
+
+def status_pill(status):
+    return '<span class="status status--%s">%s</span>' % (STATUS_CLASS[status], esc(status))
 
 
 def c_logo_anim(ctx):
@@ -112,6 +164,7 @@ def c_badge_large(ctx):
 
 def c_coming_soon(ctx):
     cs = ctx["site"]["coming_soon"]
+    p = ctx["project_index"][cs["project"]]
     return (
         '<article class="soon">'
         '<div class="soon__mark">%s</div>'
@@ -119,25 +172,193 @@ def c_coming_soon(ctx):
         '<h2 id="soon-heading" class="soon__title">%s</h2>'
         '<p>%s</p>'
         '<p class="soon__actions"><a class="btn" href="%s">%s</a> '
-        '<a class="link-arrow" href="/divisions/msp/">More from MSP</a></p></div>'
+        '<a class="link-arrow" href="/divisions/%s/#%s">More from MSP</a></p></div>'
         "</article>"
-        % (mark_svg("soon__svg mark mark--master"), esc(cs["status"]), esc(cs["title"]),
-           esc(cs["summary"]), esc(cs["cta_href"]), esc(cs["cta"]))
+        % (mark_svg("soon__svg mark mark--master"), esc(p["status"]), esc(p["name"]), esc(p["one_liner"]),
+           esc(cs["cta_href"]), esc(cs["cta"]), esc(p["division"]), esc(p["id"].lower()))
     )
 
 
-def c_division_featured(ctx):
-    d = ctx.get("d")
-    if not d or d["slug"] != "msp":
+def project_card(p, compact=False):
+    featured = p.get("featured", False)
+    w, h = (1600, 1000) if featured else (800, 500)
+    meta = status_pill(p["status"])
+    if p.get("note"):
+        meta += ' <span class="tag">%s</span>' % esc(p["note"])
+    parts = [
+        '<article class="pcard%s%s" id="%s">' % (" pcard--featured" if featured else "",
+                                                 " pcard--compact" if compact else "", esc(p["id"].lower())),
+        '<x-ph id="%s" w="%d" h="%d">%s</x-ph>' % (esc(p["id"]), w, h, esc(p["name"])),
+        '<div class="pcard__body">',
+        '<p class="pcard__meta">%s</p>' % meta,
+        '<h3 class="pcard__title">%s</h3>' % esc(p["name"]),
+        "<p>%s</p>" % esc(p["one_liner"]),
+    ]
+    if p.get("why"):
+        parts.append('<p class="pcard__why"><strong>Why it\'s unique:</strong> %s</p>' % esc(p["why"]))
+    if p.get("who"):
+        parts.append('<p class="pcard__why"><strong>Who it\'s for:</strong> %s</p>' % esc(p["who"]))
+    if p.get("public_price"):
+        parts.append('<p class="pcard__price">%s</p>' % esc(p["public_price"]))
+    parts.append('<p class="pcard__lock"><a href="/access/">Full details under NDA</a></p>')
+    parts.append("</div></article>")
+    return "".join(parts)
+
+
+def c_division_projects(ctx):
+    d = ctx["d"]
+    projects = [p for p in ctx["projects"] if p["division"] == d["slug"]]
+    groups = d.get("groups") or [{"key": None, "title": "Projects"}]
+    out = []
+    for g in groups:
+        items = [p for p in projects if g["key"] is None or p.get("group") == g["key"]]
+        items.sort(key=lambda p: not p.get("featured", False))  # stable: featured first, then file order
+        compact = g["key"] == "range"
+        hid = "g-%s-%s" % (d["slug"], g["key"] or "projects")
+        intro = '<p class="section__lead">%s</p>' % esc(g["intro"]) if g.get("intro") else ""
+        out.append(
+            '<section class="section section--tight" aria-labelledby="%s"><div class="wrap">'
+            '<h2 id="%s" class="section__title">%s <span class="count">%d</span></h2>%s'
+            '<div class="cards%s">%s</div></div></section>'
+            % (hid, hid, esc(g["title"]), len(items), intro, " cards--compact" if compact else "",
+               "\n".join(project_card(p, compact) for p in items))
+        )
+    return "\n".join(out)
+
+
+def c_division_extra(ctx):
+    if ctx["d"]["slug"] != "mentis":
         return ""
-    cs = ctx["site"]["coming_soon"]
+    items = "".join(
+        '<li><h3 class="list-card__title">%s</h3><p>%s</p></li>' % (esc(a["title"]), esc(a["text"]))
+        for a in ctx["services"]["automations"]
+    )
     return (
-        '<div class="grid grid--3"><article class="card card--soon" id="%s">'
-        '<x-ph id="%s" w="800" h="500">%s illustration</x-ph>'
-        '<p class="pill">%s</p><h2 class="card__title">%s</h2><p>%s</p>'
-        '<a class="link-arrow" href="%s">%s</a></article></div>'
-        % (esc(cs["id"].lower()), esc(cs["id"]), esc(cs["title"]), esc(cs["status"]),
-           esc(cs["title"]), esc(cs["summary"]), esc(cs["cta_href"]), esc(cs["cta"]))
+        '<section class="section section--alt" aria-labelledby="automations-heading"><div class="wrap">'
+        '<h2 id="automations-heading" class="section__title">AI automations we can set up</h2>'
+        '<p class="section__lead">Real automations we run, and can build for your business too.</p>'
+        '<ul class="list-cards">%s</ul>'
+        '<p><a class="btn" href="/contact/">Talk to us about automation</a></p>'
+        "</div></section>" % items
+    )
+
+
+def c_division_list(ctx):
+    items = []
+    for d in ctx["divisions"]:
+        n = sum(1 for p in ctx["projects"] if p["division"] == d["slug"])
+        items.append(
+            '<li><a class="dcard d-%s" href="/divisions/%s/">%s<span class="dcard__body">'
+            '<span class="dcard__name">%s</span><span class="dcard__tr">%s</span>'
+            '<span class="dcard__sub">%s</span><span class="dcard__intro">%s</span>'
+            '<span class="dcard__count">%d project%s</span></span></a></li>'
+            % (d["slug"], d["slug"], badge_svg(), esc(d["latin"]), esc(d["translation"]), esc(d["subtitle"]),
+               esc(d["intro"]), n, "" if n == 1 else "s")
+        )
+    return '<ul class="dcards">\n%s\n</ul>' % "\n".join(items)
+
+
+def portfolio_card(e, heading="h3", with_id=True):
+    current = e["client"] == "current"
+    meta = '<span class="tag">%s</span>' % ("Current client" if current else "Past client")
+    if e.get("status"):
+        meta += " " + status_pill(e["status"])
+    if e.get("one_liner"):
+        text = "<p>%s</p>" % esc(e["one_liner"])
+    else:
+        text = '<p class="text-ph">PLACEHOLDER: one-liner to come from Chris</p>'
+    if current and e.get("link"):
+        host = re.sub(r"^https://|/$", "", e["link"])
+        link = '<a class="link-arrow" href="%s" rel="noopener">Visit %s</a>' % (esc(e["link"]), esc(host))
+    elif e.get("snapshot_live"):
+        link = '<a class="link-arrow" href="%s" rel="noopener">View the portfolio snapshot</a>' % esc(e["link"])
+    else:
+        link = '<span class="muted">Portfolio snapshot coming soon</span>'
+    return (
+        '<article class="pcard pfcard"%s><x-ph id="%s" w="1600" h="1000">%s website screenshot</x-ph>'
+        '<div class="pcard__body"><p class="pcard__meta">%s</p><%s class="pcard__title">%s</%s>%s'
+        '<p class="pfcard__link">%s</p></div></article>'
+        % (' id="%s"' % esc(e["id"]) if with_id else "", esc(e["image"]), esc(e["name"]), meta,
+           heading, esc(e["name"]), heading, text, link)
+    )
+
+
+def published_portfolio(ctx):
+    return [e for e in ctx["portfolio"] if e.get("published") is True]
+
+
+def c_portfolio(ctx):
+    entries = published_portfolio(ctx)
+    out = []
+    for kind, title, lead in (
+        ("current", "Current clients", "Sites we're building and looking after now."),
+        ("past", "Past clients", "Earlier work. Each site is kept as a portfolio snapshot: a frozen copy with its forms "
+                                 "switched off, so you can see what we built."),
+    ):
+        items = [e for e in entries if e["client"] == kind]
+        if items:
+            out.append(
+                '<section class="section section--tight" aria-labelledby="pf-%s"><div class="wrap">'
+                '<h2 id="pf-%s" class="section__title">%s</h2><p class="section__lead">%s</p>'
+                '<div class="cards">%s</div></div></section>'
+                % (kind, kind, title, lead, "\n".join(portfolio_card(e) for e in items))
+            )
+    return "\n".join(out)
+
+
+def c_portfolio_highlight(ctx):
+    index = {e["id"]: e for e in published_portfolio(ctx)}
+    picks = [index[i] for i in ctx["site"]["portfolio_highlight"] if i in index]
+    return '<div class="cards">%s</div>' % "\n".join(portfolio_card(e, with_id=False) for e in picks)
+
+
+def c_services(ctx):
+    slugs = {d["slug"]: d for d in ctx["divisions"]}
+    out = []
+    for g in ctx["services"]["groups"]:
+        cards = []
+        for s in g["items"]:
+            target = s["division"]
+            if target == "portfolio":
+                href, label, cls = "/portfolio/", "See websites we've built", ""
+            else:
+                d = slugs[target]
+                href, label, cls = "/divisions/%s/" % target, "More from %s" % d["latin"], " d-%s" % target
+            cards.append(
+                '<li class="scard%s"><h3 class="scard__title">%s</h3><p>%s</p>'
+                '<a class="link-arrow" href="%s">%s</a></li>' % (cls, esc(s["title"]), esc(s["text"]), href, esc(label))
+            )
+        out.append(
+            '<section class="section section--tight" aria-labelledby="svc-%s"><div class="wrap">'
+            '<h2 id="svc-%s" class="section__title">%s</h2><ul class="scards">%s</ul></div></section>'
+            % (g["key"], g["key"], esc(g["title"]), "".join(cards))
+        )
+    return "\n".join(out)
+
+
+def c_service_steps(ctx):
+    items = "".join(
+        '<li><h3 class="steps__title">%s</h3><p>%s</p></li>' % (esc(s["title"]), esc(s["text"]))
+        for s in ctx["services"]["steps"]
+    )
+    return '<ol class="steps">%s</ol>' % items
+
+
+def c_testimonials(ctx):
+    entries = ctx["testimonials"]
+    if not entries:
+        return ""
+    figs = []
+    for e in entries:
+        who = ", ".join(esc(e[k]) for k in ("name", "business") if str(e.get(k, "")).strip())
+        figs.append(
+            '<figure class="quote"><blockquote><p>%s</p></blockquote><figcaption>%s</figcaption></figure>'
+            % (esc(e["quote"]), who)
+        )
+    return (
+        '<section class="section" aria-labelledby="testimonials-heading"><div class="wrap">'
+        '<h2 id="testimonials-heading" class="section__title">What our clients say</h2>'
+        '<div class="quotes">%s</div></div></section>' % "\n".join(figs)
     )
 
 
@@ -151,7 +372,14 @@ COMPONENTS = {
     "badges": c_badges,
     "badge_large": c_badge_large,
     "coming_soon": c_coming_soon,
-    "division_featured": c_division_featured,
+    "division_projects": c_division_projects,
+    "division_extra": c_division_extra,
+    "division_list": c_division_list,
+    "portfolio": c_portfolio,
+    "portfolio_highlight": c_portfolio_highlight,
+    "services": c_services,
+    "service_steps": c_service_steps,
+    "testimonials": c_testimonials,
     "stub": c_stub,
 }
 
@@ -189,12 +417,11 @@ def render_vars(text, ctx, where, escape=True):
 def render_placeholders(text, where):
     def sub(m):
         attrs = dict(re.findall(r'(\w+)="([^"]*)"', m.group(1)))
-        label = m.group(2).strip()
+        label = html.unescape(m.group(2).strip())  # components pass escaped text; escape exactly once below
         try:
             pid, w, h = attrs["id"], int(attrs["w"]), int(attrs["h"])
         except (KeyError, ValueError):
             raise BuildError("%s: <x-ph> needs id, w and h" % where)
-        from math import gcd
         g = gcd(w, h)
         ratio = PH_RATIOS.get((w // g, h // g))
         if not ratio:
@@ -258,37 +485,37 @@ def load_mark():
 
 def fonts_css():
     rules = []
-    for name, family, weight in FONT_FILES:
+    for name, family, weight, style in FONT_FILES:
         if (SRC / "assets/fonts" / name).exists():
             rules.append(
-                "@font-face { font-family: \"%s\"; font-weight: %d; font-style: normal; "
-                "font-display: swap; src: url(\"/assets/fonts/%s\") format(\"woff2\"); }" % (family, weight, name)
+                "@font-face { font-family: \"%s\"; font-weight: %s; font-style: %s; "
+                "font-display: swap; src: url(\"/assets/fonts/%s\") format(\"truetype\"); }"
+                % (family, weight, style, name)
             )
     if not rules:
-        return "/* No self-hosted font files yet (PLAN.md Q40): system fonts are used. */\n"
+        return "/* No self-hosted font files (Q40): system fonts are used. */\n"
     return "\n".join(rules) + "\n"
 
 
 def copy_assets(mark_svg_text, image_opts):
     paths, view_size = pngmark.load_mark_paths(mark_svg_text)
+    shipped_fonts = {f[0] for f in FONT_FILES}
     marked = 0
     for src in sorted((SRC / "assets").rglob("*")):
         if src.is_dir() or src.name.startswith("."):
             continue
         rel = src.relative_to(SRC)
+        ext = src.suffix.lower()
+        if ext in FONT_EXT and src.name not in shipped_fonts:
+            continue  # unused faces stay out of dist/
         out = DIST / rel
         out.parent.mkdir(parents=True, exist_ok=True)
-        ext = src.suffix.lower()
         if ext in RASTER_EXT:
-            if ext != ".png":
-                raise BuildError(
-                    "%s: only PNG rasters can be watermarked with the stdlib build (PLAN.md §5.1, Q43)" % rel
-                )
             key = str(src.relative_to(SRC / "assets/img")) if (SRC / "assets/img") in src.parents else str(rel)
             corner = image_opts.get(key, {}).get("corner", "br")
             try:
-                out.write_bytes(pngmark.watermark(src.read_bytes(), paths, view_size, corner))
-            except pngmark.PNGError as e:
+                out.write_bytes(rastermark.watermark(src.read_bytes(), ext, paths, view_size, corner))
+            except rastermark.MarkError as e:
                 raise BuildError("%s: %s" % (rel, e))
             marked += 1
         else:
@@ -306,9 +533,16 @@ def build():
     DIST.mkdir()
 
     site, divisions, image_opts = load_json("site.json"), load_json("divisions.json"), load_json("images.json")
+    projects = load_json("projects.json")
+    check_projects(projects, divisions)
     mark_text, viewbox, sprite, favicon = load_mark()
     partials = {p.stem: p.read_text(encoding="utf-8") for p in (SRC / "partials").glob("*.html")}
-    base_ctx = {"site": site, "divisions": divisions, "sprite": sprite, "mark_viewbox": viewbox}
+    base_ctx = {
+        "site": site, "divisions": divisions, "sprite": sprite, "mark_viewbox": viewbox,
+        "projects": projects, "project_index": {p["id"]: p for p in projects},
+        "portfolio": load_json("portfolio.json"), "services": load_json("services.json"),
+        "testimonials": approved_testimonials(load_json("testimonials.json")),
+    }
 
     outputs = {}
     for src in sorted((SRC / "pages").rglob("*.html")):
@@ -335,7 +569,8 @@ def build():
     (DIST / "assets/css/fonts.css").write_text(fonts_css(), encoding="utf-8")
     (DIST / "favicon.svg").write_text(favicon, encoding="utf-8")
     shutil.copyfile(SRC / "_headers", DIST / "_headers")
-    print("built %d pages, %d watermarked images -> %s" % (len(outputs), marked, DIST.relative_to(ROOT)))
+    print("built %d pages, %d project cards, %d testimonials, %d watermarked images -> %s"
+          % (len(outputs), len(projects), len(base_ctx["testimonials"]), marked, DIST.relative_to(ROOT)))
 
 
 def main(argv):

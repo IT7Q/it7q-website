@@ -1,0 +1,3 @@
+# Build dependency (PLAN.md §5.1, Q43): Pillow decodes/encodes JPEG and WebP for the
+# watermark step. PNG and tools/check.py stay stdlib-only. Hash pinning: Q47.
+Pillow==12.0.0

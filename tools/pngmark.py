@@ -3,7 +3,8 @@
 - decode(): PNG bytes -> Image (8-bit RGB or RGBA, non-interlaced output)
 - encode(): Image -> PNG bytes, with an IT7Q-Watermark tEXt marker
 - render_mark(): rasterise the master mark (mark.svg circles, card colours)
-- watermark(): composite the mark into a corner and return marked PNG bytes
+- composite(): blend the mark into a corner of any decoded image
+- watermark(): composite + return marked PNG bytes
 - verify(): True only if the marker is present and matches the pixels
 
 Anything outside what we can handle exactly (interlaced, 16-bit) raises
@@ -290,8 +291,15 @@ def mark_size(width):
     return max(MIN_SIZE, min(MAX_SIZE, int(width * SIZE_FRACTION)))
 
 
-def watermark(png_bytes, paths, view_size, corner="br", _cache={}):
+def watermark(png_bytes, paths, view_size, corner="br"):
     img = decode(png_bytes)
+    composite(img, paths, view_size, corner)
+    marker = "%s sha256=%s corner=%s" % (MARK_VERSION, img.digest(), corner)
+    return encode(img, marker)
+
+
+def composite(img, paths, view_size, corner="br", _cache={}):
+    """Blend the mark into an 8-bit RGB/RGBA Image in place (shared by every format)."""
     if corner not in ("br", "bl", "tr", "tl"):
         raise PNGError("corner must be br, bl, tr or tl")
     size = mark_size(img.width)
@@ -316,8 +324,6 @@ def watermark(png_bytes, paths, view_size, corner="br", _cache={}):
             px[o] = round(r * a + px[o] * (1 - a))
             px[o + 1] = round(g * a + px[o + 1] * (1 - a))
             px[o + 2] = round(b * a + px[o + 2] * (1 - a))
-    marker = "%s sha256=%s corner=%s" % (MARK_VERSION, img.digest(), corner)
-    return encode(img, marker)
 
 
 def verify(png_bytes):

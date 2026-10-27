@@ -10,12 +10,11 @@ nav: divisions
       <p class="eyebrow">{{d.subtitle}}</p>
       <h1>{{d.latin}} <span class="division-head__tr">{{d.translation}}</span></h1>
       <p class="section__lead">{{d.intro}}</p>
+      <p class="nda-note">Every card shows the basics. Investors and partners can see the full detail under NDA: <a href="/access/">request access</a>.</p>
     </div>
   </div>
 </section>
-<section class="section section--tight">
-  <div class="wrap">
-{{> division_featured}}
-{{> stub}}
-  </div>
-</section>
+<div class="d-{{d.slug}}">
+{{> division_projects}}
+</div>
+{{> division_extra}}

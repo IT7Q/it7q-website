@@ -1,0 +1,572 @@
+[
+ {
+  "id": "P-MSP-06",
+  "division": "msp",
+  "name": "AI-powered security hardening for your small business and home",
+  "status": "Coming soon",
+  "one_liner": "A new service that finds weak security settings on your computers and home or office network, and helps put them right. Plain English, no jargon.",
+  "why": "Made for homes and small businesses, not big IT departments.",
+  "featured": true
+ },
+ {
+  "id": "P-MSP-01",
+  "division": "msp",
+  "name": "SCUTUM",
+  "status": "In development",
+  "one_liner": "24/7 managed protection for your computers: enterprise-grade, explained in plain English.",
+  "why": "Alerts are checked in-house, so it's more than a resold antivirus badge.",
+  "public_price": "From $68 a year (incl. GST)"
+ },
+ {
+  "id": "P-MSP-02",
+  "division": "msp",
+  "name": "MSP Companion App",
+  "status": "In development",
+  "one_liner": "One-click sign-up to IT7Q managed protection.",
+  "why": "Signs your device up without opening anything on your network.",
+  "note": "Pilot"
+ },
+ {
+  "id": "P-MSP-03",
+  "division": "msp",
+  "name": "Managed security monitoring",
+  "status": "Developed",
+  "one_liner": "Round-the-clock security monitoring across your computers.",
+  "why": "We watch for trouble so you don't have to, and tell you in plain English when something needs doing."
+ },
+ {
+  "id": "P-MSP-04",
+  "division": "msp",
+  "name": "IT7Q Support Portal",
+  "status": "In development",
+  "one_liner": "Your support tickets, devices and help articles in one clean portal.",
+  "why": "One place to ask for help and see what's been done."
+ },
+ {
+  "id": "P-MSP-05",
+  "division": "msp",
+  "name": "IT7Q SysMon",
+  "status": "In development",
+  "one_liner": "Keeps an eye on server health around the clock and flags problems early.",
+  "why": "Spots slow-downs and failures before your staff do."
+ },
+ {
+  "id": "P-OPUS-01",
+  "division": "opus",
+  "name": "Athena Browser",
+  "status": "Developed",
+  "one_liner": "A private, all-in-one browser built for IT7Q clients.",
+  "why": "Your mail, chat, passwords and support are built in."
+ },
+ {
+  "id": "P-OPUS-02",
+  "division": "opus",
+  "name": "Hermes Mail",
+  "status": "In development",
+  "one_liner": "A clean, fast email app with support built in.",
+  "why": "Help is one tab away, right inside your inbox."
+ },
+ {
+  "id": "P-OPUS-03",
+  "division": "opus",
+  "name": "Calendis and Calendi IT7Q",
+  "status": "In development",
+  "one_liner": "Smart scheduling, for you and for your projects.",
+  "why": "A calendar anyone can sign up for, and a sister tool that keeps projects on track day by day."
+ },
+ {
+  "id": "P-OPUS-04",
+  "division": "opus",
+  "name": "LexiScan",
+  "status": "In development",
+  "one_liner": "A quick screener for dyslexia and visual stress.",
+  "why": "Works offline, keeps results private and shows them straight away."
+ },
+ {
+  "id": "P-OPUS-05",
+  "division": "opus",
+  "name": "Nexus",
+  "status": "In development",
+  "one_liner": "Secure messaging for teams.",
+  "why": "Self-hosted, so your conversations stay on systems you control."
+ },
+ {
+  "id": "P-OPUS-06",
+  "division": "opus",
+  "name": "Andromeda OS",
+  "status": "In development",
+  "one_liner": "A purpose-built desktop operating system from IT7Q.",
+  "why": "Simple and secure, built around the Athena Browser."
+ },
+ {
+  "id": "P-OPUS-07",
+  "division": "opus",
+  "name": "Paideia OS",
+  "status": "Developed",
+  "one_liner": "A safe, guided computer for kids.",
+  "why": "A welfare-aware AI companion, and chats that parents approve."
+ },
+ {
+  "id": "P-OPUS-08",
+  "division": "opus",
+  "name": "JANUS",
+  "status": "In design",
+  "one_liner": "One inbox for every messaging channel.",
+  "why": "Messages from your chat and social apps land in one place."
+ },
+ {
+  "id": "P-OPUS-09",
+  "division": "opus",
+  "name": "Project Silo",
+  "status": "In design",
+  "one_liner": "A unified, private alternative to Google Workspace.",
+  "why": "Mail, calendar, files, chat and documents in one suite you control."
+ },
+ {
+  "id": "P-OPUS-10",
+  "division": "opus",
+  "name": "Andromeda CE",
+  "status": "In development",
+  "one_liner": "A friendly AI companion app that works with more than one AI provider.",
+  "why": "Pick the AI that suits you, all in one app."
+ },
+ {
+  "id": "P-OPUS-11",
+  "division": "opus",
+  "name": "Aegir SecureStart",
+  "status": "In development",
+  "one_liner": "Sets up a Windows computer for privacy and security, step by step.",
+  "why": "Clears out clutter and tracking in one go, made for non-technical people."
+ },
+ {
+  "id": "P-MEN-01",
+  "division": "mentis",
+  "name": "Project Persephone",
+  "status": "Developed",
+  "one_liner": "A team of AI agents running IT7Q's back office.",
+  "why": "21 specialised agents, run on our own systems.",
+  "note": "Partly live"
+ },
+ {
+  "id": "P-MEN-02",
+  "division": "mentis",
+  "name": "MNEMOSYNE",
+  "status": "In development",
+  "one_liner": "The memory layer that lets our AI actually remember.",
+  "why": "Designed in-house from a clean sheet, not bolted on."
+ },
+ {
+  "id": "P-MEN-03",
+  "division": "mentis",
+  "name": "Neo",
+  "status": "In development",
+  "one_liner": "Tell us what you need, and Neo builds your website.",
+  "why": "AI takes you from first questions to a proposal to a live site."
+ },
+ {
+  "id": "P-MEN-04",
+  "division": "mentis",
+  "name": "FORTUNA",
+  "status": "In development",
+  "one_liner": "An AI agent that keeps watch on investments.",
+  "why": "Watches the markets around the clock and reports back in plain English.",
+  "note": "Part of Persephone"
+ },
+ {
+  "id": "P-MEN-05",
+  "division": "mentis",
+  "name": "COLLOQUIUM",
+  "status": "In development",
+  "one_liner": "A chat and AI assistant service for businesses.",
+  "why": "Gives your customers quick, friendly answers, day or night."
+ },
+ {
+  "id": "P-TEM-03",
+  "division": "tempestas",
+  "name": "T3 Guard",
+  "status": "In development",
+  "one_liner": "Our flagship security appliance: AI-accelerated threat detection in a box.",
+  "who": "Home offices and small businesses that want serious protection.",
+  "featured": true
+ },
+ {
+  "id": "P-TEM-01",
+  "division": "tempestas",
+  "name": "T1 Scout",
+  "status": "In development",
+  "one_liner": "An entry-level security box that blocks ads, trackers and known bad sites for the whole home.",
+  "who": "Flats and smaller homes."
+ },
+ {
+  "id": "P-TEM-02",
+  "division": "tempestas",
+  "name": "T2 Sentinel",
+  "status": "In development",
+  "one_liner": "A firewall that protects every device in a busy household.",
+  "who": "Families and home offices."
+ },
+ {
+  "id": "P-TEM-04",
+  "division": "tempestas",
+  "name": "T4 Fortress",
+  "status": "In development",
+  "one_liner": "Stronger protection for offices with more people and more devices.",
+  "who": "Growing small businesses."
+ },
+ {
+  "id": "P-TEM-05",
+  "division": "tempestas",
+  "name": "T5 Citadel",
+  "status": "In development",
+  "one_liner": "Our most powerful appliance, for larger networks.",
+  "who": "Bigger offices and community organisations."
+ },
+ {
+  "id": "P-TEM-06",
+  "division": "tempestas",
+  "name": "TEMPESTAS carrier board",
+  "status": "In design",
+  "one_liner": "Our own Australian-designed board that powers the TEMPESTAS range.",
+  "why": "Designed here, so we control the hardware from the ground up."
+ },
+ {
+  "id": "P-POR-01",
+  "division": "portus",
+  "name": "PORTUS community safety network",
+  "status": "In design",
+  "one_liner": "Technology that keeps our community safer.",
+  "why": "Neighbourhood Watch, modernised, with verified members and safe places to go."
+ },
+ {
+  "id": "P-POR-02",
+  "division": "portus",
+  "name": "PORTUS App",
+  "status": "In development",
+  "one_liner": "A community safety app that shows verified safe places nearby and helps you call for help fast.",
+  "why": "Built for neighbours looking out for each other, on the phone you already carry."
+ },
+ {
+  "id": "P-POR-03",
+  "division": "portus",
+  "name": "PORTUS Jnr",
+  "status": "In development",
+  "one_liner": "A child-safe version of the PORTUS app.",
+  "why": "A simpler screen for kids, with parents kept in the loop."
+ },
+ {
+  "id": "P-FAB-101",
+  "division": "fabricus",
+  "name": "FABRICUS App",
+  "status": "In development",
+  "one_liner": "Browse the range and place an order, even without an internet connection.",
+  "why": "Works offline, so it's handy at markets and in the workshop.",
+  "group": "made"
+ },
+ {
+  "id": "P-FAB-102",
+  "division": "fabricus",
+  "name": "FORMAE",
+  "status": "In development",
+  "one_liner": "Custom 3D-printed pieces, made to order.",
+  "why": "Designed and printed in-house, as one-offs or small runs.",
+  "group": "made"
+ },
+ {
+  "id": "P-FAB-103",
+  "division": "fabricus",
+  "name": "BIONICUS",
+  "status": "In development",
+  "one_liner": "Assistive supports for the body, shaped to fit the person who wears them.",
+  "why": "Made to measure in-house with 3D printing.",
+  "group": "made"
+ },
+ {
+  "id": "P-FAB-001",
+  "division": "fabricus",
+  "name": "Toilet roll holder with shelf & planter nook",
+  "status": "In development",
+  "one_liner": "A toilet roll holder with a handy shelf on top and a little nook for a plant.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-002",
+  "division": "fabricus",
+  "name": "Towel rail with shelf",
+  "status": "In development",
+  "one_liner": "A wall towel rail with a shelf above for the bits you reach for every day.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-003",
+  "division": "fabricus",
+  "name": "Tea-towel ladder rack with roll holder",
+  "status": "In development",
+  "one_liner": "A ladder-style rack for tea towels, with a paper-towel roll built in.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-004",
+  "division": "fabricus",
+  "name": "L-shape spice rack with paper towel holder",
+  "status": "In development",
+  "one_liner": "A corner-friendly spice rack that keeps the paper towel within reach too.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-005",
+  "division": "fabricus",
+  "name": "Wall pantry rack with paper towel holder",
+  "status": "In development",
+  "one_liner": "Wall-mounted pantry shelving that frees up bench space, with a paper towel holder.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-006",
+  "division": "fabricus",
+  "name": "Bathroom cubby unit (3 x 3)",
+  "status": "In development",
+  "one_liner": "Nine open cubbies to keep towels, toiletries and bits sorted.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-007",
+  "division": "fabricus",
+  "name": "Rustic mini wall dresser, 2 drawers",
+  "status": "In development",
+  "one_liner": "A small rustic dresser that hangs on the wall, with two drawers for odds and ends.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-008",
+  "division": "fabricus",
+  "name": "Spice cabinet with towel rail, curved legs",
+  "status": "In development",
+  "one_liner": "A free-standing spice cabinet on curved legs, with a towel rail on the side.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-009",
+  "division": "fabricus",
+  "name": "Slatted arch mail & key holder",
+  "status": "In development",
+  "one_liner": "An arched, slatted organiser by the door for mail and keys.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-010",
+  "division": "fabricus",
+  "name": "Shield key holder with shelf & peg keyrings",
+  "status": "In development",
+  "one_liner": "A shield-shaped key holder with a small shelf and matching peg keyrings.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-011",
+  "division": "fabricus",
+  "name": "Horse planter",
+  "status": "In development",
+  "one_liner": "A horse-shaped planter that brings a bit of character to the garden or veranda.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-012",
+  "division": "fabricus",
+  "name": "Market cart / flower wagon planter",
+  "status": "In development",
+  "one_liner": "A little market-cart planter for flowers, herbs or a front-porch display.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-013",
+  "division": "fabricus",
+  "name": "Heart phone stand",
+  "status": "In development",
+  "one_liner": "A heart-shaped stand that holds your phone upright on a desk or bedside.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-014",
+  "division": "fabricus",
+  "name": "Automotive wall clock",
+  "status": "In development",
+  "one_liner": "A wall clock with a motoring theme, for the garage, shed or games room.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-015",
+  "division": "fabricus",
+  "name": "LED-lit sign plaque (custom text)",
+  "status": "In development",
+  "one_liner": "A personalised sign plaque with your own text, softly lit by LEDs.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-016",
+  "division": "fabricus",
+  "name": "Medal display shadow box with photo",
+  "status": "In development",
+  "one_liner": "A shadow box that displays medals alongside a photo, made to honour service and achievement.",
+  "group": "range",
+  "note": "TABULAE"
+ },
+ {
+  "id": "P-FAB-017",
+  "division": "fabricus",
+  "name": "Solid timber TV entertainment unit",
+  "status": "In development",
+  "one_liner": "A solid timber entertainment unit for the TV and everything that goes with it.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-018",
+  "division": "fabricus",
+  "name": "LED TV feature wall with slats & shelves",
+  "status": "In development",
+  "one_liner": "A slatted TV feature wall with shelves and LED accent lighting.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-019",
+  "division": "fabricus",
+  "name": "Simple workbench",
+  "status": "In development",
+  "one_liner": "A sturdy, no-fuss workbench for the shed or garage.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-020",
+  "division": "fabricus",
+  "name": "Stepped bedside table with asymmetric hutch",
+  "status": "In development",
+  "one_liner": "A bedside table with stepped levels and an off-centre hutch for books and bits.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-021",
+  "division": "fabricus",
+  "name": "House-shaped wall key holders (3 variants)",
+  "status": "In development",
+  "one_liner": "Little house-shaped key holders for the wall, in three styles.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-022",
+  "division": "fabricus",
+  "name": "Illuminated shadow-box frame planters",
+  "status": "In development",
+  "one_liner": "Shadow-box frames that double as planters, with built-in lighting.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-023",
+  "division": "fabricus",
+  "name": "Serving trays (standard & elevated)",
+  "status": "In development",
+  "one_liner": "Timber serving trays, flat or raised, for entertaining.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-024",
+  "division": "fabricus",
+  "name": "Cap display rack",
+  "status": "In development",
+  "one_liner": "A wall rack that shows off a cap collection neatly.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-025",
+  "division": "fabricus",
+  "name": "LED wall clock with shelf",
+  "status": "In development",
+  "one_liner": "A wall clock with LED lighting and a small display shelf.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-026",
+  "division": "fabricus",
+  "name": "Honeycomb hex shelf",
+  "status": "In development",
+  "one_liner": "Hexagon shelves that fit together in a honeycomb on the wall.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-027",
+  "division": "fabricus",
+  "name": "Kids' tree bookshelf",
+  "status": "In development",
+  "one_liner": "A tree-shaped bookshelf that makes kids' books part of the room.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-028",
+  "division": "fabricus",
+  "name": "Diagonal mug shelf",
+  "status": "In development",
+  "one_liner": "A diagonal wall shelf that shows off a mug collection.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-029",
+  "division": "fabricus",
+  "name": "Live-edge wine rack",
+  "status": "In development",
+  "one_liner": "A wine rack cut from live-edge timber, so each piece is one of a kind.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-030",
+  "division": "fabricus",
+  "name": "Bedside valet / dock",
+  "status": "In development",
+  "one_liner": "A bedside tidy for your phone, watch, wallet and keys.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-031",
+  "division": "fabricus",
+  "name": "Nightstand with hutch",
+  "status": "In development",
+  "one_liner": "A nightstand with a hutch on top for a lamp, books and the alarm clock.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-032",
+  "division": "fabricus",
+  "name": "Standing bird table",
+  "status": "In development",
+  "one_liner": "A free-standing bird table for the backyard.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-033",
+  "division": "fabricus",
+  "name": "Asymmetric geometric wall shelf",
+  "status": "In development",
+  "one_liner": "A geometric wall shelf with an off-beat, modern shape.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-034",
+  "division": "fabricus",
+  "name": "Arched slat-panel shelf",
+  "status": "In development",
+  "one_liner": "An arched shelf with a slatted back panel, for display or storage.",
+  "group": "range"
+ },
+ {
+  "id": "P-FAB-035",
+  "division": "fabricus",
+  "name": "Guitar stand & media station",
+  "status": "In development",
+  "one_liner": "A stand for your guitar with room for the amp, music and gear.",
+  "group": "range"
+ },
+ {
+  "id": "P-DOM-01",
+  "division": "domus",
+  "name": "Smart, segmented, private home",
+  "status": "Documented",
+  "one_liner": "A smarter, safer, better-connected home.",
+  "why": "Work, kids' and smart-home devices kept on separate networks, and your media kept at home instead of locked in someone's cloud."
+ }
+]

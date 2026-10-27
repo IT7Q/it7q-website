@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v8, 28 Oct 2026. Phase 1 built; Phase 2 in progress** (division pages with every project card, Portfolio, Services, Home testimonials). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v8, 28 Oct 2026. Phases 1 and 2 built** (Phase 2: division pages with all 70 project cards, Portfolio, Services, Home testimonials). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -679,7 +679,7 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 
 0. ✅ Repo, source, plan v1. ✅ Financials removed from repo + history, GitHub purge done (§10). ✅ Plans v2–v6. ✅ NDA draft for review. ✅ Brand packs extracted and checked.
 1. ✅ **Phase 1 (27 Oct)**: `src/` structure with stub pages for every route, build/check tools with unit tests, watermark pipeline, brand tokens, base CSS, header/footer, placeholder component, animated logo, Home (hero stats, badge row, coming-soon teaser). Preview: §7.1.
-2. **Phase 2 (28 Oct, scope set by Chris)**: Divisions index + 7 division pages with all 70 cards from `projects.json`, MENTIS services list, Portfolio (`portfolio.json`), Services (`services.json`), Home testimonials (`testimonials.json`, consent guard). Plus Q40 fonts and Q43 JPEG/WebP watermarking. All images are placeholders.
+2. ✅ **Phase 2 (28 Oct, scope set by Chris)**: Divisions index + 7 division pages with all 70 cards from `projects.json`, MENTIS services list, Portfolio (`portfolio.json`), Services (`services.json`), Home testimonials (`testimonials.json`, consent guard). Plus Q40 fonts and Q43 JPEG/WebP watermarking. All images are placeholders.
 3. About, Contact and Legal pages (moved here from Phase 2); NDA front end (`/access/`, locked panels, renderer) and enquiry form against a local mock with failure simulation.
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
 5. Investors shell; Blog + Downloads only if 2–3 posts are ready (Q17).
@@ -734,4 +734,4 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 - **26 Oct 2026: plan v5.** `_brand/` zips git-ignored.
 - **27 Oct 2026: plan v6.** Brand packs extracted (outside the repo) and colour-checked. FABRICUS register F-001–F-035 added.
 - **27 Oct 2026: plan v7 + Phase 1.** Brand = business card. Phase 1 scaffold, tools and Home committed.
-- **28 Oct 2026: plan v8.** Q40–Q43 answered, portfolio details, testimonials. Phase 2 started.
+- **28 Oct 2026: plan v8 + Phase 2.** Q40–Q43 answered, portfolio details, testimonials. Phase 2 built: cards, Portfolio, Services, testimonials, TTF fonts, JPEG/WebP watermarking.
