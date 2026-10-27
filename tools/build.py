@@ -3,6 +3,8 @@
 
     python3 tools/build.py            build, then run tools/check.py
     python3 tools/build.py --no-check build only (for debugging)
+    python3 tools/build.py --mock     local build whose forms talk to tools/preview.py
+                                      (never deployed: Pages runs the plain build)
 
 Pages are src/pages/**/*.html with a small front-matter block. Templating:
     {{site.key}} / {{d.key}}   escaped value from data
@@ -12,6 +14,7 @@ Anything unresolved fails the build. Raster images are watermarked on the way
 to dist/ (§5.1); sources in src/ are never modified. Stdlib only, except that
 JPEG/WebP sources need Pillow (requirements.txt, Q43).
 """
+import hashlib
 import html
 import json
 import re
@@ -43,6 +46,7 @@ STATUS_CLASS = {
     "Developed": "done", "In development": "dev", "In design": "design",
     "Documented": "doc", "Coming soon": "soon",
 }
+PROD_SCRIPTS = ("forms", "nda")  # page scripts a page may ask for in front matter
 PROJECT_FIELDS = {"id", "division", "name", "status", "one_liner", "why", "who", "note",
                   "featured", "public_price", "group"}
 
@@ -109,6 +113,68 @@ def approved_testimonials(data):
         if problems:  # never publish a quote without recorded consent (§2.3)
             raise BuildError("testimonials.json: approved entry %d %s" % (i, "; ".join(problems)))
     return approved
+
+
+# ---------------------------------------------------------------- legal text
+
+def inline_md(text):
+    out = esc(text)
+    out = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", out)
+    return re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<em>\1</em>", out)
+
+
+def render_md(text, top=2):
+    """Just enough Markdown for the legal texts: ### headings, paragraphs, - lists (two levels), bold."""
+    out, para, lists = [], [], []  # lists: stack of indent levels with an open <ul>
+
+    def close_para():
+        if para:
+            out.append("<p>%s</p>" % inline_md(" ".join(para)))
+            para.clear()
+
+    def close_lists(level=-1):
+        while lists and lists[-1] > level:
+            lists.pop()
+            out.append("</li></ul>")
+
+    for line in text.splitlines():
+        m = re.match(r"^(\s*)- (.*)$", line)
+        if line.startswith("#"):
+            close_para()
+            close_lists()
+            hashes = len(line) - len(line.lstrip("#"))
+            level = min(6, top + hashes - 3)
+            out.append("<h%d>%s</h%d>" % (level, inline_md(line.lstrip("#").strip()), level))
+        elif m:
+            close_para()
+            indent = len(m.group(1))
+            if not lists or indent > lists[-1]:
+                out.append("<ul>")
+                lists.append(indent)
+            else:
+                close_lists(indent)
+                out.append("</li>")
+            out.append("<li>%s" % inline_md(m.group(2)))
+        elif not line.strip():
+            close_para()
+            close_lists()
+        else:
+            if lists:
+                raise BuildError("legal text: continuation lines inside lists aren't supported")
+            para.append(line.strip())
+    close_para()
+    close_lists()
+    return "\n".join(out)
+
+
+def load_nda():
+    files = sorted((SRC / "legal").glob("nda-*.md"))
+    if not files:
+        raise BuildError("src/legal/nda-<version>.md is missing")
+    path = max(files, key=lambda f: [int(n) for n in re.findall(r"\d+", f.stem)])
+    raw = path.read_bytes().replace(b"\r\n", b"\n")
+    return {"version": path.stem.split("-", 1)[1], "sha256": hashlib.sha256(raw).hexdigest(),
+            "text": raw.decode("utf-8")}
 
 
 # ---------------------------------------------------------------- components
@@ -200,7 +266,10 @@ def project_card(p, compact=False):
         parts.append('<p class="pcard__why"><strong>Who it\'s for:</strong> %s</p>' % esc(p["who"]))
     if p.get("public_price"):
         parts.append('<p class="pcard__price">%s</p>' % esc(p["public_price"]))
-    parts.append('<p class="pcard__lock"><a href="/access/">Full details under NDA</a></p>')
+    parts.append(
+        '<div class="lock" data-project="%s"><p class="lock__locked">'
+        '<a href="/access/?next=/divisions/%s/">Full details under NDA</a></p></div>' % (esc(p["id"]), esc(p["division"]))
+    )
     parts.append("</div></article>")
     return "".join(parts)
 
@@ -362,6 +431,121 @@ def c_testimonials(ctx):
     )
 
 
+def c_nda_text(ctx):
+    return '<div class="legal-text">%s</div>' % render_md(ctx["nda"]["text"], top=2)
+
+
+def c_nda_text_embedded(ctx):
+    return (
+        '<div class="legal-text legal-text--scroll" tabindex="0" role="region" aria-label="NDA text">%s</div>'
+        % render_md(ctx["nda"]["text"], top=3)
+    )
+
+
+def c_nda_meta(ctx):
+    return (
+        '<p class="legal-meta">Version %s &middot; Fingerprint (SHA-256): <code class="hash">%s</code></p>'
+        % (esc(ctx["nda"]["version"]), esc(ctx["nda"]["sha256"]))
+    )
+
+
+def c_legal_draft(ctx):
+    return ('<p class="draft-note"><strong>Draft.</strong> This text is being checked by a lawyer '
+            "before the site launches, so it may still change.</p>")
+
+
+def c_nda_bar(ctx):
+    division = ctx["d"]["slug"] if ctx.get("d") else ctx["meta"].get("nda_division", "")
+    if division not in ctx["lock_divisions"]:
+        raise BuildError("nda_bar: unknown division %r" % division)
+    return (
+        '<div class="nda-bar" data-division="%s" hidden><div class="wrap nda-bar__inner">'
+        '<p class="nda-bar__msg" role="status" aria-live="polite"></p>'
+        '<button class="btn btn--small btn--outline nda-bar__retry" type="button" hidden>Try again</button>'
+        '<button class="btn btn--small btn--outline nda-bar__logout" type="button">Log out</button>'
+        "</div></div>" % esc(division)
+    )
+
+
+def form_field(key, f, ctx):
+    fid = "f-%s-%s" % (key.replace("_", "-"), f["name"])
+    req = f.get("required", False)
+    attrs = ['id="%s"' % fid, 'name="%s"' % esc(f["name"])]
+    if req:
+        attrs.append("required")
+    if f.get("max"):
+        attrs.append('maxlength="%d"' % f["max"])
+    if f.get("autocomplete"):
+        attrs.append('autocomplete="%s"' % esc(f["autocomplete"]))
+    if f.get("match"):
+        attrs.append('data-match="f-%s-%s"' % (key.replace("_", "-"), esc(f["match"])))
+    described = []
+    hint = ""
+    if f.get("hint"):
+        hint = '<p class="field__hint" id="%s-hint">%s</p>' % (fid, esc(f["hint"]))
+        described.append(fid + "-hint")
+    described.append(fid + "-err")
+    attrs.append('aria-describedby="%s"' % " ".join(described))
+    error = '<p class="field__error" id="%s-err" hidden></p>' % fid
+    label_text = esc(f["label"])
+    if f.get("link"):
+        label_text = label_text.replace(
+            "{link}", '<a href="%s">%s</a>' % (esc(f["link"]["href"]), esc(f["link"]["text"])))
+    star = ' <span class="field__req" aria-hidden="true">*</span>' if req else ""
+    a = " ".join(attrs)
+    if f["type"] == "checkbox":
+        return ('<div class="field field--check"><input type="checkbox" value="yes" %s>'
+                '<label for="%s">%s%s</label>%s%s</div>' % (a, fid, label_text, star, hint, error))
+    if f["type"] == "textarea":
+        control = '<textarea rows="5" %s></textarea>' % a
+    elif f["type"] == "select":
+        opts = list(f.get("options", []))
+        if f.get("options_from") == "divisions":
+            opts += [{"value": d["slug"], "label": "%s (%s)" % (d["latin"], d["translation"])} for d in ctx["divisions"]]
+        control = "<select %s>%s</select>" % (a, "".join(
+            '<option value="%s">%s</option>' % (esc(o["value"]), esc(o["label"])) for o in opts))
+        if req:  # force a real choice
+            control = control.replace(">", '><option value="">Choose one</option>', 1)
+    else:
+        control = '<input type="%s" %s>' % (esc(f["type"]), a)
+    return ('<div class="field"><label for="%s">%s%s</label>%s%s%s</div>'
+            % (fid, label_text, star, hint, control, error))
+
+
+def render_form(key, ctx):
+    spec = ctx["forms"][key]
+    fid = "f-%s" % key.replace("_", "-")
+    fields = "\n".join(form_field(key, f, ctx) for f in spec["fields"])
+    return (
+        '<noscript><p class="draft-note">This form needs JavaScript. You can also call '
+        '<a href="{{site.phone_href}}">{{site.phone}}</a> or email <a href="mailto:{{site.email}}">{{site.email}}</a>.</p></noscript>'
+        '<form class="form needs-js" id="%s" data-form="%s" data-hook="%s" data-turnstile-action="%s" '
+        'data-success="%s" novalidate>'
+        '<div class="form__fields">%s'
+        '<div class="hp" aria-hidden="true"><label for="%s-website">Leave this empty</label>'
+        '<input type="text" id="%s-website" name="website" tabindex="-1" autocomplete="off"></div>'
+        '<div class="turnstile" data-for="%s"></div>'
+        '<p class="form__note">Fields marked <span aria-hidden="true">*</span><span class="visually-hidden">with a star</span> are required.</p>'
+        '<button class="btn" type="submit">%s</button></div>'
+        '<div class="form__status" role="status" aria-live="polite" tabindex="-1" hidden></div>'
+        "</form>"
+        % (fid, key, esc(spec["hook"]), esc(spec["turnstile_action"]), esc(spec["success"]), fields,
+           fid, fid, key, esc(spec["submit"]))
+    )
+
+
+def c_form_nda_request(ctx):
+    return render_form("nda_request", ctx)
+
+
+def c_form_nda_login(ctx):
+    return render_form("nda_login", ctx)
+
+
+def c_form_enquiry(ctx):
+    return render_form("enquiry", ctx)
+
+
 def c_stub(ctx):
     return '<p class="stub-note">This page is being built. Full content arrives in the next phase.</p>'
 
@@ -380,6 +564,14 @@ COMPONENTS = {
     "services": c_services,
     "service_steps": c_service_steps,
     "testimonials": c_testimonials,
+    "nda_text": c_nda_text,
+    "nda_text_embedded": c_nda_text_embedded,
+    "nda_meta": c_nda_meta,
+    "legal_draft": c_legal_draft,
+    "nda_bar": c_nda_bar,
+    "form_nda_request": c_form_nda_request,
+    "form_nda_login": c_form_nda_login,
+    "form_enquiry": c_form_enquiry,
     "stub": c_stub,
 }
 
@@ -435,7 +627,21 @@ def render_placeholders(text, where):
     return re.sub(r"<x-ph\s+([^>]*)>(.*?)</x-ph>", sub, text, flags=re.S)
 
 
+def page_scripts(meta, where):
+    names = meta.get("scripts", "").split()
+    for n in names:
+        if n not in PROD_SCRIPTS:
+            raise BuildError("%s: unknown script %r (allowed: %s)" % (where, n, ", ".join(PROD_SCRIPTS)))
+    if "nda" in names and "forms" not in names:
+        names.insert(0, "forms")  # nda.js builds on forms.js
+    if not names:
+        return ""
+    srcs = ["config"] + [n for n in PROD_SCRIPTS if n in names]
+    return "\n".join('  <script src="/assets/js/%s.js" defer></script>' % s for s in srcs)
+
+
 def render_page(meta, body, ctx, partials, nav_key, where):
+    ctx = dict(ctx, meta=meta)
     body = render_components(body, ctx, where)
     body = render_placeholders(body, where)
     nav_items = "\n".join(
@@ -452,6 +658,7 @@ def render_page(meta, body, ctx, partials, nav_key, where):
         ("{{content}}", body),
         ("{{page_title}}", esc(title)),
         ("{{description}}", esc(meta["description"])),
+        ("{{page_scripts}}", page_scripts(meta, where)),
     ):
         page = page.replace(key, value)
     page = render_vars(page, ctx, where)
@@ -525,7 +732,22 @@ def copy_assets(mark_svg_text, image_opts):
 
 # ---------------------------------------------------------------- main
 
-def build():
+def config_js(nda, mock):
+    endpoints = load_json("endpoints.json")
+    cfg = {
+        "hooks": "/webhook" if mock else endpoints["hooks"],
+        "turnstileSiteKey": "mock" if mock else endpoints["turnstile_site_key"],
+        "mock": mock,
+        "ndaVersion": nda["version"],
+        "ndaSha256": nda["sha256"],
+    }
+    if not mock and not cfg["turnstileSiteKey"]:
+        print("warning: no Turnstile site key yet (endpoints.json); forms stay switched off until Phase 6")
+    return ("// Generated by tools/build.py. Public values only (PLAN.md §4.1, §4.12).\n"
+            "window.IT7Q_CONFIG = Object.freeze(%s);\n" % json.dumps(cfg, sort_keys=True))
+
+
+def build(mock=False):
     if DIST.exists():
         if DIST.resolve().parent != ROOT or DIST.name != "dist":
             raise BuildError("refusing to delete unexpected path %s" % DIST)
@@ -542,6 +764,8 @@ def build():
         "projects": projects, "project_index": {p["id"]: p for p in projects},
         "portfolio": load_json("portfolio.json"), "services": load_json("services.json"),
         "testimonials": approved_testimonials(load_json("testimonials.json")),
+        "forms": load_json("forms.json"), "nda": load_nda(),
+        "lock_divisions": {d["slug"] for d in divisions} | {"investors"},
     }
 
     outputs = {}
@@ -567,21 +791,24 @@ def build():
 
     marked = copy_assets(mark_text, image_opts)
     (DIST / "assets/css/fonts.css").write_text(fonts_css(), encoding="utf-8")
+    (DIST / "assets/js/config.js").write_text(config_js(base_ctx["nda"], mock), encoding="utf-8")
     (DIST / "favicon.svg").write_text(favicon, encoding="utf-8")
     shutil.copyfile(SRC / "_headers", DIST / "_headers")
-    print("built %d pages, %d project cards, %d testimonials, %d watermarked images -> %s"
-          % (len(outputs), len(projects), len(base_ctx["testimonials"]), marked, DIST.relative_to(ROOT)))
+    print("built %d pages, %d project cards, %d testimonials, %d watermarked images -> %s%s"
+          % (len(outputs), len(projects), len(base_ctx["testimonials"]), marked, DIST.relative_to(ROOT),
+             " (LOCAL MOCK BUILD: do not deploy)" if mock else ""))
 
 
 def main(argv):
+    mock = "--mock" in argv
     try:
-        build()
+        build(mock)
     except BuildError as e:
         print("BUILD FAILED: %s" % e, file=sys.stderr)
         return 1
     if "--no-check" in argv:
         return 0
-    return check.main([str(DIST)])
+    return check.main([str(DIST)] + (["--mock"] if mock else []))
 
 
 if __name__ == "__main__":

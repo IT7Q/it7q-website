@@ -1,12 +1,50 @@
 ---
 title: Investors & partners
-description: Read and sign our NDA to request access to full project details.
+description: Sign IT7Q's NDA to request access to full project details, or log in if you've been approved.
 nav: access
+scripts: nda
 ---
 <section class="section page-head">
   <div class="wrap narrow">
-    <h1>Investors & partners</h1>
-    <p class="section__lead">Read and sign our NDA to request access to full project details.</p>
-{{> stub}}
+    <h1>Investors &amp; partners</h1>
+    <p class="section__lead">Every project card shows the basics. To see the full detail, sign our NDA. We review every request by hand, and once you're approved we'll email you a login.</p>
+  </div>
+</section>
+
+<section class="section section--tight" aria-labelledby="login-heading">
+  <div class="wrap narrow">
+    <div id="nda-signed-in" class="panel-box" tabindex="-1" hidden>
+      <h2 class="section__title">You're logged in</h2>
+      <p>Logged in as <strong class="nda-email"></strong>. Full details now show on each division page, in this browser tab only.</p>
+      <ul class="plain link-list">
+        <li><a class="link-arrow" href="/divisions/">Go to the divisions</a></li>
+        <li class="nda-investors" hidden><a class="link-arrow" href="/investors/">Go to the investor area</a></li>
+      </ul>
+      <button class="btn btn--outline nda-logout" type="button">Log out</button>
+    </div>
+    <div id="nda-login">
+      <h2 id="login-heading" class="section__title">Already approved? Log in</h2>
+{{> form_nda_login}}
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt" aria-labelledby="request-heading">
+  <div class="wrap narrow">
+    <h2 id="request-heading" class="section__title">Request access</h2>
+    <ol class="mini-steps">
+      <li>Read the NDA below.</li>
+      <li>Fill in the form and sign by typing your name.</li>
+      <li>We email you a copy of the NDA, then review your request by hand.</li>
+      <li>If you're approved, we email your login. Access runs for the NDA's three-year term.</li>
+    </ol>
+{{> legal_draft}}
+    <h3 class="legal-title">Non-disclosure agreement</h3>
+{{> nda_meta}}
+{{> nda_text_embedded}}
+    <p><a href="/legal/nda/">Open the NDA on its own page</a></p>
+    <h3 class="legal-title">Your details</h3>
+{{> form_nda_request}}
+    <p class="form__privacy">We use these details only to manage your NDA and access. See our <a href="/legal/privacy/">privacy policy</a>.</p>
   </div>
 </section>

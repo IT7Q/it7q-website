@@ -1,12 +1,17 @@
 ---
 title: Investor area
-description: Confidential material for approved investors and partners.
+description: Confidential material for approved investors and partners, available under NDA.
 nav: access
+scripts: nda
+nda_division: investors
 ---
+{{> nda_bar}}
 <section class="section page-head">
   <div class="wrap narrow">
     <h1>Investor area</h1>
     <p class="section__lead">Confidential material for approved investors and partners.</p>
-{{> stub}}
+    <div id="investor-content" class="lock lock--page">
+      <p class="lock__locked">This area is open to approved investors and partners under NDA. <a href="/access/?next=/investors/">Log in or request access</a>.</p>
+    </div>
   </div>
 </section>

@@ -86,6 +86,28 @@ class CheckGuards(unittest.TestCase):
         (self.dist / "assets/img/anim.gif").write_bytes(b"GIF89a")
         self.assertIn("anim.gif: watermark check: format not allowed", "\n".join(check.run(self.dist).failures))
 
+    def test_webhook_origin_only_in_config(self):
+        self.assertEqual(check.run(self.dist).failures, [])  # config.js mentions it: allowed
+        out = self.failures_after("assets/js/forms.js", lambda s: s + "\n// https://hooks.nubius.com.au/webhook\n")
+        self.assertIn("assets/js/forms.js: public-wording guard", out)
+
+    def test_mock_config_refused_unless_mock(self):
+        def to_mock(s):
+            return s.replace('"mock": false', '"mock": true').replace("https://hooks.nubius.com.au/webhook", "/webhook")
+        self.assertIn("LOCAL MOCK build", self.failures_after("assets/js/config.js", to_mock))
+        self.assertEqual(check.run(self.dist, mock=True).failures, [])
+        out = self.failures_after("assets/js/config.js", lambda s: s.replace('"mock": true', '"mock": false'))
+        self.assertIn("hooks must be", out)
+
+    def test_html_sinks_in_scripts(self):
+        for sink in ("el.innerHTML = x", "el.insertAdjacentHTML('beforeend', x)", "eval(x)", "document.write(x)"):
+            out = self.failures_after("assets/js/nda.js", lambda s, sink=sink: s + "\n" + sink + ";\n")
+            self.assertIn("textContent only", out, sink)
+
+    def test_unlabelled_field(self):
+        self.assertIn("has no <label for>", self.inject('<input type="text" id="lonely" name="x">'))
+        self.assertNotIn("field ok has", self.inject('<label for="ok">Ok</label><input id="ok" name="ok">'))
+
     def test_font_needs_licence(self):
         (self.dist / "assets/fonts/Rajdhani-OFL.txt").unlink()
         out = "\n".join(check.run(self.dist).failures)

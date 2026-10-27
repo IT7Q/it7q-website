@@ -1,0 +1,202 @@
+{
+ "_about": "One definition per form, used by tools/build.py (HTML), tools/preview.py (mock validation) and, in Phase 4, the n8n workflows. System fields every form also sends: turnstile, website (honeypot, must be empty), elapsed_ms. PLAN.md §4.12.",
+ "nda_request": {
+  "hook": "nda-submission",
+  "turnstile_action": "nda_request",
+  "submit": "Sign and request access",
+  "success": "Thanks. Your request has been received. We review every request by hand, and we've emailed you a copy of the NDA for your records. If your request is approved, we'll email your login details.",
+  "system": [
+   "nda_version",
+   "nda_sha256"
+  ],
+  "fields": [
+   {
+    "name": "name",
+    "label": "Full name",
+    "type": "text",
+    "required": true,
+    "max": 100,
+    "autocomplete": "name"
+   },
+   {
+    "name": "email",
+    "label": "Email",
+    "type": "email",
+    "required": true,
+    "max": 254,
+    "autocomplete": "email"
+   },
+   {
+    "name": "org",
+    "label": "Organisation (optional)",
+    "type": "text",
+    "max": 150,
+    "autocomplete": "organization"
+   },
+   {
+    "name": "reason",
+    "label": "Why you'd like access",
+    "type": "textarea",
+    "required": true,
+    "max": 1000,
+    "hint": "A sentence or two is plenty: for example, investing, partnering, or becoming a customer or supplier."
+   },
+   {
+    "name": "wants_investor",
+    "label": "I'm an investor or potential partner, and I'd also like access to the investor area",
+    "type": "checkbox"
+   },
+   {
+    "name": "signature",
+    "label": "Type your full name to sign",
+    "type": "text",
+    "required": true,
+    "max": 100,
+    "match": "name",
+    "hint": "This is your electronic signature. It must match the full name above."
+   },
+   {
+    "name": "agree_nda",
+    "label": "I have read the NDA above and agree to be bound by it",
+    "type": "checkbox",
+    "required": true
+   },
+   {
+    "name": "agree_terms",
+    "label": "I agree to the website {link}",
+    "link": {
+     "text": "terms of use",
+     "href": "/legal/terms/"
+    },
+    "type": "checkbox",
+    "required": true
+   }
+  ]
+ },
+ "nda_login": {
+  "hook": "nda-login",
+  "turnstile_action": "nda_login",
+  "submit": "Log in",
+  "success": "You're logged in.",
+  "fields": [
+   {
+    "name": "email",
+    "label": "Email",
+    "type": "email",
+    "required": true,
+    "max": 254,
+    "autocomplete": "username"
+   },
+   {
+    "name": "password",
+    "label": "Password",
+    "type": "password",
+    "required": true,
+    "max": 200,
+    "autocomplete": "current-password"
+   }
+  ]
+ },
+ "enquiry": {
+  "hook": "website-enquiry",
+  "turnstile_action": "enquiry",
+  "submit": "Send message",
+  "success": "Thanks, your message is on its way. We'll get back to you soon.",
+  "fields": [
+   {
+    "name": "name",
+    "label": "Your name",
+    "type": "text",
+    "required": true,
+    "max": 100,
+    "autocomplete": "name"
+   },
+   {
+    "name": "email",
+    "label": "Email",
+    "type": "email",
+    "required": true,
+    "max": 254,
+    "autocomplete": "email"
+   },
+   {
+    "name": "phone",
+    "label": "Phone (optional)",
+    "type": "tel",
+    "max": 30,
+    "autocomplete": "tel"
+   },
+   {
+    "name": "service",
+    "label": "What can we help with?",
+    "type": "select",
+    "required": true,
+    "options": [
+     {
+      "value": "home-help",
+      "label": "Computer, phone or Wi-Fi help at home"
+     },
+     {
+      "value": "online-safety",
+      "label": "Staying safe online"
+     },
+     {
+      "value": "smart-home",
+      "label": "Smart home setup"
+     },
+     {
+      "value": "managed-it",
+      "label": "Managed IT and support for a business"
+     },
+     {
+      "value": "security",
+      "label": "Security monitoring or hardware"
+     },
+     {
+      "value": "hardening",
+      "label": "AI-powered security hardening (coming soon)"
+     },
+     {
+      "value": "website",
+      "label": "A website"
+     },
+     {
+      "value": "automation",
+      "label": "AI and automation"
+     },
+     {
+      "value": "software",
+      "label": "Custom software"
+     },
+     {
+      "value": "partnership",
+      "label": "Investment or partnership"
+     },
+     {
+      "value": "other",
+      "label": "Something else"
+     }
+    ]
+   },
+   {
+    "name": "division",
+    "label": "Which part of IT7Q? (optional)",
+    "type": "select",
+    "options_from": "divisions",
+    "options": [
+     {
+      "value": "",
+      "label": "Not sure"
+     }
+    ]
+   },
+   {
+    "name": "message",
+    "label": "Tell us a bit more",
+    "type": "textarea",
+    "required": true,
+    "max": 2000
+   }
+  ]
+ }
+}

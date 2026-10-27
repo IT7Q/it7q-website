@@ -62,11 +62,12 @@
   "coming_soon": {
     "project": "P-MSP-06",
     "cta": "Tell me when it's ready",
-    "cta_href": "/contact/"
+    "cta_href": "/contact/?topic=hardening#enquiry"
   },
   "portfolio_highlight": [
     "p3",
     "p1",
     "p8"
-  ]
+  ],
+  "whatsapp_href": "https://wa.me/61411753366"
 }

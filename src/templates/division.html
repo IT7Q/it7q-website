@@ -2,7 +2,9 @@
 title: {{d.latin}}: {{d.translation}}
 description: {{d.intro}}
 nav: divisions
+scripts: nda
 ---
+{{> nda_bar}}
 <section class="section page-head d-{{d.slug}}">
   <div class="wrap division-head">
 {{> badge_large}}
@@ -10,7 +12,7 @@ nav: divisions
       <p class="eyebrow">{{d.subtitle}}</p>
       <h1>{{d.latin}} <span class="division-head__tr">{{d.translation}}</span></h1>
       <p class="section__lead">{{d.intro}}</p>
-      <p class="nda-note">Every card shows the basics. Investors and partners can see the full detail under NDA: <a href="/access/">request access</a>.</p>
+      <p class="nda-note">Every card shows the basics. Investors and partners can see the full detail under NDA: <a href="/access/?next=/divisions/{{d.slug}}/">log in or request access</a>.</p>
     </div>
   </div>
 </section>

@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v8, 28 Oct 2026. Phases 1 and 2 built** (Phase 2: division pages with all 70 project cards, Portfolio, Services, Home testimonials). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v9, 28 Oct 2026. Phases 1–3 built** (Phase 3: About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -123,6 +123,7 @@ Kept for the record. The packs used a different palette from the card; Chris cho
 | 41 | **Division colours**: keep the provisional picks for now; Chris fine-tunes them from the preview later. |
 | 42 | **Portfolio** details and one-liners (§2.2). p2 is **Redbird Studio** (was "Red Bird"). Niuleaf's one-liner stays a placeholder for Chris to supply. |
 | 43 | **Pillow** allowed as one pinned build dependency so photos can be JPEG/WebP. The watermark step and its check work for all three formats (§5.1). |
+| 47 | **Version pin is enough for now.** Full hash pinning (`--require-hashes`) at launch; Chris generates the hashes on his Mac. |
 | — | **Watermark**: every raster image on the site (photos, thumbnails, portfolio screenshots) gets a subtle master-mark watermark, applied by `tools/build.py`. Sources stay unwatermarked outside `dist/`; `tools/check.py` fails on any unmarked image (§5.1). |
 | — | **Coming soon (MSP)**: "AI-powered security hardening for your small business and home". A card on the MSP page plus a teaser on Home. Public wording follows §4.9 (no WireGuard, tunnels, Agent Smith or internal tooling). |
 | — | **Testimonials** (28 Oct): a Home section driven by `src/data/testimonials.json`, consent recorded per entry, shown only when there are approved entries (§2.3). Chris fills in the real quotes; I never write any. |
@@ -177,7 +178,9 @@ Home users first, small business second, all in plain English.
 - **Division pages**: one template. Header = the division badge + descriptive subtitle (§1). Cards come from `src/data/projects.json` via `tools/build.py`. Gated detail is **not** in that file. Each card: image placeholder, status badge (*Developed · In development · In design · Documented · Coming soon*), name, one-liner, "Why it's unique" (or "Who it's for" on TEMPESTAS tiers), and a "Full details under NDA" line linking to `/access/`. Featured cards (T3 Guard, the coming-soon MSP service) sit first and span the grid.
 - **MENTIS page** also carries a plain-English **"AI automations we can set up"** services list (from v2: patch management, social media pipeline, invoice/phone-system automation, email triage, security alerting, compliance reporting). It's a list, not cards (Q24).
 - **Services**: plain-English public services for homes and small business, from `src/data/services.json`, each linking to its division. How IT7Q delivers them internally (tooling, stack) is gated (Q15). Until the enquiry form arrives (Phase 3, with service and division selectors), the page points to phone and email.
-- **Contact / footer**: phone 0411 753 366, info@it7q.com.au, ABN 43 922 878 001, Kallangur QLD 4503.
+- **Contact / footer**: phone 0411 753 366, info@it7q.com.au, ABN 43 922 878 001, Kallangur QLD 4503. The Contact page also links WhatsApp at `wa.me/61411753366` (assumes WhatsApp is on the mobile number; Q49) and carries the enquiry form. Messenger is left off until Chris gives the page link (Q49).
+- **About**: story (Est. 2020, Kallangur, Australian owned & operated), mission, four values (from v2), photo placeholders IMG-29/IMG-30, and a visible placeholder for a few lines from Chris (Q48).
+- **Legal**: Privacy and Terms are plain-English drafts that state the §4.10 retention periods, no cookies, cookieless analytics, Turnstile and `sessionStorage`. The NDA page shows `src/legal/nda-1.0.md` with its version and SHA-256. All three carry a "Draft, being checked by a lawyer" note (Q36).
 - **Portfolio**: §2.2.
 - **Parked**: client portal dashboard, admin portal login, Neo evaluation workflow, WordPress (§9).
 
@@ -406,7 +409,12 @@ requirements.txt     Pillow, pinned (the build's only dependency, Q43)
 tools/brand_mark.py  one-off: pack emblem SVG → simplified mark.svg
 tools/check.py       links, HTML sanity, gated-content leak check, infrastructure guard on gated/,
                      unpublished-portfolio check, financial-figure guard, price guard, SVG check,
-                     watermark check, pack-colour guard, public-wording guard
+                     watermark check, pack-colour guard, public-wording guard, consent guard,
+                     font licence guard, config guard, JS-sink guard, form-label guard
+tools/preview.py     local preview: serves dist/ with the Pages headers + mock webhooks (§4.12)
+src/legal/nda-1.0.md the NDA text the site shows and fingerprints (reviewer notes stay in docs/)
+src/data/forms.json  the three forms' fields: renders the HTML, drives the mock, spec for n8n
+src/data/endpoints.json  public webhook origin + Turnstile site key
 tools/tests/         unit tests for the build tools (python3 -m unittest)
 dist/                build output, the only thing deployed (git-ignored)
 gated/               feature-level gated detail per division as JSON, NEVER in dist/ (§4.9)
@@ -482,10 +490,27 @@ Unchanged in principle. Content is **per project**, delivered per division. UX o
 2. With a token, one POST `{division}` returns the gated detail for every project in that division (structured JSON, `no-store`). `/investors/` posts `{division:"investors"}`.
 3. n8n re-checks the session, approval, revocation, NDA expiry and scope (`investors` needs `investor_access`).
 4. Rendering uses DOM APIs only (no `innerHTML`), with a watermark: "Confidential — shared with <email> under NDA".
-5. 401/403 → clear the token and re-lock. Network/5xx → stay locked, "try again". No cached fallback.
+5. 401 → clear the token and re-lock ("your session has ended"). 403 → re-lock that page only and keep the session, since a viewer without Investors access is still approved for the divisions. Network/5xx/bad JSON/wrong division → stay locked, with "try again". No cached fallback.
 6. `{action:"logout"}` deletes the session server-side.
 
 Honest limits: an approved viewer can still copy or screenshot. The NDA, watermark, audit log and revocation are the controls for that.
+
+### 4.12 Front-end contract and local mock (Phase 3)
+
+The browser side is built and tested against `tools/preview.py`, which plays the five webhooks. The Phase 4 n8n workflows must reply the same way.
+
+| Hook | Request (JSON, ≤ 8 KB) | Replies |
+|---|---|---|
+| `nda-submission` | `forms.json` → `nda_request` fields + `nda_version`, `nda_sha256` | `202` (also for bots and duplicates: no enumeration), `400` invalid, `429` |
+| `nda-login` | `email`, `password` | `200 {token, email, expires_at (ISO UTC), investor}`, one `401` for every failure, `429` after 5 fails in 15 min |
+| `nda-content` | `{token, division}` (seven slugs or `investors`) or `{token, action:"logout"}` | `200 {division, viewer, projects: {ID: {summary, sections:[{heading, items[], paragraphs[]}]}}}`; investors: `{division, viewer, sections}`; `401` session, `403` scope |
+| `website-enquiry` | `forms.json` → `enquiry` fields | `202`, `400`, `429` |
+
+- **Every form also sends** `turnstile`, `website` (honeypot, must be empty) and `elapsed_ms`. Honeypot filled or under 3 s means a neutral `202`, with nothing stored or emailed. The signature must match the name (case and spacing ignored).
+- **Config**: `tools/build.py` writes `assets/js/config.js` (webhook origin, Turnstile site key, NDA version + hash). It's the **only** file in `dist/` allowed to name the webhook origin. `--mock` builds point at `/webhook` on the preview server, and `tools/check.py` refuses a mock build unless it's told it's one, so a mock build can't be deployed by accident.
+- **Turnstile**: loaded only on pages with forms. With no site key (as now, until Phase 6) the forms **fail closed**: they say the check couldn't load and send nothing.
+- **Mock scenarios** (switch at `/__mock/scenario/<name>`): `normal`, `down`, `slow`, `rate-limited`, `content-500`, `content-bad-json`, `content-wrong-division`, `session-expired`, `forbidden`, `login-refused`. Mock logins are listed at the top of `tools/preview.py`. All their data is fake.
+- **No JS runtime on Pantheon**, so the browser code is checked by guards (no `innerHTML`/`eval`, every field labelled), by tests of the mock and the page↔mock contract, and by Chris's browser walk-through (§7.1).
 
 ### 4.7 `website-enquiry` (Q19)
 - Name, email, phone (optional), service, division, message, Turnstile, honeypot + timing.
@@ -680,38 +705,44 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 0. ✅ Repo, source, plan v1. ✅ Financials removed from repo + history, GitHub purge done (§10). ✅ Plans v2–v6. ✅ NDA draft for review. ✅ Brand packs extracted and checked.
 1. ✅ **Phase 1 (27 Oct)**: `src/` structure with stub pages for every route, build/check tools with unit tests, watermark pipeline, brand tokens, base CSS, header/footer, placeholder component, animated logo, Home (hero stats, badge row, coming-soon teaser). Preview: §7.1.
 2. ✅ **Phase 2 (28 Oct, scope set by Chris)**: Divisions index + 7 division pages with all 70 cards from `projects.json`, MENTIS services list, Portfolio (`portfolio.json`), Services (`services.json`), Home testimonials (`testimonials.json`, consent guard). Plus Q40 fonts and Q43 JPEG/WebP watermarking. All images are placeholders.
-3. About, Contact and Legal pages (moved here from Phase 2); NDA front end (`/access/`, locked panels, renderer) and enquiry form against a local mock with failure simulation.
+3. ✅ **Phase 3 (28 Oct)**: About, Contact (+ enquiry form), Privacy, Terms and NDA pages (drafts, legal check pending); NDA front end: `/access/` (read + sign + request, login, logged-in state), locked panels on every card, the gated-detail renderer with watermark, the logout bar, the `/investors/` locked shell; `tools/preview.py` mock with failure scenarios (§4.12).
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
-5. Investors shell; Blog + Downloads only if 2–3 posts are ready (Q17).
-6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live.
+5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
+6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text or "Draft" legal note.
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
 
 ### 7.1 Previewing locally
 From `/srv/work/it7q-website` on Pantheon:
 ```
-python3 tools/build.py && python3 tools/check.py
-python3 -m http.server 8080 --bind 127.0.0.1 --directory dist
+.venv/bin/python tools/preview.py
 ```
-Then open <http://localhost:8080/> in a browser on the Windows side (WSL2 forwards localhost). It's bound to 127.0.0.1, so nothing is exposed to the network. `Ctrl+C` stops it. `_headers` (CSP etc.) only applies on Cloudflare Pages, not in this local preview.
+Then open <http://localhost:8080/> in a browser on the Windows side (WSL2 forwards localhost). It builds a **mock** build, serves it with the same security headers as Pages (so CSP problems show in the browser console), and answers the forms and logins itself (§4.12). It's bound to 127.0.0.1 only. `Ctrl+C` stops it. Afterwards, `dist/` holds the mock build: run `.venv/bin/python tools/build.py` before comparing anything with production.
 
-Once JPEG/WebP photos are in `src/assets/img/`, the build needs Pillow. Set up a virtualenv in the repo once (as `chris`, with network access; `.venv/` is git-ignored), then build with it:
+**Walk-through** (what I can't test without a browser): send the enquiry form; request access; log in as `investor@example.test`, open a division page and the investor area, log out; then repeat with scenarios `down`, `slow`, `session-expired`, `forbidden` and `content-bad-json`. Every failure must leave the cards locked.
+
+Once JPEG/WebP photos are in `src/assets/img/`, the build needs Pillow in `.venv/` (git-ignored). On Ubuntu, `python3 -m venv` only includes pip if the `python3-venv` package is installed. Without it the venv comes out empty (that happened on 28 Oct: `.venv/` has no pip and no Pillow). One-off fix as `chris`:
 ```
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python tools/build.py
+sudo apt install python3-venv          # adds ensurepip, so new venvs get pip
+cd /srv/work/it7q-website
+rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python -c "import PIL; print(PIL.__version__)"   # expect 12.0.0
 ```
 
 ---
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–43 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
+**Answered**: 1–43 and 47 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
 
 **Still open**
-36. **NDA legal check** before launch (`docs/nda-draft.md`, now with a survival clause).
+36. **Legal check** before launch: the NDA (`src/legal/nda-1.0.md`, reviewer notes in `docs/nda-draft.md`), plus the new Privacy and Terms drafts.
 44. **Proposed extra stats** (§2): approve any of the five, or none.
 45. **Card copy**: check the one-liners and "why it's unique" lines on the division pages, especially my drafts (TEMPESTAS "who it's for", COLLOQUIUM, PORTUS App/Jnr, FABRICUS App/FORMAE/BIONICUS) and the MENTIS automations list.
 46. **BlueVibes Music (p6)**: a few words on what it is, for a better one-liner. **Niuleaf (p8)**: the one-liner you said you'd supply.
-47. **Pillow hashes**: `requirements.txt` pins Pillow's version. For full supply-chain pinning (`--require-hashes`), the hashes must be generated on a machine with network access (`pip download` + `pip hash`). Do it at Phase 6, or is the version pin enough?
+48. **About page**: a few lines from you on how IT7Q started and who's behind it (placeholder on the page now).
+49. **Messaging**: is WhatsApp on 0411 753 366 (the Contact page links `wa.me/61411753366`)? And the Facebook Messenger page link, if you want it listed.
+50. **Pillow on Pantheon**: `.venv/` has no pip yet; fix in §7.1 (needs `sudo`).
 
 ---
 
@@ -735,3 +766,4 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 - **27 Oct 2026: plan v6.** Brand packs extracted (outside the repo) and colour-checked. FABRICUS register F-001–F-035 added.
 - **27 Oct 2026: plan v7 + Phase 1.** Brand = business card. Phase 1 scaffold, tools and Home committed.
 - **28 Oct 2026: plan v8 + Phase 2.** Q40–Q43 answered, portfolio details, testimonials. Phase 2 built: cards, Portfolio, Services, testimonials, TTF fonts, JPEG/WebP watermarking.
+- **28 Oct 2026: plan v9 + Phase 3.** Q47 answered. About, Contact, Legal, NDA front end, enquiry form, local mock. NDA text moved to `src/legal/nda-1.0.md`.

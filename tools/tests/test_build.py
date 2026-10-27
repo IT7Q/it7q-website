@@ -1,5 +1,6 @@
 """Build-side rules: testimonials, project data validation, placeholders."""
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -60,6 +61,44 @@ class Projects(unittest.TestCase):
         out = build.render_placeholders('<x-ph id="X" w="800" h="500">Tea &amp; towels</x-ph>', "t")
         self.assertIn("Tea &amp; towels", out)
         self.assertNotIn("&amp;amp;", out)
+
+
+class LegalAndForms(unittest.TestCase):
+    def test_markdown_subset(self):
+        out = build.render_md("### 1. Title\n\nSome **bold** text\non two lines.\n\n- (a) one\n- (b) two:\n  - (i) nested\n  - (ii) more\n- (c) three\n", top=2)
+        self.assertEqual(out, "\n".join([
+            "<h2>1. Title</h2>", "<p>Some <strong>bold</strong> text on two lines.</p>",
+            "<ul>", "<li>(a) one", "</li>", "<li>(b) two:", "<ul>", "<li>(i) nested", "</li>", "<li>(ii) more",
+            "</li></ul>", "</li>", "<li>(c) three", "</li></ul>"]))
+        self.assertIn("&lt;script&gt;", build.render_md("<script>x</script>"))
+
+    def test_nda_fingerprint_is_the_file(self):
+        import hashlib
+        nda = build.load_nda()
+        raw = (build.SRC / ("legal/nda-%s.md" % nda["version"])).read_bytes()
+        self.assertEqual(nda["sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertNotIn("Reviewer note", nda["text"])
+
+    def test_forms_render_exactly_the_defined_fields(self):
+        ctx = {"forms": build.load_json("forms.json"), "divisions": build.load_json("divisions.json")}
+        for key, spec in ctx["forms"].items():
+            if key.startswith("_"):
+                continue
+            out = build.render_form(key, ctx)
+            names = re.findall(r'name="([^"]+)"', out)
+            self.assertEqual(names, [f["name"] for f in spec["fields"]] + ["website"], key)
+            for fid in re.findall(r'<(?:input|select|textarea)[^>]* id="([^"]+)"', out):
+                self.assertIn('for="%s"' % fid, out, fid)
+        enquiry = build.render_form("enquiry", ctx)
+        self.assertIn('<option value="">Choose one</option><option value="home-help">', enquiry)
+        self.assertIn('<option value="tempestas">TEMPESTAS (Storm &amp; Hardware)</option>', enquiry)
+
+    def test_page_scripts(self):
+        self.assertEqual(build.page_scripts({}, "t"), "")
+        out = build.page_scripts({"scripts": "nda"}, "t")
+        self.assertEqual(re.findall(r"js/(\w+)\.js", out), ["config", "forms", "nda"])
+        with self.assertRaises(build.BuildError):
+            build.page_scripts({"scripts": "evil"}, "t")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Pre-deploy checks for the IT7Q site (PLAN.md §2.3, §3, §4.9, §5.1, §6.2).
 
-    python3 tools/check.py [dist_dir]
+    python3 tools/check.py [dist_dir] [--mock]
+
+--mock accepts a local mock build (tools/build.py --mock); without it the
+generated config must point at the production webhooks.
 
 Exits non-zero if anything fails. tools/build.py runs this after every build,
 so a failing check also fails the Cloudflare Pages deploy.
@@ -43,6 +46,11 @@ GATED_FORBIDDEN = PUBLIC_FORBIDDEN + [
     r"\bgit\.", r"\.git\b", r"\bport\b", r"[\w-]+\.nubius\.com\.au",
     r"\b(?!(?:p\d+|www|downloads)\.)[\w-]+\.it7q\.com\.au",
 ]
+# §4.12: the webhook origin may appear only in the generated config
+CONFIG_JS = "assets/js/config.js"
+PROD_HOOKS = "https://hooks.nubius.com.au/webhook"
+# Rendering of gated content must use DOM APIs only (§4.6)
+JS_SINKS = re.compile(r"\.innerHTML|\.outerHTML|insertAdjacentHTML|document\.write|\beval\s*\(|new\s+Function\b")
 FINANCIAL = re.compile(
     r"\$\s?\d[\d,.]*\s*(?:k|m|bn|million|billion)?[^.\n]{0,60}"
     r"(?:revenue|profit|turnover|projection|forecast|valuation|\barr\b|\bmrr\b|ebitda|run[- ]rate|margin)"
@@ -76,6 +84,7 @@ class PageParser(HTMLParser):
         self.links, self.h1, self.title, self.lang, self.desc = [], 0, "", None, False
         self.inline_script, self.inline_style, self.handlers = False, False, []
         self.svg_refs, self._in_title, self._in_script_src = [], False, None
+        self.controls, self.label_fors = [], set()
 
     def handle_starttag(self, tag, attrs):
         self._attrs(tag, attrs)
@@ -118,6 +127,10 @@ class PageParser(HTMLParser):
             self.errors.append("<img> without alt")
         if tag == "use":
             self.svg_refs.append(a.get("href", ""))
+        if tag in ("input", "select", "textarea") and a.get("type") not in ("hidden", "submit", "button"):
+            self.controls.append(a.get("id") or "<%s name=%s>" % (tag, a.get("name")))
+        if tag == "label" and a.get("for"):
+            self.label_fors.add(a["for"])
         if tag == "foreignobject":
             self.errors.append("<foreignObject> in inline SVG")
 
@@ -179,6 +192,9 @@ def check_pages(dist, r):
             r.fail(where, "inline style (blocked by CSP)")
         for h in p.handlers:
             r.fail(where, "inline event handler %s (blocked by CSP)" % h)
+        for control in p.controls:
+            if control not in p.label_fors:
+                r.fail(where, "form field %s has no <label for> (accessibility)" % control)
         for ref in p.svg_refs:
             if not ref.startswith("#") or ref[1:] not in p.ids:
                 r.fail(where, "SVG <use> points at missing or external %r" % ref)
@@ -199,6 +215,8 @@ def check_text_guards(dist, r, allowed_prices=frozenset()):
     for f in public:
         where = str(f.relative_to(dist))
         text = f.read_text(encoding="utf-8", errors="replace")
+        if where == CONFIG_JS:
+            text = text.replace(PROD_HOOKS, "")  # the one allowed mention (§4.12)
         for pat in PUBLIC_FORBIDDEN:
             m = re.search(pat, text, re.I)
             if m:
@@ -239,6 +257,29 @@ def check_rasters(dist, r):
             ok, why = rastermark.verify(f.read_bytes(), f.suffix)
             if not ok:
                 r.fail(str(f.relative_to(dist)), "watermark check: %s" % why)
+
+
+def check_scripts(dist, r, mock=False):
+    for f in dist.rglob("*.js"):
+        m = JS_SINKS.search(f.read_text(encoding="utf-8", errors="replace"))
+        if m:
+            r.fail(str(f.relative_to(dist)), "script uses %r: build DOM with textContent only (§4.6)" % m.group(0))
+    path = dist / CONFIG_JS
+    if not path.exists():
+        r.fail(CONFIG_JS, "missing from dist/")
+        return
+    m = re.fullmatch(r"//[^\n]*\nwindow\.IT7Q_CONFIG = Object\.freeze\((\{.*\})\);\n", path.read_text(encoding="utf-8"), re.S)
+    try:
+        cfg = json.loads(m.group(1)) if m else None
+    except ValueError:
+        cfg = None
+    if not isinstance(cfg, dict):
+        r.fail(CONFIG_JS, "not in the generated format")
+        return
+    if cfg.get("mock") and not mock:
+        r.fail(CONFIG_JS, "this is a LOCAL MOCK build and must never be deployed; run tools/build.py without --mock")
+    if not cfg.get("mock") and cfg.get("hooks") != PROD_HOOKS:
+        r.fail(CONFIG_JS, "hooks must be %s" % PROD_HOOKS)
 
 
 def check_fonts(dist, r):
@@ -349,7 +390,7 @@ def approved_prices():
     }
 
 
-def run(dist):
+def run(dist, mock=False):
     r = Report()
     for required in ("index.html", "404.html", "_headers", "favicon.svg"):
         if not (dist / required).exists():
@@ -358,6 +399,7 @@ def run(dist):
     check_text_guards(dist, r, approved_prices())
     check_svgs(dist, r)
     check_rasters(dist, r)
+    check_scripts(dist, r, mock)
     check_fonts(dist, r)
     check_gated(dist, r)
     check_portfolio(dist, r)
@@ -366,11 +408,13 @@ def run(dist):
 
 
 def main(argv):
+    mock = "--mock" in argv
+    argv = [a for a in argv if a != "--mock"]
     dist = Path(argv[0]) if argv else ROOT / "dist"
     if not dist.is_dir():
         print("CHECK FAILED: %s does not exist; run tools/build.py first" % dist, file=sys.stderr)
         return 1
-    r = run(dist.resolve())
+    r = run(dist.resolve(), mock)
     if r.failures:
         print("CHECK FAILED (%d):" % len(r.failures), file=sys.stderr)
         for f in r.failures:

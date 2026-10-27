@@ -1,12 +1,32 @@
 ---
 title: Contact
-description: Call, email or send us a message.
+description: Call, email, WhatsApp or send IT7Q a message. Based in Kallangur, Queensland.
 nav: contact
+scripts: forms
 ---
 <section class="section page-head">
-  <div class="wrap narrow">
-    <h1>Contact</h1>
-    <p class="section__lead">Call, email or send us a message.</p>
-{{> stub}}
+  <div class="wrap">
+    <h1>Contact us</h1>
+    <p class="section__lead">No jargon, no pressure. Just a straight conversation about your tech.</p>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="wrap contact">
+    <div class="contact__ways">
+      <h2 class="section__title">Get in touch</h2>
+      <ul class="ways">
+        <li><span class="ways__label">Phone</span><a href="{{site.phone_href}}">{{site.phone}}</a></li>
+        <li><span class="ways__label">Email</span><a href="mailto:{{site.email}}">{{site.email}}</a></li>
+        <li><span class="ways__label">WhatsApp</span><a href="{{site.whatsapp_href}}" rel="noopener">Message us on WhatsApp</a></li>
+        <li><span class="ways__label">Where</span>{{site.locality}}</li>
+        <li><span class="ways__label">ABN</span>{{site.abn}}</li>
+      </ul>
+    </div>
+    <div class="contact__form" id="enquiry">
+      <h2 class="section__title">Send us a message</h2>
+{{> form_enquiry}}
+      <p class="form__privacy">We use your details only to reply to you. See our <a href="/legal/privacy/">privacy policy</a>.</p>
+    </div>
   </div>
 </section>
