@@ -515,6 +515,8 @@ def check_footer_links(dist, r, site=None):
     for s in site.get("social", []):
         if s.get("href") and not s["href"].startswith("https://"):
             r.fail("site.json", "footer guard: social link %s must be https://" % s.get("key"))
+    hidden = ['href="%s"' % html.escape(s["href"], quote=True)
+              for s in site.get("social", []) if s.get("hidden") and s.get("href")]
     needle = 'href="%s"' % html.escape(url, quote=True)
     for page in dist.rglob("*.html"):
         text = page.read_text(encoding="utf-8")
@@ -523,6 +525,9 @@ def check_footer_links(dist, r, site=None):
             r.fail(where, "footer guard: expected exactly one Staff link, found %d" % text.count(needle))
         elif text.find(needle) < text.find("<footer"):
             r.fail(where, "footer guard: the Staff link must sit in the footer only")
+        for h in hidden:
+            if h in text:
+                r.fail(where, "footer guard: hidden social link %s is on the page" % h)
 
 
 def approved_prices():

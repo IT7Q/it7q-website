@@ -83,39 +83,41 @@
   "staff_url": "https://staff.it7q.com.au",
   "social": [
     {
-      "key": "facebook",
-      "label": "Facebook",
-      "href": ""
-    },
-    {
       "key": "instagram",
       "label": "Instagram",
-      "href": "https://www.instagram.com/it7q_qld"
-    },
-    {
-      "key": "linkedin",
-      "label": "LinkedIn",
-      "href": ""
+      "href": "https://www.instagram.com/it7q_qld/"
     },
     {
       "key": "x",
       "label": "X",
-      "href": ""
+      "href": "https://x.com/it7qqld"
     },
     {
       "key": "youtube",
       "label": "YouTube",
-      "href": ""
+      "href": "https://www.youtube.com/@IT7Q-KITS"
+    },
+    {
+      "key": "linkedin",
+      "label": "Chris's LinkedIn",
+      "href": "https://www.linkedin.com/in/chris-lord-b53731102/"
+    },
+    {
+      "key": "facebook",
+      "label": "Facebook",
+      "href": "https://www.facebook.com/InfiniteQld"
     },
     {
       "key": "google",
       "label": "Google Business",
-      "href": ""
+      "href": "",
+      "hidden": true
     },
     {
       "key": "tiktok",
       "label": "TikTok",
-      "href": ""
+      "href": "",
+      "hidden": true
     }
   ]
 }

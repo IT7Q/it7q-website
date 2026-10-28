@@ -154,10 +154,20 @@ def check_credentials(data):
     return data["entries"]
 
 
+NO_SOCIAL = re.compile(r"reddit|etsy", re.I)  # Q54: no Reddit or Etsy in the footer
+
+
 def check_social(site):
     for s in site["social"]:
         if s.get("href") and not s["href"].startswith("https://"):
             raise BuildError("site.json social %s: link must be https://" % s["key"])
+        if NO_SOCIAL.search(s["key"] + " " + s.get("href", "")):
+            raise BuildError("site.json social %s: no Reddit or Etsy links in the footer (Q54)" % s["key"])
+
+
+def shown_social(site):
+    """Entries with a URL that aren't marked hidden (Google Business, TikTok until ready)."""
+    return [s for s in site["social"] if s.get("href") and not s.get("hidden")]
 
 
 def approved_testimonials(data):
@@ -492,7 +502,7 @@ def c_testimonials(ctx):
 
 def c_footer_social(ctx):
     items = "".join('<li><a href="%s" rel="noopener me">%s</a></li>' % (esc(s["href"]), esc(s["label"]))
-                    for s in ctx["site"]["social"] if s.get("href"))  # no URL yet: not shown (§2)
+                    for s in shown_social(ctx["site"]))  # no URL yet, or hidden: not shown (§2)
     return '<ul class="plain social" aria-label="IT7Q on social media">%s</ul>' % items if items else ""
 
 

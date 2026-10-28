@@ -193,6 +193,10 @@ class CheckGuards(unittest.TestCase):
         r = check.Report()
         check.check_footer_links(self.dist, r, dict(site, social=[{"key": "x", "href": "http://x.example/it7q"}]))
         self.assertIn("social link x must be https://", "\n".join(r.failures))
+        r = check.Report()
+        shown = next(s for s in site["social"] if s["key"] == "instagram")
+        check.check_footer_links(self.dist, r, dict(site, social=[dict(shown, hidden=True)]))
+        self.assertIn("hidden social link", "\n".join(r.failures))
 
     def test_hooks_base_is_one_value(self):
         headers = (self.dist / "_headers").read_text(encoding="utf-8")

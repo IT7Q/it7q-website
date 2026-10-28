@@ -143,6 +143,34 @@ class Phase3b(unittest.TestCase):
         self.assertIn('href="https://b.example/"', out)
         self.assertNotIn(">A<", out)
         self.assertEqual(build.c_footer_social({"site": {"social": [{"key": "a", "label": "A", "href": ""}]}}), "")
+        hidden = {"social": [{"key": "g", "label": "G", "href": "https://g.example/", "hidden": True}]}
+        self.assertEqual(build.c_footer_social({"site": hidden}), "")
+
+    def test_social_row_phase3c(self):
+        """Q54: five links in Chris's order, LinkedIn labelled as his, Google/TikTok hidden, no Reddit/Etsy."""
+        site = build.load_json("site.json")
+        out = build.c_footer_social({"site": site})
+        hrefs = re.findall(r'href="([^"]+)"', out)
+        self.assertEqual(hrefs, ["https://www.instagram.com/it7q_qld/", "https://x.com/it7qqld",
+                                 "https://www.youtube.com/@IT7Q-KITS",
+                                 "https://www.linkedin.com/in/chris-lord-b53731102/",
+                                 "https://www.facebook.com/InfiniteQld"])
+        self.assertIn("Chris&#x27;s LinkedIn", out)
+        self.assertNotIn("Google", out)
+        self.assertNotIn("TikTok", out)
+        for key in ("google", "tiktok"):
+            self.assertTrue(next(s for s in site["social"] if s["key"] == key).get("hidden"))
+        for bad in ({"key": "reddit", "href": ""}, {"key": "shop", "href": "https://www.etsy.com/shop/x"}):
+            with self.assertRaises(build.BuildError):
+                build.check_social({"social": [bad]})
+
+    def test_about_paragraph_stands_alone(self):
+        """Q61: the overlapping lines are gone, Chris's paragraph and the Credentials link stay."""
+        text = (build.SRC / "pages/about/index.html").read_text(encoding="utf-8")
+        self.assertNotIn("started in 2020 in Kallangur", text)
+        self.assertNotIn("seven divisions under one roof", text)
+        self.assertIn("IT7Q was founded in 2020 by Chris Lord", text)
+        self.assertIn('href="/credentials/"', text)
 
     def test_guide_without_files_is_a_placeholder(self):
         g = dict(self.guides["harden-windows"], md=False, pdf=False)
