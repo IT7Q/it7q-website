@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v12, 29 Oct 2026. Phases 1–3 and 3b built.** v12 folds in Chris's answers to Q61 (About overlap) and the rest of Q54 (social URLs); Q60 is Chris's click-test, Q53 and Q59 still to come. The site changes they need are queued as Phase 3c (§7). v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v13, 29 Oct 2026. Phases 1–4 built (3b, 3c included).** v13: Phase 3c (About trim, footer social URLs; Q60, Q62 answered) and Phase 4: the back end as reviewable files (SQL, six n8n workflows, gated content, contract test) plus `deploy/DEPLOY.md`, Chris's step-by-step deploy guide (§4.13). Nothing is deployed yet; that's Chris's, step by step. v12 folds in Chris's answers to Q61 (About overlap) and the rest of Q54 (social URLs); Q60 is Chris's click-test, Q53 and Q59 still to come. The site changes they need are queued as Phase 3c (§7). v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -559,10 +559,10 @@ Unchanged in principle. Content is **per project**, delivered per division. UX o
 ### 4.2 Protection layers (all five public webhooks)
 | Layer | What |
 |---|---|
-| Cloudflare edge header | A Transform Rule sets `X-IT7Q-Edge` on `hooks.nubius.com.au/webhook/*`; n8n Header Auth checks it. |
+| Cloudflare edge header | A Transform Rule sets `X-IT7Q-Edge` on `forms.it7q.com.au/webhook/*` (v13: set up on the final host now, DEPLOY.md step 6); n8n Header Auth checks it. |
 | CORS | Allowed origin `https://it7q.com.au` (+ the Pages preview origin while testing). |
 | Turnstile | Widget on every form (NDA, login, enquiry). n8n verifies server-side and checks hostname + action. Honeypot + min fill time as backup. |
-| Rate limits | Cloudflare WAF rule where the free plan allows, plus Postgres-backed per-IP/per-email counters in n8n. Login lockout: 5 fails/15 min. |
+| Rate limits | One Cloudflare rate-limit rule (20 req/10 s per IP, floods only), plus Postgres counters (v13): NDA requests 5/h per IP and 3/day per email; enquiries 5/h per IP; login lockout 5 fails/15 min per email and 20 per IP; content 300/10 min per session. |
 | Validation | JSON only, ≤ 8 KB, strict allow-list, NDA version/hash must match. |
 | Least-privilege DB | Separate `it7q_web` database/role. |
 | No caching | Cloudflare bypass on `/webhook/*`; `Cache-Control: no-store`. |
@@ -571,7 +571,7 @@ Unchanged in principle. Content is **per project**, delivered per division. UX o
 
 ### 4.3 `nda-submission`
 1. The visitor reads the NDA (the page embeds its version + SHA-256). They give name, email, org, reason, typed signature, NDA tick, T&C tick and Turnstile, plus a hidden honeypot + timestamp. They can tick **"I'm an investor or potential partner"** to request Investors access (Q6).
-2. POST to `https://hooks.nubius.com.au/webhook/nda-submission`. Nothing unlocks.
+2. POST to `<hooks base>/nda-submission` (`https://forms.it7q.com.au/webhook` from Phase 6). Nothing unlocks.
 3. n8n checks: edge header → size/schema → honeypot/timing → Turnstile → rate limits.
 4. Upsert into `nda_requests` with status `pending`, server timestamp, IP, UA and NDA version/hash. No duplicate if one is already pending or approved.
 5. Email the signer (from `noreply@`, Reply-To `info@`) an **HTML copy** of the agreed NDA + the acceptance record (name, email, time, version, hash), saying it's reviewed manually. No PDF (Q9).
@@ -667,12 +667,20 @@ Trade-off: once the IP is nulled at 12 months, the record still holds name, emai
 
 **Retention vs NDA survival (Q36, for the legal check)**: confidentiality now survives 2 years past the 3-year term, and indefinitely for trade secrets. The acceptance record is kept for term + 2 years, which covers the general survival period but not trade secrets, and not a claim brought later within Queensland's 6-year contract limitation period. The lawyer should say whether to keep a minimal acceptance record (name, email, version, hash, date; no IP) for longer.
 
-### 4.11 Chris's server-side setup (documented in `deploy/`, not done by me)
+### 4.11 Chris's server-side setup (step by step in `deploy/DEPLOY.md`, not done by me)
 - Mailboxes: **`noreply@it7q.com.au`** (MXRoute, sending only) and **`info@it7q.com.au`**. SPF/DKIM/DMARC for `it7q.com.au` must cover MXRoute.
 - n8n credentials, referenced by name only: `IT7Q Edge Header`, `Turnstile secret`, `Postgres it7q_web`, `Mail sender (noreply@)`.
 - n8n env var `NODE_FUNCTION_ALLOW_BUILTIN=crypto` (compose change under `/opt/it7q`).
 - Postgres `it7q_web` DB + role, then run the SQL.
 - Cloudflare: Transform Rule, cache bypass, rate-limit rule, Turnstile widget, **Access on `nda-review`**, Web Analytics on the Pages project.
+
+### 4.13 What Phase 4 built (29 Oct)
+- **SQL** (`deploy/sql/`): `01` roles + database, `02` the §4.8 tables, `03` nine `SECURITY DEFINER` functions (each `jsonb` in, `jsonb` out). n8n's role `it7q_web` can only `EXECUTE` those: no table rights at all. `90-selftest.sql` exercises every function as `it7q_web`, plus retention with back-dated rows, inside a transaction that's rolled back.
+- **n8n** (`n8n/code/*.js` → `tools/n8n_build.py` → `n8n/workflows/*.json`): `nda-submission`, `nda-login`, `nda-content`, `website-enquiry`, `nda-review` (GET + POST), `nda-retention`. The JS is plain files for review; the generator pastes `common.js` (with public config from `deploy/config.json`, `forms.json` and the NDA hash) into each Code node. Credentials by name only. Success executions aren't saved anywhere; `nda-login` and `nda-review` don't save failures either (passwords). Replies match §4.12 exactly.
+- **`nda-review`** (v13 detail): the one-time email link shows that request (approve with division ticks + investor tick, or reject). The same URL without a token lists every request, with revoke, new password, investor on/off and "email me a new review link". Both check Cloudflare Access's signed JWT (team, AUD, Chris's email) as well as Access itself, POSTs must come from the review page's own origin, and the pages send `default-src 'none'` + `no-referrer`.
+- **Gated content** (`gated/*.json`): all 70 gated projects + an investor placeholder, from the private build pack under §4.9; `notes` flag drafts for Chris and never leave the repo. `tools/gated_sql.py` checks shape/coverage and **refuses to output SQL until each file says `"reviewed": true`** (Q63).
+- **`tools/contract.py`**: the §4.12 contract as a test: refusals, honeypot, lockout, logged-in division/investor/logout checks, CORS and `no-store`. It passes against the mock in the test suite, and Chris runs it against the real hooks (DEPLOY.md steps 9–10). `--prod` proves the Turnstile test secret is gone.
+- **Limits of what I could verify**: Pantheon has no JS runtime and no Postgres. The JS and SQL are covered by static tests (wiring, references, grants, no secrets) and by careful review. Their first real run is DEPLOY.md step 2 (SQL self-test) and steps 7–9 (contract test).
 
 ---
 
@@ -818,7 +826,7 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 3. ✅ **Phase 3 (28 Oct)**: About, Contact (+ enquiry form), Privacy, Terms and NDA pages (drafts, legal check pending); NDA front end: `/access/` (read + sign + request, login, logged-in state), locked panels on every card, the gated-detail renderer with watermark, the logout bar, the `/investors/` locked shell; `tools/preview.py` mock with failure scenarios (§4.12).
 3b. ✅ **Phase 3b (29 Oct)**: MERCATOR card (P-MSP-07) + `/shop/`; `/resources/` with the 15 software entries + Guides section and guide pages (placeholders); `/media/`, `/news/`, `/athena/` Coming soon pages; `/credentials/`; nav update; footer social row, WhatsApp button and Staff link; About text from Q51; the four v10 guards (§3) with tests; the webhook base as one config value (Q58). Download URLs were written from my knowledge of each project's official site; Pantheon's sandbox blocked fetching them, so Chris clicks each one in the preview (Q60). Guide Markdown uses the legal-text renderer (headings, paragraphs, lists, bold); it gets extended when Chris's first guide files show what they need.
 3c. ✅ **Phase 3c (29 Oct)**: About: the two overlapping lines dropped, Credentials link kept (Q61). Footer: the five social URLs and the "Chris's LinkedIn" label in `site.json`; Google Business and TikTok `hidden`; build refuses Reddit/Etsy entries; check fails if a hidden link reaches a page (Q54, Q62). Download URLs all confirmed by Chris (Q60), no changes.
-4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
+4. ✅ **Phase 4 (29 Oct)**: gated content (`gated/`, awaiting Chris's review, Q63), the n8n workflows (five webhooks + `nda-retention`), SQL with a self-test, the contract test, and `deploy/DEPLOY.md` (§4.13). Deploying it is Chris's, following DEPLOY.md.
 5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
 6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: webhook base → `https://forms.it7q.com.au/webhook` in `endpoints.json` (Q58), Cloudflare Access on `staff.it7q.com.au` (Q52), Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
@@ -845,7 +853,7 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–43, 47, 48, 51, 52, 54 (all but Google Business), 55, 57, 58, 60, 61 and 62 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
+**Answered**: 1–43, 47, 48, 51, 52, 50 (`.venv/` now has pip and Pillow 12.0.0, checked 29 Oct), 54 (all but Google Business), 55, 57, 58, 60, 61 and 62 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
 
 **Still open**
 36. **Legal check** before launch: the NDA (`src/legal/nda-1.0.md`, reviewer notes in `docs/nda-draft.md`), plus the new Privacy and Terms drafts.
@@ -853,11 +861,13 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 45. **Card copy**: check the one-liners and "why it's unique" lines on the division pages, especially my drafts (TEMPESTAS "who it's for", COLLOQUIUM, PORTUS App/Jnr, FABRICUS App/FORMAE/BIONICUS) and the MENTIS automations list.
 46. **BlueVibes Music (p6)**: a few words on what it is, for a better one-liner. **Niuleaf (p8)**: the one-liner you said you'd supply.
 49. **Messaging**: is WhatsApp on 0411 753 366 (the Contact page and now the footer link `wa.me/61411753366`)? And the Facebook Messenger page link, if you want it listed.
-50. **Pillow on Pantheon**: `.venv/` has no pip yet; fix in §7.1 (needs `sudo`).
 53. **Credentials list** (to come): qualifications and certifications (title, issuer, year), no units.
 54. **Google Business** share link (to come). Hidden until then.
 56. **Athena CE** (later): where the build will be hosted, and whether it's code-signed.
 59. **Guide files**: Windows and Android hardening guides, then the Education Series chapters, as Markdown/HTML for view-in-browser plus a PDF each, with metadata stripped.
+63. **Gated content review**: read `gated/*.json` (entries with `notes` are my drafts where the build pack was thin: MSP-05/06, OPUS-10/11, MEN-05, the T1–T5 tier details, PORTUS, FABRICUS App/BIONICUS). Edit or tell me changes, then set `"reviewed": true` per file.
+64. **Cloudflare Access values** (DEPLOY.md step 6f): the team name and the review application's AUD tag (neither is secret), and the email you log in to Access with if it isn't `chris@it7q.com.au`.
+65. **Versions**: your n8n and Postgres versions (DEPLOY.md, before step 1), so I can confirm the node versions match.
 
 ---
 
@@ -890,3 +900,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **29 Oct 2026: Phase 3b built.** MERCATOR card + Shop, Resources + 20 guide pages, Media/News/Athena/Credentials pages, footer social/WhatsApp/Staff, About text, webhook base as one value; download, PDF, PORTUS and footer guards.
 - **29 Oct 2026: plan v12.** Q61 and Q54 (all but Google Business) answered; Q62 (TikTok) asked; Etsy and LinkedIn company page pinned; Phase 3c queued.
 - **29 Oct 2026: Phase 3c built.** Q60 (all 15 downloads confirmed) and Q62 (TikTok hidden) answered. About trimmed, footer social URLs in, hidden-link and no-Reddit/Etsy guards with tests.
+- **29 Oct 2026: Phase 4 built.** SQL (roles, tables, nine definer functions, self-test), six n8n workflows generated from reviewable JS, gated content for 70 projects (unreviewed), contract test, `deploy/DEPLOY.md`. Q63–Q65 asked.
