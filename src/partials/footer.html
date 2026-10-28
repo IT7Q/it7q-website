@@ -8,6 +8,8 @@
         <span class="brand__name">IT7Q</span>
       </a>
       <p class="site-footer__tagline">{{site.tagline}}</p>
+      {{> footer_social}}
+      <a class="btn btn--small btn--outline site-footer__wa" href="{{site.whatsapp_href}}" rel="noopener">Message us on WhatsApp</a>
     </div>
     <div>
       <h2 class="site-footer__heading">Contact</h2>
@@ -22,8 +24,19 @@
       <ul class="plain">
         <li><a href="/divisions/">Divisions</a></li>
         <li><a href="/services/">Services</a></li>
+        <li><a href="/shop/">Shop</a></li>
         <li><a href="/portfolio/">Portfolio</a></li>
         <li><a href="/access/">Investors &amp; partners</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="site-footer__heading">Learn</h2>
+      <ul class="plain">
+        <li><a href="/resources/">Resources &amp; guides</a></li>
+        <li><a href="/media/">Media</a></li>
+        <li><a href="/news/">News</a></li>
+        <li><a href="/credentials/">Credentials</a></li>
+        <li><a href="/athena/">Athena Browser</a></li>
       </ul>
     </div>
     <div>
@@ -37,5 +50,6 @@
   </div>
   <div class="wrap site-footer__base">
     <p>&copy; {{site.year}} {{site.name}} &middot; ABN {{site.abn}}</p>
+    <a class="site-footer__staff" href="{{site.staff_url}}" rel="nofollow">Staff</a>
   </div>
 </footer>

@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v11, 29 Oct 2026. Phases 1–3 built; Phase 3b being built.** v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v11, 29 Oct 2026. Phases 1–3 and 3b built.** v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -497,6 +497,8 @@ src/                 page sources + partials
   data/resources.json  FOSS entries + official download domains (§2.4)
   data/guides.json     Education Series chapters + hardening manuals (§2.4)
   data/credentials.json  Chris's qualifications/certifications, no units (§2)
+  templates/guide.html  one page per guide (§2.4)
+src/guides/          <slug>.md (browser view) + <slug>.pdf (download), from Chris; PDFs ship to /resources/guides/pdf/
   assets/css|js|fonts|img
   assets/img/brand/mark.svg  four circle shapes, derived from the pack emblem, no colours
   _headers           security headers for Pages
@@ -813,7 +815,7 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 1. ✅ **Phase 1 (27 Oct)**: `src/` structure with stub pages for every route, build/check tools with unit tests, watermark pipeline, brand tokens, base CSS, header/footer, placeholder component, animated logo, Home (hero stats, badge row, coming-soon teaser). Preview: §7.1.
 2. ✅ **Phase 2 (28 Oct, scope set by Chris)**: Divisions index + 7 division pages with all 70 cards from `projects.json`, MENTIS services list, Portfolio (`portfolio.json`), Services (`services.json`), Home testimonials (`testimonials.json`, consent guard). Plus Q40 fonts and Q43 JPEG/WebP watermarking. All images are placeholders.
 3. ✅ **Phase 3 (28 Oct)**: About, Contact (+ enquiry form), Privacy, Terms and NDA pages (drafts, legal check pending); NDA front end: `/access/` (read + sign + request, login, logged-in state), locked panels on every card, the gated-detail renderer with watermark, the logout bar, the `/investors/` locked shell; `tools/preview.py` mock with failure scenarios (§4.12).
-3b. **Phase 3b (v10 scope, building 29 Oct)**: MERCATOR card (P-MSP-07) + `/shop/`; `/resources/` with the 15 software entries + Guides section and guide pages (placeholders); `/media/`, `/news/`, `/athena/` Coming soon pages; `/credentials/`; nav update; footer social row, WhatsApp button and Staff link; About text from Q51; the four v10 guards (§3) with tests.
+3b. ✅ **Phase 3b (29 Oct)**: MERCATOR card (P-MSP-07) + `/shop/`; `/resources/` with the 15 software entries + Guides section and guide pages (placeholders); `/media/`, `/news/`, `/athena/` Coming soon pages; `/credentials/`; nav update; footer social row, WhatsApp button and Staff link; About text from Q51; the four v10 guards (§3) with tests; the webhook base as one config value (Q58). Download URLs were written from my knowledge of each project's official site; Pantheon's sandbox blocked fetching them, so Chris clicks each one in the preview (Q60). Guide Markdown uses the legal-text renderer (headings, paragraphs, lists, bold); it gets extended when Chris's first guide files show what they need.
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
 5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
 6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: webhook base → `https://forms.it7q.com.au/webhook` in `endpoints.json` (Q58), Cloudflare Access on `staff.it7q.com.au` (Q52), Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
@@ -854,6 +856,8 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 54. **Social URLs** (rest to come): Facebook, LinkedIn, X, YouTube, Google Business, TikTok. Instagram is done.
 56. **Athena CE** (later): where the build will be hosted, and whether it's code-signed.
 59. **Guide files**: Windows and Android hardening guides, then the Education Series chapters, as Markdown/HTML for view-in-browser plus a PDF each, with metadata stripped.
+60. **Download links**: click each Download button on `/resources/` in the preview and confirm it lands on the official download page (I couldn't fetch them from Pantheon).
+61. **About page overlap**: your paragraph now sits between the two existing ones, which also say "started in 2020 in Kallangur" and "seven divisions". Drop those two lines so yours stands alone?
 
 ---
 
@@ -881,3 +885,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **28 Oct 2026: plan v9 + Phase 3.** Q47 answered. About, Contact, Legal, NDA front end, enquiry form, local mock. NDA text moved to `src/legal/nda-1.0.md`.
 - **29 Oct 2026: plan v10.** Chris's new scope folded in: MERCATOR (MSP section) + Shop, Resources + Guides, Media, News (HERALD), Credentials, Athena CE page, footer Staff/social links, PORTUS discretion. Phase 3b planned; separate future builds listed in §2.6.
 - **29 Oct 2026: plan v11.** Q51, Q52, Q54, Q55, Q57, Q58 answered.
+- **29 Oct 2026: Phase 3b built.** MERCATOR card + Shop, Resources + 20 guide pages, Media/News/Athena/Credentials pages, footer social/WhatsApp/Staff, About text, webhook base as one value; download, PDF, PORTUS and footer guards.

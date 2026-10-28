@@ -22,7 +22,7 @@ class MockHooks(unittest.TestCase):
         cls.tmp = Path(tempfile.mkdtemp())
         (cls.tmp / "index.html").write_text("<p>home</p>", encoding="utf-8")
         (cls.tmp / "404.html").write_text("<p>not found</p>", encoding="utf-8")
-        shutil.copyfile(build.SRC / "_headers", cls.tmp / "_headers")
+        (cls.tmp / "_headers").write_text(build.headers_text(), encoding="utf-8")
         cls.mock = preview.Mock()
         cls.server = preview.serve(cls.tmp, cls.mock, 0, quiet=True)
         cls.base = "http://127.0.0.1:%d" % cls.server.server_address[1]

@@ -1,0 +1,39 @@
+{
+ "_about": "IT7Q guides on the Resources page (PLAN.md §2.4). Each guide gets /resources/guides/<slug>/. Drop src/guides/<slug>.md in for the browser view and src/guides/<slug>.pdf for the download; until then the page shows a placeholder.",
+ "sections": [
+  {
+   "key": "series",
+   "title": "IT7Q Client Education Series",
+   "intro": "Eleven plain-English chapters on staying safe and saving money with the right software.",
+   "guides": [
+    {"slug": "bitwarden", "chapter": 1, "title": "Bitwarden", "summary": "Set up a password manager and stop reusing passwords."},
+    {"slug": "windows-backup-recovery", "chapter": 2, "title": "Windows backup & recovery", "summary": "Back up what matters and get it back when something goes wrong."},
+    {"slug": "libreoffice-vs-microsoft-office", "chapter": 3, "title": "LibreOffice vs Microsoft Office", "summary": "What you gain, what changes and how to switch."},
+    {"slug": "private-cloud-storage", "chapter": 4, "title": "Private cloud storage", "summary": "Keep your files synced without handing them to a big platform."},
+    {"slug": "clamav", "chapter": 5, "title": "ClamAV", "summary": "Use a free virus scanner as a second opinion."},
+    {"slug": "pi-hole", "chapter": 6, "title": "Pi-hole", "summary": "Block ads and trackers for the whole home network."},
+    {"slug": "wireguard", "chapter": 7, "title": "WireGuard", "summary": "Connect safely to your own network when you're away."},
+    {"slug": "more-foss-tools", "chapter": 8, "title": "More FOSS tools", "summary": "Free, open-source apps for mail, photos, design, notes and meetings."},
+    {"slug": "why-foss", "chapter": 9, "title": "Why FOSS", "summary": "What free and open-source software is, and why it's worth a look."},
+    {"slug": "windows-11-editions", "chapter": 10, "title": "Windows 11 editions", "summary": "Home, Pro and the rest: which one you need."},
+    {"slug": "windows-11-privacy-security", "chapter": 11, "title": "Windows 11 privacy & security", "summary": "The settings worth changing on a new Windows 11 computer."}
+   ]
+  },
+  {
+   "key": "manuals",
+   "title": "Device hardening & setup manuals",
+   "intro": "One guide per device type, plus three that apply to every device.",
+   "guides": [
+    {"slug": "harden-windows", "title": "Windows", "summary": "Set up and lock down a Windows computer."},
+    {"slug": "harden-chromebook", "title": "Chromebook", "summary": "Set up and lock down a Chromebook."},
+    {"slug": "harden-android", "title": "Android", "summary": "Set up and lock down an Android phone or tablet."},
+    {"slug": "harden-iphone-ipad", "title": "iPhone/iPad", "summary": "Set up and lock down an iPhone or iPad."},
+    {"slug": "harden-macos", "title": "macOS", "summary": "Set up and lock down a Mac."},
+    {"slug": "harden-ubuntu", "title": "Ubuntu", "summary": "Set up and lock down an Ubuntu computer."},
+    {"slug": "family-multi-user", "title": "Family & Multi-User", "summary": "Separate accounts, parental controls and sharing a device safely."},
+    {"slug": "security-hardening-checklist", "title": "Security Hardening Checklist", "summary": "A short checklist for any device."},
+    {"slug": "ongoing-maintenance", "title": "Ongoing Maintenance", "summary": "The regular jobs that keep a device safe and running well."}
+   ]
+  }
+ ]
+}

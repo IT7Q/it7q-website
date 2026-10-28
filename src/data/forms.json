@@ -153,6 +153,10 @@
       "label": "Security monitoring or hardware"
      },
      {
+      "value": "parts",
+      "label": "Parts, sales & service (MERCATOR, coming soon)"
+     },
+     {
       "value": "hardening",
       "label": "AI-powered security hardening (coming soon)"
      },

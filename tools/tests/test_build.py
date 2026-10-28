@@ -101,5 +101,56 @@ class LegalAndForms(unittest.TestCase):
             build.page_scripts({"scripts": "evil"}, "t")
 
 
+class Phase3b(unittest.TestCase):
+    def setUp(self):
+        self.resources = build.load_json("resources.json")
+        self.guides = build.load_guides()[1]
+
+    def test_repo_data_is_valid(self):
+        build.check_resources(self.resources, self.guides)
+        self.assertEqual(len(self.resources["entries"]), 15)
+        self.assertEqual(len(self.guides), 20)  # 11 chapters + 9 manuals (Q57)
+        build.check_credentials(build.load_json("credentials.json"))
+        build.check_social(build.load_json("site.json"))
+
+    def test_bad_data_fails(self):
+        entry = self.resources["entries"][0]
+        for bad in (dict(entry, download="https://bitwarden.example.net/download/"),
+                    dict(entry, download="http://bitwarden.com/download/"),
+                    dict(entry, guide="nope"), {k: v for k, v in entry.items() if k != "why"}):
+            with self.assertRaises(build.BuildError):
+                build.check_resources({"entries": [bad]}, self.guides)
+        with self.assertRaises(build.BuildError):  # no unit details (Q53)
+            build.check_credentials({"entries": [{"title": "Diploma", "units": ["ICTSAS"]}]})
+        with self.assertRaises(build.BuildError):
+            build.check_social({"social": [{"key": "x", "href": "http://x.example/"}]})
+        project = build.load_json("projects.json")[0]
+        for bad in (dict(project, link="https://elsewhere.example/"), dict(project, gated="no")):
+            with self.assertRaises(build.BuildError):
+                build.check_projects([bad], [{"slug": project["division"]}])
+
+    def test_mercator_card_links_shop_without_lock(self):
+        p = next(x for x in build.load_json("projects.json") if x["id"] == "P-MSP-07")
+        self.assertEqual(p["division"], "msp")
+        out = build.project_card(p)
+        self.assertIn('href="/shop/"', out)
+        self.assertNotIn('class="lock"', out)
+        self.assertIn('class="lock"', build.project_card(dict(p, gated=True)))
+
+    def test_social_links_skip_empty(self):
+        site = {"social": [{"key": "a", "label": "A", "href": ""}, {"key": "b", "label": "B", "href": "https://b.example/"}]}
+        out = build.c_footer_social({"site": site})
+        self.assertIn('href="https://b.example/"', out)
+        self.assertNotIn(">A<", out)
+        self.assertEqual(build.c_footer_social({"site": {"social": [{"key": "a", "label": "A", "href": ""}]}}), "")
+
+    def test_guide_without_files_is_a_placeholder(self):
+        g = dict(self.guides["harden-windows"], md=False, pdf=False)
+        self.assertIn("Coming soon", build.c_guide_actions({"g": g}))
+        self.assertIn("PLACEHOLDER", build.c_guide_body({"g": g}))
+        out = build.c_guide_actions({"g": dict(g, pdf=True)})
+        self.assertIn('href="/resources/guides/pdf/harden-windows.pdf" download', out)
+
+
 if __name__ == "__main__":
     unittest.main()

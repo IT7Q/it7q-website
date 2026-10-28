@@ -1,0 +1,125 @@
+{
+ "_about": "Recommended free and open-source software (PLAN.md §2.4). Download buttons go only to each project's official download page on its allow-listed domain; IT7Q never hosts binaries. tools/check.py enforces both. 'guide' is a slug from guides.json.",
+ "entries": [
+  {
+   "name": "Bitwarden",
+   "what": "A password manager that remembers every password for you and fills them in on your computer and phone.",
+   "why": "One strong password unlocks the rest, so you can use a different password everywhere without writing them down.",
+   "guide": "bitwarden",
+   "download": "https://bitwarden.com/download/",
+   "domain": "bitwarden.com"
+  },
+  {
+   "name": "LibreOffice",
+   "what": "A full office suite: documents, spreadsheets and presentations.",
+   "why": "Opens and saves Word, Excel and PowerPoint files, with no subscription to pay.",
+   "guide": "libreoffice-vs-microsoft-office",
+   "download": "https://www.libreoffice.org/download/download-libreoffice/",
+   "domain": "libreoffice.org"
+  },
+  {
+   "name": "OnlyOffice",
+   "what": "Office apps for documents, spreadsheets and presentations, with a look close to Microsoft Office.",
+   "why": "A good fit if you share a lot of Office files and want them to look the same on both ends.",
+   "guide": "libreoffice-vs-microsoft-office",
+   "download": "https://www.onlyoffice.com/download-desktop.aspx",
+   "domain": "onlyoffice.com"
+  },
+  {
+   "name": "Thunderbird",
+   "what": "An email app for your computer that handles several mail accounts, contacts and calendars.",
+   "why": "All your email in one place, kept on your own computer rather than in someone else's app.",
+   "guide": "more-foss-tools",
+   "download": "https://www.thunderbird.net/",
+   "domain": "thunderbird.net"
+  },
+  {
+   "name": "GIMP",
+   "what": "A photo editor for retouching, cropping, resizing and touch-ups.",
+   "why": "Handles most everyday photo jobs without a monthly fee.",
+   "guide": "more-foss-tools",
+   "download": "https://www.gimp.org/downloads/",
+   "domain": "gimp.org"
+  },
+  {
+   "name": "Krita",
+   "what": "A painting and drawing app, made by artists for artists.",
+   "why": "Great brushes and drawing-tablet support, free for everyone, including kids learning to draw.",
+   "guide": "more-foss-tools",
+   "download": "https://krita.org/en/download/",
+   "domain": "krita.org"
+  },
+  {
+   "name": "Inkscape",
+   "what": "A design app for logos, flyers, signs and other artwork that stays sharp at any size.",
+   "why": "Make your own logo or flyer without paying for design software.",
+   "guide": "more-foss-tools",
+   "download": "https://inkscape.org/release/",
+   "domain": "inkscape.org"
+  },
+  {
+   "name": "darktable",
+   "what": "A photo workflow app for sorting and developing camera RAW photos.",
+   "why": "Lets photographers organise and edit big photo collections without a subscription.",
+   "guide": "more-foss-tools",
+   "download": "https://www.darktable.org/install/",
+   "domain": "darktable.org"
+  },
+  {
+   "name": "Joplin",
+   "what": "A note-taking app with notebooks, to-do lists and syncing between your devices.",
+   "why": "Your notes stay yours, and you can encrypt them before they sync.",
+   "guide": "more-foss-tools",
+   "download": "https://joplinapp.org/download/",
+   "domain": "joplinapp.org"
+  },
+  {
+   "name": "7-Zip",
+   "what": "A small tool for opening and making zip files and other compressed archives.",
+   "why": "Opens almost any archive you're sent, and can password-protect the ones you send.",
+   "guide": "more-foss-tools",
+   "download": "https://www.7-zip.org/download.html",
+   "domain": "7-zip.org"
+  },
+  {
+   "name": "Nextcloud",
+   "what": "Your own private cloud for files, photos, calendars and contacts.",
+   "why": "Dropbox-style syncing and sharing, with your files kept on a server you control.",
+   "guide": "private-cloud-storage",
+   "download": "https://nextcloud.com/install/",
+   "domain": "nextcloud.com"
+  },
+  {
+   "name": "ClamAV",
+   "what": "A free, open-source virus scanner.",
+   "why": "A handy second opinion: scan downloads, USB sticks and shared folders for known nasties.",
+   "guide": "clamav",
+   "download": "https://www.clamav.net/downloads",
+   "domain": "clamav.net"
+  },
+  {
+   "name": "Pi-hole",
+   "what": "A small network ad blocker that runs on a Raspberry Pi or a spare computer.",
+   "why": "Blocks ads and known tracking sites for every device on your home network at once.",
+   "guide": "pi-hole",
+   "download": "https://docs.pi-hole.net/main/basic-install/",
+   "domain": "docs.pi-hole.net"
+  },
+  {
+   "name": "WireGuard",
+   "what": "A fast, modern VPN app for connecting safely to your home or office network.",
+   "why": "Reach your own files and devices securely when you're out, even on public Wi-Fi.",
+   "guide": "wireguard",
+   "download": "https://www.wireguard.com/install/",
+   "domain": "wireguard.com"
+  },
+  {
+   "name": "Jitsi",
+   "what": "Video meetings that run in your browser or app, with no account needed.",
+   "why": "Send a link and talk face to face, without signing anyone up to anything.",
+   "guide": "more-foss-tools",
+   "download": "https://jitsi.org/downloads/",
+   "domain": "jitsi.org"
+  }
+ ]
+}

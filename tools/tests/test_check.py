@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zlib
 from pathlib import Path
 
 TOOLS = Path(__file__).resolve().parent.parent
@@ -119,11 +120,92 @@ class CheckGuards(unittest.TestCase):
 
     def test_division_pages_carry_every_card(self):
         projects = json.loads((ROOT / "src/data/projects.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(projects), 70)
+        self.assertEqual(len(projects), 71)
         pages = "".join(p.read_text(encoding="utf-8") for p in self.dist.glob("divisions/*/index.html"))
         for p in projects:
             self.assertIn('id="%s"' % p["id"].lower(), pages, p["id"])
         self.assertNotIn("What our clients say", (self.dist / "index.html").read_text(encoding="utf-8"))
+
+    def test_resource_only_names(self):
+        def add(s):
+            return s.replace("</main>", "<p>ClamAV and WireGuard are worth a look.</p></main>")
+        self.assertNotIn("public-wording guard", self.failures_after("resources/index.html", add))
+        self.assertIn("public-wording guard", self.failures_after("shop/index.html", add))
+        out = self.failures_after("resources/guides/clamav/index.html",
+                                  lambda s: s.replace("</main>", "<p>We use ClamAV on our servers.</p></main>"))
+        self.assertIn("reads as IT7Q's own setup (Q55)", out)
+        self.assertIn("'n8n'", self.failures_after("resources/index.html", lambda s: s + "<p>n8n</p>"))
+
+    def test_download_guard(self):
+        out = self.failures_after("resources/index.html", lambda s: s.replace(
+            "</main>", '<a href="https://bitwarden.example.net/setup.exe" data-download="official">x</a></main>'))
+        self.assertIn("is not an official download page", out)
+        (self.dist / "resources/setup.exe").write_bytes(b"MZ")
+        (self.dist / "assets/tool.zip").write_bytes(b"PK")
+        out = "\n".join(check.run(self.dist).failures)
+        self.assertIn("resources/setup.exe: download-link guard", out)
+        self.assertIn("assets/tool.zip: download-link guard", out)
+        self.assertTrue(check.official_download("https://www.gimp.org/downloads/", "gimp.org"))
+        self.assertFalse(check.official_download("https://gimp.org.evil.example/", "gimp.org"))
+        self.assertFalse(check.official_download("http://www.gimp.org/downloads/", "gimp.org"))
+
+    def write_pdf(self, rel, body, stream=b""):
+        path = self.dist / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        z = zlib.compress(stream)
+        path.write_bytes(b"%PDF-1.7\n" + body + b"\n1 0 obj<</Filter/FlateDecode>>stream\n" + z + b"\nendstream\n%%EOF\n")
+
+    def pdf_failures(self):
+        return "\n".join(f for f in check.run(self.dist).failures if "PDF guard" in f)
+
+    def test_pdf_guard(self):
+        self.write_pdf("resources/guides/pdf/clamav.pdf", b"<</Title (ClamAV) /Author ()>>", b"BT (Scan with ClamAV) Tj ET")
+        self.assertEqual(self.pdf_failures(), "")
+        self.write_pdf("resources/guides/pdf/clamav.pdf", b"<</Author (Chris)>>")
+        self.assertIn("metadata must be stripped", self.pdf_failures())
+        self.write_pdf("resources/guides/pdf/clamav.pdf", b"", b"saved from /home/chris/guides")
+        self.assertIn("local file path", self.pdf_failures())
+        self.write_pdf("resources/guides/pdf/clamav.pdf", b"", b"BT (set up in n8n) Tj ET")
+        self.assertIn("'n8n' must not appear", self.pdf_failures())
+        (self.dist / "resources/guides/pdf/clamav.pdf").unlink()
+        self.write_pdf("assets/brochure.pdf", b"", b"WireGuard")
+        out = self.pdf_failures()
+        self.assertIn("PDFs ship only as guides", out)
+        self.assertIn("'WireGuard' must not appear", out)
+
+    def test_portus_discretion_guard(self):
+        self.assertNotIn("PORTUS discretion", self.inject("<p>We report abuse of this website to the police.</p>"))
+        out = self.failures_after("divisions/portus/index.html",
+                                  lambda s: s.replace("</main>", "<p>Help for people leaving domestic violence.</p></main>"))
+        self.assertIn("PORTUS discretion guard: 'domestic'", out)
+        out = self.inject("<p>PORTUS can help people escaping abuse.</p>")
+        self.assertIn("PORTUS discretion guard", out)
+
+    def test_footer_guard(self):
+        out = self.failures_after("index.html", lambda s: s.replace(
+            '<nav id="site-nav"', '<a href="https://staff.it7q.com.au">Staff</a><nav id="site-nav"'))
+        self.assertIn("index.html: footer guard: expected exactly one Staff link, found 2", out)
+        site = json.loads((ROOT / "src/data/site.json").read_text(encoding="utf-8"))
+        for bad in ("https://staff.nubius.com.au", "http://staff.it7q.com.au", ""):
+            r = check.Report()
+            check.check_footer_links(self.dist, r, dict(site, staff_url=bad))
+            self.assertIn("staff_url must be", "\n".join(r.failures), bad)
+        r = check.Report()
+        check.check_footer_links(self.dist, r, dict(site, social=[{"key": "x", "href": "http://x.example/it7q"}]))
+        self.assertIn("social link x must be https://", "\n".join(r.failures))
+
+    def test_hooks_base_is_one_value(self):
+        headers = (self.dist / "_headers").read_text(encoding="utf-8")
+        self.assertIn("connect-src 'self' https://hooks.nubius.com.au ", headers)
+        real = check.prod_hooks
+        check.prod_hooks = lambda: "https://forms.it7q.com.au/webhook"  # Phase 6 switch (Q58)
+        try:
+            out = "\n".join(check.run(self.dist).failures)
+        finally:
+            check.prod_hooks = real
+        self.assertIn("_headers: public-wording guard: 'nubius'", out)
+        self.assertIn("assets/js/config.js: public-wording guard: 'nubius'", out)
+        self.assertIn("hooks must be https://forms.it7q.com.au/webhook", out)
 
 
 class ConsentGuard(unittest.TestCase):

@@ -48,7 +48,10 @@ STATUS_CLASS = {
 }
 PROD_SCRIPTS = ("forms", "nda")  # page scripts a page may ask for in front matter
 PROJECT_FIELDS = {"id", "division", "name", "status", "one_liner", "why", "who", "note",
-                  "featured", "public_price", "group"}
+                  "featured", "public_price", "group", "link", "link_text", "gated"}
+CREDENTIAL_FIELDS = {"title", "issuer", "year", "in_progress"}  # whole qualifications only, no units (Q53)
+GUIDES_SRC = SRC / "guides"  # <slug>.md (browser view) and <slug>.pdf (download), supplied by Chris
+GUIDE_PDF_DIR = "resources/guides/pdf"
 
 
 class BuildError(Exception):
@@ -97,12 +100,64 @@ def check_projects(projects, divisions):
             raise BuildError("projects.json %s: unknown division %r" % (pid, p["division"]))
         if p["status"] not in STATUS_CLASS:
             raise BuildError("projects.json %s: status must be one of %s" % (pid, ", ".join(STATUS_CLASS)))
+        if p.get("link") and not p["link"].startswith("/"):
+            raise BuildError("projects.json %s: link must be a page on this site" % pid)
+        if p.get("gated", True) is not True and p.get("gated") is not False:
+            raise BuildError("projects.json %s: gated must be true or false" % pid)
         groups = {g["key"] for g in slugs[p["division"]].get("groups", [])}
         if groups and p.get("group") not in groups:
             raise BuildError("projects.json %s: group must be one of %s" % (pid, ", ".join(sorted(groups))))
     for d in divisions:
         if not any(p["division"] == d["slug"] for p in projects):
             raise BuildError("projects.json: division %s has no projects" % d["slug"])
+
+
+def check_resources(resources, guide_slugs):
+    for e in resources["entries"]:
+        name = e.get("name", "?")
+        for field in ("name", "what", "why", "download", "domain"):
+            if not e.get(field):
+                raise BuildError("resources.json %s: missing %s" % (name, field))
+        if not check.official_download(e["download"], e["domain"]):
+            raise BuildError("resources.json %s: download must be https:// on %s (§2.4)" % (name, e["domain"]))
+        if e.get("guide") and e["guide"] not in guide_slugs:
+            raise BuildError("resources.json %s: unknown guide %r" % (name, e["guide"]))
+
+
+def load_guides():
+    """guides.json plus which files Chris has supplied for each guide."""
+    data = load_json("guides.json")
+    guides = {}
+    for section in data["sections"]:
+        for g in section["guides"]:
+            if g["slug"] in guides or not re.fullmatch(r"[a-z0-9-]+", g["slug"]):
+                raise BuildError("guides.json: bad or duplicate slug %r" % g["slug"])
+            eyebrow = section["title"] + (" · Chapter %d" % g["chapter"] if g.get("chapter") else "")
+            guides[g["slug"]] = dict(g, eyebrow=eyebrow,
+                                     md=(GUIDES_SRC / (g["slug"] + ".md")).exists(),
+                                     pdf=(GUIDES_SRC / (g["slug"] + ".pdf")).exists())
+    if GUIDES_SRC.exists():
+        for f in GUIDES_SRC.iterdir():
+            if f.is_file() and not f.name.startswith(".") and (f.suffix not in (".md", ".pdf") or f.stem not in guides):
+                raise BuildError("src/guides/%s: not <slug>.md or <slug>.pdf for a guide in guides.json" % f.name)
+    return data, guides
+
+
+def check_credentials(data):
+    for i, e in enumerate(data["entries"], 1):
+        unknown = set(e) - CREDENTIAL_FIELDS
+        if unknown:
+            raise BuildError("credentials.json entry %d: unknown field(s) %s (no unit details, Q53)"
+                             % (i, ", ".join(sorted(unknown))))
+        if not e.get("title"):
+            raise BuildError("credentials.json entry %d: missing title" % i)
+    return data["entries"]
+
+
+def check_social(site):
+    for s in site["social"]:
+        if s.get("href") and not s["href"].startswith("https://"):
+            raise BuildError("site.json social %s: link must be https://" % s["key"])
 
 
 def approved_testimonials(data):
@@ -266,10 +321,14 @@ def project_card(p, compact=False):
         parts.append('<p class="pcard__why"><strong>Who it\'s for:</strong> %s</p>' % esc(p["who"]))
     if p.get("public_price"):
         parts.append('<p class="pcard__price">%s</p>' % esc(p["public_price"]))
-    parts.append(
-        '<div class="lock" data-project="%s"><p class="lock__locked">'
-        '<a href="/access/?next=/divisions/%s/">Full details under NDA</a></p></div>' % (esc(p["id"]), esc(p["division"]))
-    )
+    if p.get("link"):
+        parts.append('<p class="pcard__link"><a class="link-arrow" href="%s">%s</a></p>'
+                     % (esc(p["link"]), esc(p.get("link_text", "Find out more"))))
+    if p.get("gated", True):
+        parts.append(
+            '<div class="lock" data-project="%s"><p class="lock__locked">'
+            '<a href="/access/?next=/divisions/%s/">Full details under NDA</a></p></div>' % (esc(p["id"]), esc(p["division"]))
+        )
     parts.append("</div></article>")
     return "".join(parts)
 
@@ -431,6 +490,91 @@ def c_testimonials(ctx):
     )
 
 
+def c_footer_social(ctx):
+    items = "".join('<li><a href="%s" rel="noopener me">%s</a></li>' % (esc(s["href"]), esc(s["label"]))
+                    for s in ctx["site"]["social"] if s.get("href"))  # no URL yet: not shown (§2)
+    return '<ul class="plain social" aria-label="IT7Q on social media">%s</ul>' % items if items else ""
+
+
+def c_resources(ctx):
+    items = []
+    for e in ctx["resources"]["entries"]:
+        host = e["domain"]
+        guide = ""
+        if e.get("guide"):
+            guide = ' <a class="link-arrow" href="/resources/guides/%s/">IT7Q guide</a>' % esc(e["guide"])
+        items.append(
+            '<li class="rcard"><h3 class="rcard__title">%s</h3>'
+            '<p><strong>What it is:</strong> %s</p><p><strong>Why use it:</strong> %s</p>'
+            '<p class="rcard__actions"><a class="btn btn--small" href="%s" rel="noopener noreferrer" data-download="official">'
+            'Download<span class="visually-hidden"> %s</span></a>%s</p>'
+            '<p class="rcard__src">From the official site, %s</p></li>'
+            % (esc(e["name"]), esc(e["what"]), esc(e["why"]), esc(e["download"]), esc(e["name"]), guide, esc(host))
+        )
+    return '<ul class="rcards">%s</ul>' % "\n".join(items)
+
+
+def guide_status(g):
+    if g["md"] or g["pdf"]:
+        return '<span class="status status--done">Available</span>'
+    return status_pill("Coming soon")
+
+
+def c_guides(ctx):
+    out = []
+    for section in ctx["guides_data"]["sections"]:
+        cards = []
+        for item in section["guides"]:
+            g = ctx["guides"][item["slug"]]
+            chapter = '<span class="tag">Chapter %d</span> ' % g["chapter"] if g.get("chapter") else ""
+            pdf = ""
+            if g["pdf"]:
+                pdf = ' <a class="link-arrow" href="/%s/%s.pdf" download>PDF</a>' % (GUIDE_PDF_DIR, esc(g["slug"]))
+            cards.append(
+                '<li class="gcard"><p class="pcard__meta">%s%s</p><h4 class="gcard__title">%s</h4><p>%s</p>'
+                '<p class="gcard__links"><a class="link-arrow" href="/resources/guides/%s/">Read in browser</a>%s</p></li>'
+                % (chapter, guide_status(g), esc(g["title"]), esc(g["summary"]), esc(g["slug"]), pdf)
+            )
+        out.append(
+            '<h3 id="guides-%s" class="guides__title">%s</h3><p class="section__lead">%s</p><ul class="gcards">%s</ul>'
+            % (esc(section["key"]), esc(section["title"]), esc(section["intro"]), "".join(cards))
+        )
+    return "\n".join(out)
+
+
+def c_guide_actions(ctx):
+    g = ctx["g"]
+    if not g["pdf"]:
+        return '<p class="guide-actions">%s</p>' % status_pill("Coming soon")
+    href = "/%s/%s.pdf" % (GUIDE_PDF_DIR, esc(g["slug"]))
+    return ('<p class="guide-actions"><a class="btn" href="%s">View the PDF</a> '
+            '<a class="btn btn--outline" href="%s" download>Download PDF</a></p>' % (href, href))
+
+
+def c_guide_body(ctx):
+    g = ctx["g"]
+    if g["md"]:
+        text = (GUIDES_SRC / (g["slug"] + ".md")).read_text(encoding="utf-8")
+        return '<div class="legal-text">%s</div>' % render_md(text, top=2)
+    if g["pdf"]:
+        return "<p>This guide is a PDF. Use the buttons above to read it in your browser or save a copy.</p>"
+    return ('<p class="text-ph">PLACEHOLDER: guide text and PDF to come from Chris.</p>'
+            "<p>This guide is on its way. In the meantime, if you'd like a hand, just ask.</p>")
+
+
+def c_credentials(ctx):
+    entries = ctx["credentials"]
+    if not entries:
+        return '<p class="text-ph">PLACEHOLDER: qualifications and certifications to come from Chris.</p>'
+    items = []
+    for e in entries:
+        meta = " · ".join(esc(e[k]) for k in ("issuer", "year") if str(e.get(k, "")).strip())
+        extra = ' <span class="tag">In progress</span>' if e.get("in_progress") else ""
+        items.append('<li><h3 class="list-card__title">%s%s</h3>%s</li>'
+                     % (esc(e["title"]), extra, "<p>%s</p>" % meta if meta else ""))
+    return '<ul class="list-cards credentials">%s</ul>' % "".join(items)
+
+
 def c_nda_text(ctx):
     return '<div class="legal-text">%s</div>' % render_md(ctx["nda"]["text"], top=2)
 
@@ -573,6 +717,12 @@ COMPONENTS = {
     "form_nda_login": c_form_nda_login,
     "form_enquiry": c_form_enquiry,
     "stub": c_stub,
+    "footer_social": c_footer_social,
+    "resources": c_resources,
+    "guides": c_guides,
+    "guide_actions": c_guide_actions,
+    "guide_body": c_guide_body,
+    "credentials": c_credentials,
 }
 
 
@@ -653,7 +803,7 @@ def render_page(meta, body, ctx, partials, nav_key, where):
     page = partials["layout"]
     for key, value in (
         ("{{header}}", partials["header"].replace("{{nav_items}}", nav_items)),
-        ("{{footer}}", partials["footer"]),
+        ("{{footer}}", render_components(partials["footer"], ctx, "partials/footer.html")),
         ("{{sprite}}", ctx["sprite"]),
         ("{{content}}", body),
         ("{{page_title}}", esc(title)),
@@ -747,6 +897,26 @@ def config_js(nda, mock):
             "window.IT7Q_CONFIG = Object.freeze(%s);\n" % json.dumps(cfg, sort_keys=True))
 
 
+def headers_text():
+    """src/_headers with the webhook origin from endpoints.json in the CSP (Q58: one config value)."""
+    hooks = load_json("endpoints.json")["hooks"]
+    text = (SRC / "_headers").read_text(encoding="utf-8")
+    if "{{hooks_origin}}" not in text:
+        raise BuildError("src/_headers: the CSP must use {{hooks_origin}}")
+    return text.replace("{{hooks_origin}}", check.origin(hooks))
+
+
+def render_template_pages(name, items, base_ctx, partials, outputs):
+    tmpl = (SRC / "templates" / name).read_text(encoding="utf-8")
+    for rel, ctx in items:
+        if rel in outputs:
+            raise BuildError("%s exists in src/pages and would clash with templates/%s" % (rel, name))
+        ctx = dict(base_ctx, **ctx)
+        meta, body = parse_page(tmpl, "templates/" + name)
+        meta = {k: render_vars(v, ctx, str(rel), escape=False) for k, v in meta.items()}
+        outputs[rel] = render_page(meta, body, ctx, partials, meta.get("nav", ""), str(rel))
+
+
 def build(mock=False):
     if DIST.exists():
         if DIST.resolve().parent != ROOT or DIST.name != "dist":
@@ -757,6 +927,10 @@ def build(mock=False):
     site, divisions, image_opts = load_json("site.json"), load_json("divisions.json"), load_json("images.json")
     projects = load_json("projects.json")
     check_projects(projects, divisions)
+    check_social(site)
+    guides_data, guides = load_guides()
+    resources = load_json("resources.json")
+    check_resources(resources, guides)
     mark_text, viewbox, sprite, favicon = load_mark()
     partials = {p.stem: p.read_text(encoding="utf-8") for p in (SRC / "partials").glob("*.html")}
     base_ctx = {
@@ -766,6 +940,8 @@ def build(mock=False):
         "testimonials": approved_testimonials(load_json("testimonials.json")),
         "forms": load_json("forms.json"), "nda": load_nda(),
         "lock_divisions": {d["slug"] for d in divisions} | {"investors"},
+        "resources": resources, "guides_data": guides_data, "guides": guides,
+        "credentials": check_credentials(load_json("credentials.json")),
     }
 
     outputs = {}
@@ -774,15 +950,10 @@ def build(mock=False):
         meta, body = parse_page(src.read_text(encoding="utf-8"), str(rel))
         outputs[rel] = render_page(meta, body, base_ctx, partials, meta.get("nav", ""), str(rel))
 
-    tmpl = (SRC / "templates/division.html").read_text(encoding="utf-8")
-    for d in divisions:
-        rel = Path("divisions", d["slug"], "index.html")
-        if rel in outputs:
-            raise BuildError("%s exists in src/pages and would clash with the division template" % rel)
-        ctx = dict(base_ctx, d=d)
-        meta, body = parse_page(tmpl, "templates/division.html")
-        meta = {k: render_vars(v, ctx, str(rel), escape=False) for k, v in meta.items()}
-        outputs[rel] = render_page(meta, body, ctx, partials, meta.get("nav", ""), str(rel))
+    render_template_pages("division.html", [(Path("divisions", d["slug"], "index.html"), {"d": d}) for d in divisions],
+                          base_ctx, partials, outputs)
+    render_template_pages("guide.html", [(Path("resources/guides", g, "index.html"), {"g": guides[g]}) for g in guides],
+                          base_ctx, partials, outputs)
 
     for rel, page in outputs.items():
         out = DIST / rel
@@ -793,7 +964,11 @@ def build(mock=False):
     (DIST / "assets/css/fonts.css").write_text(fonts_css(), encoding="utf-8")
     (DIST / "assets/js/config.js").write_text(config_js(base_ctx["nda"], mock), encoding="utf-8")
     (DIST / "favicon.svg").write_text(favicon, encoding="utf-8")
-    shutil.copyfile(SRC / "_headers", DIST / "_headers")
+    (DIST / "_headers").write_text(headers_text(), encoding="utf-8")
+    pdfs = [g for g in guides.values() if g["pdf"]]
+    for g in pdfs:
+        (DIST / GUIDE_PDF_DIR).mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(GUIDES_SRC / (g["slug"] + ".pdf"), DIST / GUIDE_PDF_DIR / (g["slug"] + ".pdf"))
     print("built %d pages, %d project cards, %d testimonials, %d watermarked images -> %s%s"
           % (len(outputs), len(projects), len(base_ctx["testimonials"]), marked, DIST.relative_to(ROOT),
              " (LOCAL MOCK BUILD: do not deploy)" if mock else ""))

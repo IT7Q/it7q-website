@@ -14,6 +14,7 @@ import html
 import json
 import re
 import sys
+import zlib
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -46,9 +47,26 @@ GATED_FORBIDDEN = PUBLIC_FORBIDDEN + [
     r"\bgit\.", r"\.git\b", r"\bport\b", r"[\w-]+\.nubius\.com\.au",
     r"\b(?!(?:p\d+|www|downloads)\.)[\w-]+\.it7q\.com\.au",
 ]
-# §4.12: the webhook origin may appear only in the generated config
+# Q55: these two may appear only under resources/, as general recommendations for the reader
+RESOURCE_ONLY = [r"wire\s?guard", r"\bclamav\b"]
+RESOURCES_DIR = "resources/"
+FIRST_PERSON = re.compile(
+    r"\bwe(?:'re| are)? (?:use|run|rely on|deploy)\b|\bour (?:own )?(?:setup|stack|servers?|network|systems?|infrastructure)\b",
+    re.I)
+# §2.5: a domestic-violence use case stays gated, so nothing public near PORTUS puts a user at risk
+PORTUS_SENSITIVE = re.compile(
+    r"domestic|family violence|\bviolen|\babus|\brefuge|\bescap|coercive|perpetrator|\bvictim|\bstalk", re.I)
+# §2.4: IT7Q never hosts installers or archives
+BINARY_EXT = {".exe", ".msi", ".msix", ".dmg", ".pkg", ".apk", ".aab", ".ipa", ".deb", ".rpm", ".appimage", ".snap",
+              ".flatpak", ".zip", ".7z", ".rar", ".tar", ".gz", ".tgz", ".xz", ".bz2", ".iso", ".img", ".bin", ".jar",
+              ".bat", ".cmd", ".ps1", ".sh", ".vbs", ".scr"}
+GUIDE_PDF_DIR = "resources/guides/pdf/"
+PDF_META = re.compile(rb"/(?:Author|Creator)\s*(?:\((?!\))|<(?!>))|<(?:dc:creator|xmp:CreatorTool)\b")
+LOCAL_PATH = re.compile(rb"[A-Za-z]:\\{1,2}\w|/home/|/Users/|/srv/|/opt/")
+# §4.12 / Q58: the webhook base (endpoints.json "hooks") may appear only in the generated config and the CSP
 CONFIG_JS = "assets/js/config.js"
-PROD_HOOKS = "https://hooks.nubius.com.au/webhook"
+HEADERS = "_headers"
+ENDPOINTS = SRC / "data/endpoints.json"
 # Rendering of gated content must use DOM APIs only (§4.6)
 JS_SINKS = re.compile(r"\.innerHTML|\.outerHTML|insertAdjacentHTML|document\.write|\beval\s*\(|new\s+Function\b")
 FINANCIAL = re.compile(
@@ -59,6 +77,31 @@ FINANCIAL = re.compile(
     re.I,
 )
 PRICE = re.compile(r"\$\s?\d[\d,.]*")
+
+
+def prod_hooks():
+    """The one public webhook base (Q58). Moving it off nubius makes nubius fail everywhere in dist/."""
+    return json.loads(ENDPOINTS.read_text(encoding="utf-8"))["hooks"]
+
+
+def origin(url):
+    m = re.match(r"https://[^/]+", url)
+    return m.group(0) if m else url
+
+
+def host(url):
+    m = re.match(r"https://([^/:?#]+)(?:[/?#]|$)", url)
+    return m.group(1).lower() if m else None
+
+
+def official_download(url, domain):
+    h = host(url)
+    return h is not None and (h == domain or h.endswith("." + domain))
+
+
+def visible_sentences(text):
+    text = html.unescape(re.sub(r"<[^>]+>", " ", re.sub(r"(?is)<(script|style)\b.*?</\1>", " ", text)))
+    return [s for s in re.split(r"(?<=[.!?])\s+|\n\s*\n", re.sub(r"[ \t]+", " ", text)) if s.strip()]
 
 
 def rel(path):
@@ -211,16 +254,27 @@ def check_pages(dist, r):
 
 
 def check_text_guards(dist, r, allowed_prices=frozenset()):
-    public = [p for p in dist.rglob("*") if p.is_file() and p.suffix in (".html", ".css", ".js", ".svg", ".json", ".txt")]
+    public = [p for p in dist.rglob("*") if p.is_file() and (
+        p.suffix in (".html", ".css", ".js", ".svg", ".json", ".txt") or p.name == HEADERS)]
+    hooks = prod_hooks()
     for f in public:
         where = str(f.relative_to(dist))
         text = f.read_text(encoding="utf-8", errors="replace")
         if where == CONFIG_JS:
-            text = text.replace(PROD_HOOKS, "")  # the one allowed mention (§4.12)
+            text = text.replace(hooks, "")  # the allowed mentions (§4.12, Q58)
+        elif where == HEADERS:
+            text = text.replace(origin(hooks), "")
+        in_resources = where.startswith(RESOURCES_DIR)
         for pat in PUBLIC_FORBIDDEN:
+            if in_resources and pat in RESOURCE_ONLY:
+                continue
             m = re.search(pat, text, re.I)
             if m:
                 r.fail(where, "public-wording guard: %r must not appear (§4.9)" % m.group(0))
+        if in_resources and where.endswith(".html"):
+            for s in visible_sentences(text):
+                if any(re.search(p, s, re.I) for p in RESOURCE_ONLY) and FIRST_PERSON.search(s):
+                    r.fail(where, "public-wording guard: %r reads as IT7Q's own setup (Q55)" % s.strip()[:80])
         for m in PRICE.finditer(text):
             amount = m.group(0).rstrip(".,").replace(" ", "")
             if amount not in allowed_prices:
@@ -278,8 +332,10 @@ def check_scripts(dist, r, mock=False):
         return
     if cfg.get("mock") and not mock:
         r.fail(CONFIG_JS, "this is a LOCAL MOCK build and must never be deployed; run tools/build.py without --mock")
-    if not cfg.get("mock") and cfg.get("hooks") != PROD_HOOKS:
-        r.fail(CONFIG_JS, "hooks must be %s" % PROD_HOOKS)
+    if not cfg.get("mock") and cfg.get("hooks") != prod_hooks():
+        r.fail(CONFIG_JS, "hooks must be %s (endpoints.json)" % prod_hooks())
+    if not prod_hooks().startswith("https://"):
+        r.fail(rel(ENDPOINTS), "hooks must be an https:// URL")
 
 
 def check_fonts(dist, r):
@@ -378,6 +434,97 @@ def check_portfolio(dist, r):
             r.fail("portfolio.json", "unpublished entry %r appears in dist/" % entry["name"])
 
 
+def check_downloads(dist, r):
+    """§2.4: Download buttons go only to official sites; no installers or archives ship."""
+    path = SRC / "data/resources.json"
+    allowed = set()
+    if path.exists():
+        for e in json.loads(path.read_text(encoding="utf-8"))["entries"]:
+            if official_download(e.get("download", ""), e.get("domain", "")):
+                allowed.add(e["download"])
+            else:
+                r.fail("resources.json", "download-link guard: %s must be https:// on %s" % (e.get("name"), e.get("domain")))
+    for f in dist.rglob("*"):
+        if f.is_file() and f.suffix.lower() in BINARY_EXT:
+            r.fail(str(f.relative_to(dist)), "download-link guard: no binaries or archives on the site (§2.4)")
+    for page in dist.rglob("*.html"):
+        for tag in re.findall(r"<a\b[^>]*\bdata-download\b[^>]*>", page.read_text(encoding="utf-8")):
+            m = re.search(r'href="([^"]*)"', tag)
+            href = html.unescape(m.group(1)) if m else ""
+            if href not in allowed:
+                r.fail(str(page.relative_to(dist)), "download-link guard: %r is not an official download page" % href)
+
+
+def check_pdfs(dist, r):
+    """§2.4: guide PDFs only, with no metadata, local paths or banned words."""
+    for f in dist.rglob("*"):
+        if not (f.is_file() and f.suffix.lower() == ".pdf"):
+            continue
+        where = str(f.relative_to(dist))
+        if not where.startswith(GUIDE_PDF_DIR):
+            r.fail(where, "PDF guard: PDFs ship only as guides under /%s" % GUIDE_PDF_DIR)
+        raw = f.read_bytes()
+        chunks = [raw]
+        for m in re.finditer(rb"stream\r?\n(.*?)endstream", raw, re.S):
+            try:
+                chunks.append(zlib.decompress(m.group(1)))
+            except zlib.error:
+                pass
+        data = b"\n".join(chunks)
+        if PDF_META.search(data):
+            r.fail(where, "PDF guard: author/creator metadata must be stripped before it ships")
+        if LOCAL_PATH.search(data):
+            r.fail(where, "PDF guard: contains a local file path")
+        text = data.decode("latin-1")
+        for pat in PUBLIC_FORBIDDEN:
+            if pat in RESOURCE_ONLY and where.startswith(RESOURCES_DIR):
+                continue
+            m = re.search(pat, text, re.I)
+            if m:
+                r.fail(where, "PDF guard: %r must not appear (§4.9)" % m.group(0))
+
+
+def check_portus(dist, r):
+    """§2.5: public PORTUS wording stays on community safety."""
+    for page in dist.rglob("*.html"):
+        where = str(page.relative_to(dist))
+        whole = where == "divisions/portus/index.html"
+        for s in visible_sentences(page.read_text(encoding="utf-8")):
+            if (whole or "portus" in s.lower()) and PORTUS_SENSITIVE.search(s):
+                r.fail(where, "PORTUS discretion guard: %r belongs in gated detail only" % PORTUS_SENSITIVE.search(s).group(0))
+    for name, pick in (("projects.json", lambda x: x.get("division") == "portus"),
+                       ("divisions.json", lambda x: x.get("slug") == "portus")):
+        path = SRC / "data" / name
+        if path.exists():
+            for entry in json.loads(path.read_text(encoding="utf-8")):
+                if pick(entry):
+                    for s in gated_strings(entry):
+                        if PORTUS_SENSITIVE.search(s):
+                            r.fail(name, "PORTUS discretion guard: %r belongs in gated detail only"
+                                   % PORTUS_SENSITIVE.search(s).group(0))
+
+
+def check_footer_links(dist, r, site=None):
+    """One Staff link per page, in the footer only, to an it7q.com.au name; social links over https."""
+    site = site or json.loads((SRC / "data/site.json").read_text(encoding="utf-8"))
+    url = site.get("staff_url", "")
+    if not re.fullmatch(r"https://[a-z0-9-]+\.it7q\.com\.au/?", url):
+        r.fail("site.json", "footer guard: staff_url must be https://<name>.it7q.com.au")
+    if any(n.get("href") == url for n in site.get("nav", [])):
+        r.fail("site.json", "footer guard: the Staff link must not be in the main nav")
+    for s in site.get("social", []):
+        if s.get("href") and not s["href"].startswith("https://"):
+            r.fail("site.json", "footer guard: social link %s must be https://" % s.get("key"))
+    needle = 'href="%s"' % html.escape(url, quote=True)
+    for page in dist.rglob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        where = str(page.relative_to(dist))
+        if text.count(needle) != 1:
+            r.fail(where, "footer guard: expected exactly one Staff link, found %d" % text.count(needle))
+        elif text.find(needle) < text.find("<footer"):
+            r.fail(where, "footer guard: the Staff link must sit in the footer only")
+
+
 def approved_prices():
     """Dollar amounts named in projects.json public_price fields (Q28: SCUTUM only)."""
     path = SRC / "data/projects.json"
@@ -404,6 +551,10 @@ def run(dist, mock=False):
     check_gated(dist, r)
     check_portfolio(dist, r)
     check_testimonials(dist, r)
+    check_downloads(dist, r)
+    check_pdfs(dist, r)
+    check_portus(dist, r)
+    check_footer_links(dist, r)
     return r
 
 
@@ -421,7 +572,8 @@ def main(argv):
             print("  - " + f, file=sys.stderr)
         return 1
     pages = len(list(dist.rglob("*.html")))
-    print("check passed: %d pages, links, CSP, wording, prices, pack colours, SVGs, watermarks, fonts, consent" % pages)
+    print("check passed: %d pages, links, CSP, wording, prices, pack colours, SVGs, watermarks, fonts, consent, "
+          "downloads, PDFs, PORTUS, footer" % pages)
     return 0
 
 

@@ -44,9 +44,19 @@
       "href": "/services/"
     },
     {
+      "key": "shop",
+      "label": "Shop",
+      "href": "/shop/"
+    },
+    {
       "key": "portfolio",
       "label": "Portfolio",
       "href": "/portfolio/"
+    },
+    {
+      "key": "resources",
+      "label": "Resources",
+      "href": "/resources/"
     },
     {
       "key": "about",
@@ -69,5 +79,43 @@
     "p1",
     "p8"
   ],
-  "whatsapp_href": "https://wa.me/61411753366"
+  "whatsapp_href": "https://wa.me/61411753366",
+  "staff_url": "https://staff.it7q.com.au",
+  "social": [
+    {
+      "key": "facebook",
+      "label": "Facebook",
+      "href": ""
+    },
+    {
+      "key": "instagram",
+      "label": "Instagram",
+      "href": "https://www.instagram.com/it7q_qld"
+    },
+    {
+      "key": "linkedin",
+      "label": "LinkedIn",
+      "href": ""
+    },
+    {
+      "key": "x",
+      "label": "X",
+      "href": ""
+    },
+    {
+      "key": "youtube",
+      "label": "YouTube",
+      "href": ""
+    },
+    {
+      "key": "google",
+      "label": "Google Business",
+      "href": ""
+    },
+    {
+      "key": "tiktok",
+      "label": "TikTok",
+      "href": ""
+    }
+  ]
 }

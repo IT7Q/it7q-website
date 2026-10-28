@@ -9,6 +9,18 @@
   "featured": true
  },
  {
+  "id": "P-MSP-07",
+  "division": "msp",
+  "name": "MERCATOR: Parts, Sales & Service",
+  "status": "Coming soon",
+  "one_liner": "IT7Q's hardware store for networking gear, office peripherals and storage, with Supply + Install bundles: we sell the gear and set it up for you.",
+  "why": "One local team for the parts and the install, explained in plain English.",
+  "featured": true,
+  "link": "/shop/",
+  "link_text": "Visit the shop page",
+  "gated": false
+ },
+ {
   "id": "P-MSP-01",
   "division": "msp",
   "name": "SCUTUM",
@@ -56,7 +68,9 @@
   "name": "Athena Browser",
   "status": "Developed",
   "one_liner": "A private, all-in-one browser built for IT7Q clients.",
-  "why": "Your mail, chat, passwords and support are built in."
+  "why": "Your mail, chat, passwords and support are built in.",
+  "link": "/athena/",
+  "link_text": "Athena Browser Customer Edition"
  },
  {
   "id": "P-OPUS-02",
