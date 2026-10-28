@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v11, 29 Oct 2026. Phases 1–3 and 3b built.** v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v12, 29 Oct 2026. Phases 1–3 and 3b built.** v12 folds in Chris's answers to Q61 (About overlap) and the rest of Q54 (social URLs); Q60 is Chris's click-test, Q53 and Q59 still to come. The site changes they need are queued as Phase 3c (§7). v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -135,7 +135,8 @@ Kept for the record. The packs used a different palette from the card; Chris cho
 | — | **Resources** (29 Oct): recommended FOSS software (15 entries) + the **Guides** section (IT7Q Client Education Series + device-hardening manuals). Download buttons go to each project's **official** download page; IT7Q never hosts binaries (§2.4). |
 | — | **Media** (IT7Q's own self-hosted video channel + podcast) and **News** (**HERALD**, IT7Q's own tech-news and updates feed): **Coming soon** placeholder pages only (§2.6). |
 | — | **Credentials** page: Chris's qualifications and certifications, from a list he supplies; **no individual unit details** (Q53). |
-| — | **Footer social links**: Facebook, Instagram (`@it7q_qld`), LinkedIn, X, YouTube, Google Business, TikTok (Instagram: `https://www.instagram.com/it7q_qld` (Q54); the rest to come), plus the WhatsApp button. |
+| 61 | **About overlap** (29 Oct): drop the two older About lines that repeat "started in 2020 in Kallangur" and "seven divisions". Chris's paragraph stands alone; the **Credentials** link stays. |
+| 54 | **Footer social links** (29 Oct), shown in this order with these URLs:<br>Instagram `https://www.instagram.com/it7q_qld/` · X `https://x.com/it7qqld` · YouTube `https://www.youtube.com/@IT7Q-KITS` · LinkedIn `https://www.linkedin.com/in/chris-lord-b53731102/` (labelled **"Chris's LinkedIn"**; an IT7Q company page comes later) · Facebook `https://www.facebook.com/InfiniteQld`.<br>**Google Business**: hidden until Chris sends the profile share link. **No Reddit or Etsy.** TikTok wasn't in the list: hidden until Chris confirms (Q62). Plus the WhatsApp button. |
 | — | **Athena Browser Customer Edition**: a **Coming soon** download page. |
 | — | **PORTUS public wording**: presented as a **community safety tool**. Any domestic-violence use case is **gated detail only**, so the public card never puts a user at risk (§2.5). |
 
@@ -200,7 +201,7 @@ Home users first, small business second, all in plain English.
 - **Legal**: Privacy and Terms are plain-English drafts that state the §4.10 retention periods, no cookies, cookieless analytics, Turnstile and `sessionStorage`. The NDA page shows `src/legal/nda-1.0.md` with its version and SHA-256. All three carry a "Draft, being checked by a lawyer" note (Q36).
 - **Portfolio**: §2.2.
 - **Main nav** (v10): Home · Divisions · Services · Shop · Portfolio · Resources · About · Contact. Chris asked for Shop; I've added Resources too, since it's the biggest new page. Media, News, Credentials and Athena sit in the footer. Chris checks the order in the preview.
-- **Footer** (v10): contact facts, then a **social row** (Facebook, Instagram `@it7q_qld`, LinkedIn, X, YouTube, Google Business, TikTok, as plain text-labelled links with `rel="noopener"`; no third-party scripts, embeds or widgets, so the CSP stays as is), the **WhatsApp button** (`wa.me/61411753366`, Q49), the footer page links, and a small **"Staff"** link. Social URLs live in `site.json`; an entry with no URL yet isn't rendered (so no dead links ship), and the launch check fails if any is still empty.
+- **Footer** (v10, URLs v12): contact facts, then a **social row** (Instagram, X, YouTube, Chris's LinkedIn, Facebook; Google Business once its link arrives; see §1a Q54; as plain text-labelled links with `rel="noopener"`; no third-party scripts, embeds or widgets, so the CSP stays as is), the **WhatsApp button** (`wa.me/61411753366`, Q49), the footer page links, and a small **"Staff"** link. Social URLs live in `site.json`; an entry with no URL yet isn't rendered (so no dead links ship), and the launch check fails if any is still empty. v12: an entry can be marked `"hidden": true` (Google Business until its link arrives; TikTok until Q62), which the launch check accepts as a deliberate choice rather than a gap.
 - **Shop / MERCATOR**: "Coming soon": IT7Q's hardware store (`shop.it7q.com.au`, shown as text, not linked until it's live). Three launch categories (Networking, Office Peripherals, Storage Solutions) as simple tiles, and a "Supply + Install" panel: *we sell the gear and install it*. CTA: the enquiry form with service "Parts, sales & service". No supplier names, prices or margins (the price guard already fails on any `$`).
 - **Media**: "Coming soon": IT7Q's own video channel and podcast, self-hosted. Placeholder only; no YouTube or podcast embeds.
 - **News**: "Coming soon": **HERALD**, IT7Q's own tech-news and updates feed. Placeholder only.
@@ -818,6 +819,7 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 3b. ✅ **Phase 3b (29 Oct)**: MERCATOR card (P-MSP-07) + `/shop/`; `/resources/` with the 15 software entries + Guides section and guide pages (placeholders); `/media/`, `/news/`, `/athena/` Coming soon pages; `/credentials/`; nav update; footer social row, WhatsApp button and Staff link; About text from Q51; the four v10 guards (§3) with tests; the webhook base as one config value (Q58). Download URLs were written from my knowledge of each project's official site; Pantheon's sandbox blocked fetching them, so Chris clicks each one in the preview (Q60). Guide Markdown uses the legal-text renderer (headings, paragraphs, lists, bold); it gets extended when Chris's first guide files show what they need.
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
 5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
+3c. **Phase 3c (next small step, when Chris says go)**: About: drop the two overlapping lines, keep the Credentials link (Q61). Footer: the five social URLs and the "Chris's LinkedIn" label in `site.json`, Google Business and TikTok hidden, no Reddit/Etsy (Q54); a test for each. Fix any Download URLs Chris reports from the click-test (Q60).
 6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: webhook base → `https://forms.it7q.com.au/webhook` in `endpoints.json` (Q58), Cloudflare Access on `staff.it7q.com.au` (Q52), Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
 
@@ -843,7 +845,7 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–43, 47, 48, 51, 52, 54 (Instagram), 55, 57 and 58 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
+**Answered**: 1–43, 47, 48, 51, 52, 54 (all but Google Business), 55, 57, 58 and 61 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
 
 **Still open**
 36. **Legal check** before launch: the NDA (`src/legal/nda-1.0.md`, reviewer notes in `docs/nda-draft.md`), plus the new Privacy and Terms drafts.
@@ -852,12 +854,12 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 46. **BlueVibes Music (p6)**: a few words on what it is, for a better one-liner. **Niuleaf (p8)**: the one-liner you said you'd supply.
 49. **Messaging**: is WhatsApp on 0411 753 366 (the Contact page and now the footer link `wa.me/61411753366`)? And the Facebook Messenger page link, if you want it listed.
 50. **Pillow on Pantheon**: `.venv/` has no pip yet; fix in §7.1 (needs `sudo`).
-53. **Credentials list** (later): qualifications and certifications (title, issuer, year), no units.
-54. **Social URLs** (rest to come): Facebook, LinkedIn, X, YouTube, Google Business, TikTok. Instagram is done.
+53. **Credentials list** (to come): qualifications and certifications (title, issuer, year), no units.
+54. **Google Business** share link (to come). Hidden until then.
 56. **Athena CE** (later): where the build will be hosted, and whether it's code-signed.
 59. **Guide files**: Windows and Android hardening guides, then the Education Series chapters, as Markdown/HTML for view-in-browser plus a PDF each, with metadata stripped.
-60. **Download links**: click each Download button on `/resources/` in the preview and confirm it lands on the official download page (I couldn't fetch them from Pantheon).
-61. **About page overlap**: your paragraph now sits between the two existing ones, which also say "started in 2020 in Kallangur" and "seven divisions". Drop those two lines so yours stands alone?
+60. **Download links** (Chris is click-testing): click each of the 15 Download buttons on `/resources/` in the preview and report any that don't land on the official download page.
+62. **TikTok**: the v10 footer list had TikTok, but your Q54 list doesn't. Drop it, or keep it hidden until there's an account?
 
 ---
 
@@ -867,6 +869,8 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - Neo website-evaluation workflow.
 - WordPress version: superseded.
 - Blog + Downloads, if fewer than 2–3 posts are ready at launch (Q17). (HERALD may end up replacing the blog; decide when HERALD is planned.)
+- **FABRICUS Etsy shop**: once the shop exists, its link goes on the FABRICUS division page (not the footer; no Etsy link in the social row).
+- **IT7Q LinkedIn company page**: when it exists, swap it in for (or add it beside) Chris's LinkedIn in the footer.
 - **Separate future builds** (§2.6), each with its own plan and repo: the **MERCATOR store** (`shop.it7q.com.au`), **self-hosted video/podcast hosting**, the **HERALD app**, and Athena CE distribution.
 
 ---
@@ -886,3 +890,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **29 Oct 2026: plan v10.** Chris's new scope folded in: MERCATOR (MSP section) + Shop, Resources + Guides, Media, News (HERALD), Credentials, Athena CE page, footer Staff/social links, PORTUS discretion. Phase 3b planned; separate future builds listed in §2.6.
 - **29 Oct 2026: plan v11.** Q51, Q52, Q54, Q55, Q57, Q58 answered.
 - **29 Oct 2026: Phase 3b built.** MERCATOR card + Shop, Resources + 20 guide pages, Media/News/Athena/Credentials pages, footer social/WhatsApp/Staff, About text, webhook base as one value; download, PDF, PORTUS and footer guards.
+- **29 Oct 2026: plan v12.** Q61 and Q54 (all but Google Business) answered; Q62 (TikTok) asked; Etsy and LinkedIn company page pinned; Phase 3c queued.
