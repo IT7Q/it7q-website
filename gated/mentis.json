@@ -1,0 +1,104 @@
+{
+  "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
+  "division": "mentis",
+  "reviewed": false,
+  "projects": {
+    "P-MEN-01": {
+      "summary": "A workforce of 21 specialised AI agents, run on IT7Q's own systems, that handles much of the back office.",
+      "sections": [
+        {
+          "heading": "Agents at work",
+          "items": [
+            "Oracle: watches the health of IT7Q's systems",
+            "A security agent that watches for attacks and blocks repeat offenders",
+            "Marianna (live): checks the inbox every 10 minutes, sorts and summarises mail, and sends a 7 am digest",
+            "Constance: prepares social media posts with matching images",
+            "FORTUNA: keeps watch on investments (see its own card)"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Partly live: Marianna runs every day",
+            "Every agent reports into its own Nexus channel"
+          ]
+        }
+      ]
+    },
+    "P-MEN-02": {
+      "summary": "The memory layer that lets IT7Q's AI remember people and context properly, designed in-house from a clean sheet.",
+      "sections": [
+        {
+          "heading": "Design",
+          "items": [
+            "Remembers what was said between each pair of people or agents, not one big pile",
+            "Four levels of observation, each linked back to its source",
+            "A tiered question-and-answer interface for other systems",
+            "A nightly consolidation pass that tidies and strengthens memories",
+            "Text understanding runs locally; a commercial AI model is used for summarising"
+          ]
+        },
+        {
+          "heading": "Why it matters",
+          "items": [
+            "The keystone for the Support Portal's AI layer, agent memory, CUSTOS and JANUS"
+          ]
+        }
+      ]
+    },
+    "P-MEN-03": {
+      "summary": "A website-building agent: a client answers a few questions, and Neo takes them from proposal to a live site.",
+      "sections": [
+        {
+          "heading": "Flow",
+          "items": [
+            "Online intake form",
+            "Automatic proposal",
+            "Site deployed from a template",
+            "Customised and reviewed",
+            "Launched"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Part of the Persephone agent workforce; intake form running"
+          ]
+        }
+      ]
+    },
+    "P-MEN-04": {
+      "summary": "An AI agent that watches investment markets and reports back in plain English. It currently trades on paper only (no real money).",
+      "sections": [
+        {
+          "heading": "How it works",
+          "items": [
+            "Watches Australian and US markets",
+            "Runs morning and evening checks",
+            "Reports into its own Nexus channel"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Paper trading only"
+          ]
+        }
+      ]
+    },
+    "P-MEN-05": {
+      "summary": "A chat and AI assistant service that gives a business's customers quick, friendly answers, day or night.",
+      "sections": [
+        {
+          "heading": "Planned features",
+          "items": [
+            "A website chat widget",
+            "Answers drawn from the business's own information",
+            "Hands over to a person when needed"
+          ]
+        }
+      ],
+      "notes": "No detail in the build pack. Drafted from the public card; Chris to fill in."
+    }
+  }
+}

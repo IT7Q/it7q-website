@@ -1,0 +1,202 @@
+{
+  "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
+  "division": "opus",
+  "reviewed": false,
+  "projects": {
+    "P-OPUS-01": {
+      "summary": "A private, all-in-one browser for IT7Q clients, with mail, chat, passwords and support built in. Available on desktop and as a signed Android app.",
+      "sections": [
+        {
+          "heading": "In the current release",
+          "items": [
+            "Desktop app plus a signed Android build",
+            "IT7Q login built in",
+            "A download page for clients"
+          ]
+        },
+        {
+          "heading": "Next release adds",
+          "items": [
+            "Hermes Mail and Nexus messaging",
+            "A built-in password manager and bookmark manager",
+            "The IT7Q Support Portal",
+            "Andromeda AI with a choice of AI providers",
+            "On-demand malware scanning and network-level ad and tracker blocking",
+            "A one-click private connection back to IT7Q services"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-02": {
+      "summary": "A clean, fast email app that handles several accounts at once and has an IT7Q support channel in its sidebar.",
+      "sections": [
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Web version running",
+            "Works with several mailboxes at once"
+          ]
+        },
+        {
+          "heading": "What's next",
+          "items": [
+            "Fix a display bug on some messages",
+            "A Windows installer",
+            "An Android app"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-03": {
+      "summary": "Two sister tools: Calendis, a multi-user calendar anyone can sign up for, and Calendi IT7Q, the internal planner that keeps IT7Q's projects on track.",
+      "sections": [
+        {
+          "heading": "Calendi IT7Q",
+          "items": [
+            "Syncs with Google Calendar",
+            "Colour-coded per project",
+            "Orders work by simplicity and urgency",
+            "Per-project timelines, start and finish dates, and daily goals"
+          ]
+        },
+        {
+          "heading": "History",
+          "items": [
+            "Grew out of a single-club calendar first built for Pine Rivers RSL, since retired"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-04": {
+      "summary": "A screener for dyslexia and visual stress that runs entirely offline, keeps results on the device and shows them instantly.",
+      "sections": [
+        {
+          "heading": "Features",
+          "items": [
+            "Seven screening modules",
+            "Results as an at-a-glance radar chart",
+            "PDF export for parents, teachers or clinicians",
+            "History, with side-by-side comparison of sessions"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Second milestone complete"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-05": {
+      "summary": "IT7Q's secure, self-hosted messaging system. It already carries the alerts and reports from IT7Q's AI agents, each in its own channel.",
+      "sections": [
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Messaging server live with 21 agent channels",
+            "A cross-platform messenger app started",
+            "A Linux desktop package planned"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-06": {
+      "summary": "A purpose-built desktop operating system: a minimal, locked-down Linux base with the Athena Browser as the whole desktop.",
+      "sections": [
+        {
+          "heading": "Progress",
+          "items": [
+            "First three milestones complete",
+            "Now integrating IT7Q's own apps (Athena, Nexus) as proper packages",
+            "Updates will come from IT7Q's own signed software source"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-07": {
+      "summary": "A safe, guided computer for kids, built as a locked-down kiosk with a friendly AI companion.",
+      "sections": [
+        {
+          "heading": "Features",
+          "items": [
+            "CUSTOS, an owl companion powered by an AI model and tuned for children",
+            "A daily journal with welfare monitoring that can alert parents",
+            "Nexus Kids Chat: friends are added only when both sets of parents approve"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "First release complete"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-08": {
+      "summary": "A unified messaging gateway: messages from chat and social apps land in one inbox inside Nexus.",
+      "sections": [
+        {
+          "heading": "Design",
+          "items": [
+            "Each platform connected with its own secure sign-in",
+            "A unified inbox tab in Nexus",
+            "Will use MNEMOSYNE so replies keep context"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "In design"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-09": {
+      "summary": "A private alternative to Google Workspace that brings every OPUS app together into one suite.",
+      "sections": [
+        {
+          "heading": "Brings together",
+          "items": [
+            "Hermes Mail",
+            "Calendis",
+            "Nexus messaging",
+            "Files and documents"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "In design"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-10": {
+      "summary": "An AI companion app that works with more than one AI provider, so people can pick the one that suits them.",
+      "sections": [
+        {
+          "heading": "Features",
+          "items": [
+            "One app, several AI providers",
+            "Conversations kept in one place"
+          ]
+        }
+      ],
+      "notes": "No detail in the build pack. Drafted from the public card; Chris to fill in."
+    },
+    "P-OPUS-11": {
+      "summary": "A step-by-step tool that sets up a Windows computer for privacy and security, made for non-technical people.",
+      "sections": [
+        {
+          "heading": "What it does",
+          "items": [
+            "Removes bloatware and tracking",
+            "Applies sensible privacy and security settings",
+            "Explains each step as it goes"
+          ]
+        }
+      ],
+      "notes": "No detail in the build pack. Drafted from the public card; Chris to fill in."
+    }
+  }
+}

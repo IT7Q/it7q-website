@@ -1,0 +1,46 @@
+{
+  "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
+  "division": "portus",
+  "reviewed": false,
+  "projects": {
+    "P-POR-01": {
+      "summary": "A community safety network: Neighbourhood Watch, modernised, with verified members and verified safe places to go. A strategic venture that also carries forward IT7Q's earlier community education work.",
+      "sections": [
+        {
+          "heading": "Where it's at",
+          "items": [
+            "In design"
+          ]
+        }
+      ],
+      "notes": "Kept deliberately general (PLAN.md §2.5). Chris to decide how much more to say even behind the NDA."
+    },
+    "P-POR-02": {
+      "summary": "The PORTUS app: shows verified safe places nearby and helps someone call for help fast, on the phone they already carry.",
+      "sections": [
+        {
+          "heading": "Planned features",
+          "items": [
+            "Map of verified safe places",
+            "Fast call-for-help",
+            "Verified community members"
+          ]
+        }
+      ],
+      "notes": "Drafted from the public card; Chris to fill in. Sensitive use cases stay out unless Chris says otherwise (§2.5)."
+    },
+    "P-POR-03": {
+      "summary": "A child-safe version of the PORTUS app with a simpler screen and parents kept in the loop.",
+      "sections": [
+        {
+          "heading": "Planned features",
+          "items": [
+            "Simple, large controls for kids",
+            "Parents notified when help is called"
+          ]
+        }
+      ],
+      "notes": "Drafted from the public card; Chris to fill in."
+    }
+  }
+}

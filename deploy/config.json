@@ -1,0 +1,24 @@
+{
+  "_about": "Public deploy values for the n8n workflows (PLAN.md §4, DEPLOY.md). No secrets: those live only in n8n credentials, referenced by the names below. After changing anything here, run: python3 tools/n8n_build.py (rewrites n8n/workflows/). PLACEHOLDER values make nda-review refuse everyone until Chris fills them in (DEPLOY.md step 6).",
+  "hook_base": "https://forms.it7q.com.au/webhook",
+  "site_base": "https://it7q.com.au",
+  "site_origins": ["https://it7q.com.au", "https://www.it7q.com.au"],
+  "preview_origins": [],
+  "mail": {
+    "from": "IT7Q <noreply@it7q.com.au>",
+    "reply_to": "info@it7q.com.au",
+    "chris": "chris@it7q.com.au"
+  },
+  "access": {
+    "team": "PLACEHOLDER-team-name",
+    "aud": "PLACEHOLDER-application-audience-tag",
+    "allowed_emails": ["chris@it7q.com.au"]
+  },
+  "credentials": {
+    "edge": "IT7Q Edge Header",
+    "turnstile": "Turnstile secret",
+    "postgres": "Postgres it7q_web",
+    "smtp": "Mail sender (noreply@)"
+  },
+  "timezone": "Australia/Brisbane"
+}

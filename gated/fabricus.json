@@ -1,0 +1,70 @@
+{
+  "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
+  "division": "fabricus",
+  "reviewed": false,
+  "projects": {
+    "P-FAB-101": {
+      "summary": "The FABRICUS ordering app: browse the range and place orders, even with no internet connection.",
+      "sections": [
+        {
+          "heading": "Features",
+          "items": [
+            "Full catalogue with photos",
+            "Orders saved offline and sent when back online",
+            "Handy at markets and in the workshop"
+          ]
+        }
+      ],
+      "notes": "Drafted from the public card; Chris to fill in."
+    },
+    "P-FAB-102": {
+      "summary": "Custom 3D-printed pieces, designed and printed in-house as one-offs or small runs.",
+      "sections": [
+        {
+          "heading": "How it's made",
+          "items": [
+            "Designed in-house",
+            "Printed on IT7Q's own high-speed 3D printer",
+            "Used for TEMPESTAS enclosures and IT7Q branded pieces as well as client orders"
+          ]
+        }
+      ]
+    },
+    "P-FAB-103": {
+      "summary": "Assistive supports for the body, made to measure in-house with 3D printing.",
+      "sections": [
+        {
+          "heading": "How it works",
+          "items": [
+            "Measured to fit the person",
+            "Printed in-house",
+            "Adjusted until it fits right"
+          ]
+        }
+      ],
+      "notes": "Drafted from the public card; Chris to fill in. Check any health claims before review."
+    }
+  },
+  "catalogue": {
+    "summary": "Every FABRICUS piece is made in-house in Queensland and carries IT7Q's maker's mark: a Mjölnir-and-tongs stamp, 40 mm across.",
+    "sections": [
+      {
+        "heading": "How it's made",
+        "items": [
+          "Each product has its own A3 technical plan sheet",
+          "Cut on IT7Q's own CNC router; detail parts on its own 3D printer",
+          "Made to order, so sizes and timber can be changed"
+        ]
+      },
+      {
+        "heading": "Also made in the workshop",
+        "items": [
+          "Custom timber medal display boards",
+          "Branded signage, display stands and client gifts",
+          "Enclosures for TEMPESTAS appliances"
+        ]
+      }
+    ]
+  },
+  "_catalogue_about": "Applied to every catalogue item (P-FAB-0xx) without its own entry."
+}

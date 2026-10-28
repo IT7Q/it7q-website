@@ -1,0 +1,129 @@
+{
+  "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
+  "division": "msp",
+  "reviewed": false,
+  "projects": {
+    "P-MSP-06": {
+      "summary": "A guided service that checks the security settings on a client's computers and home or office network, explains what it finds in plain English, and helps fix it.",
+      "sections": [
+        {
+          "heading": "How it works",
+          "items": [
+            "An AI assistant reviews each device against a hardening checklist built by IT7Q",
+            "Findings are ranked by risk and explained without jargon",
+            "Fixes are applied with the client's say-so, then checked again"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Checklists for Windows, Android and home routers are being written",
+            "Pilot with existing managed clients first"
+          ]
+        }
+      ],
+      "notes": "Drafted from the public card and the Resources hardening guides; Chris to confirm scope and timing."
+    },
+    "P-MSP-01": {
+      "summary": "Managed protection for Windows computers: Microsoft Defender hardened and tuned as the main shield, backed by IT7Q's own monitoring and an AI-assisted triage step that checks alerts before a person does.",
+      "sections": [
+        {
+          "heading": "What clients get",
+          "items": [
+            "Defender configured to a hardened standard, not left on defaults",
+            "On-demand malware scanning as a second opinion",
+            "An IT7Q tray icon and a simple protection dashboard on each computer",
+            "Alerts reach IT7Q's own messaging system (Nexus), so nothing waits in a shared inbox"
+          ]
+        },
+        {
+          "heading": "Why it's different",
+          "items": [
+            "Alerts are triaged in-house by IT7Q's own AI (Andromeda) first; an outside AI service is used only when genuinely needed, so client data stays with IT7Q",
+            "Priced for homes and small businesses: target $68 a year per device, including GST"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Built for Windows fleets first",
+            "Being piloted on IT7Q's own monitored devices"
+          ]
+        }
+      ]
+    },
+    "P-MSP-02": {
+      "summary": "A small app that signs a client's device up to IT7Q managed protection in one click, without opening any connection into the client's network.",
+      "sections": [
+        {
+          "heading": "Why it matters",
+          "items": [
+            "No inbound access, no router changes, nothing exposed to the internet",
+            "Takes the fiddly enrolment steps away from the client"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Working enrolment service built",
+            "Pilot on IT7Q's existing four-device monitored fleet"
+          ]
+        }
+      ]
+    },
+    "P-MSP-03": {
+      "summary": "Round-the-clock security monitoring across a client's computers, run on IT7Q's own self-hosted monitoring platform rather than a resold cloud service.",
+      "sections": [
+        {
+          "heading": "What it covers",
+          "items": [
+            "Security events collected from Windows, macOS and Linux computers",
+            "Automatic alerting into IT7Q's automation and messaging systems",
+            "Plain-English follow-up when something needs doing"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "Running today on IT7Q's own devices",
+            "Sign-up guides written per platform; Chromebooks have known limits that are explained up front"
+          ]
+        }
+      ]
+    },
+    "P-MSP-04": {
+      "summary": "One place for clients to raise a support ticket, see their devices and read help articles, built in-house so it joins up with the rest of IT7Q's tools.",
+      "sections": [
+        {
+          "heading": "Roadmap",
+          "items": [
+            "Stage 1: tickets and devices in a clean app (in progress)",
+            "Stage 2: a searchable knowledge base and FAQ",
+            "Stage 3: built into the Athena Browser with single sign-on",
+            "Stage 4: an AI support layer: automatic first-level triage, escalation, device-aware answers, queue watching and service-level alerts"
+          ]
+        },
+        {
+          "heading": "Built with",
+          "items": [
+            "A cross-platform app with its own back end and database, all self-hosted"
+          ]
+        }
+      ]
+    },
+    "P-MSP-05": {
+      "summary": "A server health monitor that watches performance and availability around the clock and raises problems before staff notice them.",
+      "sections": [
+        {
+          "heading": "What it watches",
+          "items": [
+            "Uptime, slow-downs and failing services",
+            "Disk, memory and processor pressure",
+            "Alerts in plain English, with the likely cause"
+          ]
+        }
+      ],
+      "notes": "No detail in the build pack. Drafted from the public card; Chris to add features and status."
+    }
+  }
+}

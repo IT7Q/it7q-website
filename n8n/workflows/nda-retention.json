@@ -1,0 +1,72 @@
+{
+  "name": "IT7Q nda-retention",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "15 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "411db25a-0685-591f-ade2-81d10c3e14dc",
+      "name": "Daily 03:15",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT web.retention('{}'::jsonb) AS r",
+        "options": {}
+      },
+      "id": "80ff6da1-2bed-5553-bc7b-b6f950fd7a4f",
+      "name": "Retention",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        220,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "it7q-postgres",
+          "name": "Postgres it7q_web"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 03:15": {
+      "main": [
+        [
+          {
+            "node": "Retention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Australia/Brisbane",
+    "saveManualExecutions": false,
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "saveExecutionProgress": false
+  },
+  "pinData": {},
+  "meta": {
+    "generatedBy": "tools/n8n_build.py; edit n8n/code/ and rebuild, not this file"
+  }
+}
