@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v9, 28 Oct 2026. Phases 1–3 built** (Phase 3: About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v10, 29 Oct 2026. Phases 1–3 built; Phase 3b planned** (§2.4–2.6): v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -8,7 +8,8 @@ Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 ## 0. Bottom line
 
 - **Multi-page static site** on **Cloudflare Pages (free plan)**. Brand = the **April 2026 business card** (Q37): four circles in cyan/lime/purple/orange on navy `#0D1B2A`. The circle **shapes** come from the `_brand/` pack emblem; **none of the pack colours are used**. Copy and layout ideas come from v2. The structure, forms and NDA gate are rebuilt.
-- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory is **70 cards** (§2.1), all public, 38 of them FABRICUS.
+- **Every project in every division gets a public card**: image + brief description + "why it's unique". Full detail sits behind the NDA wall. The inventory is **71 cards** (§2.1), all public, 38 of them FABRICUS. IT7Q stays at **seven divisions**: MERCATOR is a section of MSP, not a division.
+- **Coming-soon pages, no back ends** (29 Oct): Shop (MERCATOR), Media, News (HERALD) and the Athena CE download page are placeholders on this site. The store, the video/podcast platform and the HERALD app are separate projects (§2.6).
 - **Every raster image is watermarked at build time** with the master mark (§5.1): PNG, JPEG and WebP. Sources stay clean; `tools/check.py` fails on any unmarked image in `dist/`. Pillow is the build's one pinned dependency, needed only for JPEG/WebP (Q43).
 - **Gated detail never ships in the static site.** It lives server-side (Postgres, read by n8n) and only reaches the browser after an approved login. Any failure keeps the page locked.
 - **No secrets in the site.** Protection comes from server-side checks in n8n, Turnstile, rate limits and a Cloudflare-injected edge header.
@@ -128,6 +129,15 @@ Kept for the record. The packs used a different palette from the card; Chris cho
 | — | **Coming soon (MSP)**: "AI-powered security hardening for your small business and home". A card on the MSP page plus a teaser on Home. Public wording follows §4.9 (no WireGuard, tunnels, Agent Smith or internal tooling). |
 | — | **Testimonials** (28 Oct): a Home section driven by `src/data/testimonials.json`, consent recorded per entry, shown only when there are approved entries (§2.3). Chris fills in the real quotes; I never write any. |
 | — | **T3 Guard images** come from earlier marketing renders (Chris). Placeholder until then. |
+| 48 | **About page approved exactly as written** (29 Oct): the 2020 / Kallangur / four kids paragraph. **That paragraph isn't in the repo yet**: the page still has the Q48 placeholder. Chris pastes the approved text and I drop it in word for word (Q51). |
+| — | **Staff link** (29 Oct): one small "Staff" link in the footer only, pointing to a single URL that will sit behind Cloudflare Access. Placeholder until Chris gives the URL (Q52). The link text is just "Staff": no internal hostnames, service names or tool names anywhere on the public site. |
+| — | **MERCATOR** (29 Oct): **not a new division**; IT7Q stays at seven (the "7" in the name). MERCATOR is MSP's **"Parts, Sales & Service"** section: a featured **Coming soon** card on the MSP page (P-MSP-07) and a **Shop** page in the main nav. Store: `shop.it7q.com.au` (separate build, §2.6). Launch categories: Networking, Office Peripherals, Storage Solutions, plus **"Supply + Install"** bundles. **No supplier names, prices or margins.** |
+| — | **Resources** (29 Oct): recommended FOSS software (15 entries) + the **Guides** section (IT7Q Client Education Series + device-hardening manuals). Download buttons go to each project's **official** download page; IT7Q never hosts binaries (§2.4). |
+| — | **Media** (IT7Q's own self-hosted video channel + podcast) and **News** (**HERALD**, IT7Q's own tech-news and updates feed): **Coming soon** placeholder pages only (§2.6). |
+| — | **Credentials** page: Chris's qualifications and certifications, from a list he supplies; **no individual unit details** (Q53). |
+| — | **Footer social links**: Facebook, Instagram (`@it7q_qld`), LinkedIn, X, YouTube, Google Business, TikTok (URLs to come; Q54), plus the WhatsApp button. |
+| — | **Athena Browser Customer Edition**: a **Coming soon** download page. |
+| — | **PORTUS public wording**: presented as a **community safety tool**. Any domestic-violence use case is **gated detail only**, so the public card never puts a user at risk (§2.5). |
 
 ---
 
@@ -148,6 +158,13 @@ Home users first, small business second, all in plain English.
 /divisions/domus/         ┘
 /portfolio/               Client websites: p1–p7 past clients (snapshots) + p8 Niuleaf (current); p9 reserved
 /services/                "How we can help": plain-English services + enquiry form
+/shop/                    MERCATOR (MSP Parts, Sales & Service): Coming soon        [main nav]
+/resources/               Recommended FOSS software + Guides (§2.4)               [main nav]
+/resources/guides/<slug>/ One guide: view in browser + PDF download
+/media/                   Video channel + podcast: Coming soon                     [footer]
+/news/                    HERALD tech news and updates: Coming soon                [footer]
+/credentials/             Chris's qualifications and certifications              [footer + About]
+/athena/                  Athena Browser Customer Edition download: Coming soon     [OPUS card + footer]
 /contact/                 Phone, info@, WhatsApp/Messenger, short form
 /access/                  NDA: read, request access, log in, log out
 /investors/               Investor & partner area: shell page, all content gated (per-person access)
@@ -182,6 +199,13 @@ Home users first, small business second, all in plain English.
 - **About**: story (Est. 2020, Kallangur, Australian owned & operated), mission, four values (from v2), photo placeholders IMG-29/IMG-30, and a visible placeholder for a few lines from Chris (Q48).
 - **Legal**: Privacy and Terms are plain-English drafts that state the §4.10 retention periods, no cookies, cookieless analytics, Turnstile and `sessionStorage`. The NDA page shows `src/legal/nda-1.0.md` with its version and SHA-256. All three carry a "Draft, being checked by a lawyer" note (Q36).
 - **Portfolio**: §2.2.
+- **Main nav** (v10): Home · Divisions · Services · Shop · Portfolio · Resources · About · Contact. Chris asked for Shop; I've added Resources too, since it's the biggest new page. Media, News, Credentials and Athena sit in the footer. Chris checks the order in the preview.
+- **Footer** (v10): contact facts, then a **social row** (Facebook, Instagram `@it7q_qld`, LinkedIn, X, YouTube, Google Business, TikTok, as plain text-labelled links with `rel="noopener"`; no third-party scripts, embeds or widgets, so the CSP stays as is), the **WhatsApp button** (`wa.me/61411753366`, Q49), the footer page links, and a small **"Staff"** link. Social URLs live in `site.json`; an entry with no URL yet isn't rendered (so no dead links ship), and the launch check fails if any is still empty.
+- **Shop / MERCATOR**: "Coming soon": IT7Q's hardware store (`shop.it7q.com.au`, shown as text, not linked until it's live). Three launch categories (Networking, Office Peripherals, Storage Solutions) as simple tiles, and a "Supply + Install" panel: *we sell the gear and install it*. CTA: the enquiry form with service "Parts, sales & service". No supplier names, prices or margins (the price guard already fails on any `$`).
+- **Media**: "Coming soon": IT7Q's own video channel and podcast, self-hosted. Placeholder only; no YouTube or podcast embeds.
+- **News**: "Coming soon": **HERALD**, IT7Q's own tech-news and updates feed. Placeholder only.
+- **Credentials**: a list from `src/data/credentials.json` (title, issuer, year; optional "in progress"). Whole qualifications and certifications only, **no individual units**. Placeholder entries until Chris's list arrives (Q53). Linked from About and the footer.
+- **Athena CE**: "Coming soon": Athena Browser Customer Edition. No download button until there's a signed build and a hosting decision (Q56). The OPUS Athena card links here.
 - **Parked**: client portal dashboard, admin portal login, Neo evaluation workflow, WordPress (§9).
 
 ### 2.1 Project inventory (public card list)
@@ -214,6 +238,9 @@ The card text (one-liner + "why it's unique") lives in `src/data/projects.json`.
 | P-MSP-04 | IT7Q Support Portal | In development | build pack, v2 |
 | P-MSP-05 | IT7Q SysMon (server health monitoring) | In development | v2 |
 | P-MSP-06 | **AI-powered security hardening for your small business and home** (featured on Home) | **Coming soon** | Chris (27 Oct) |
+| P-MSP-07 | **MERCATOR — Parts, Sales & Service** (featured, links to `/shop/`): IT7Q's hardware store for networking, office peripherals and storage, with Supply + Install bundles | **Coming soon** | Chris (29 Oct) |
+
+MERCATOR is a section **of MSP**, not a division. Its badge uses the MSP colour and master shapes; no new division colour, page or badge-row entry. It has no "Full details under NDA" line.
 
 P-MSP-06 public wording is plain English only: what it does for the customer (finds and fixes weak security settings, with AI help). It never names tooling, agents, tunnels or WireGuard (§4.9). `tools/check.py` enforces this on all of `dist/` (§3, public-wording guard).
 
@@ -260,6 +287,8 @@ Public tier cards show only the tier name, a one-liner and who it's for. Prices,
 | P-POR-01 | PORTUS community safety network (absorbs K.I.T.S.) | In design | build pack, business plan |
 | P-POR-02 | PORTUS App | In development | v2 |
 | P-POR-03 | PORTUS Jnr (child-safe version) | In development | v2 |
+
+**PORTUS wording (29 Oct)**: every public line presents PORTUS as a **community safety tool** (neighbours, verified safe places, calling for help fast). Any domestic-violence use case lives **only in gated detail** (§4.9), so someone glancing at a phone or browser history sees nothing that puts a user at risk. The current public lines already fit; v10 adds a guard (§3) so they stay that way.
 
 **FABRICUS — Craft & Making (woodcraft & digital manufacturing)**
 | ID | Project | Status | Source |
@@ -315,7 +344,7 @@ Shared "why it's unique" for the range (from the build pack): *bespoke, maker's-
 |---|---|---|---|
 | P-DOM-01 | Smart, segmented, private home setup | Documented / service | build pack, business plan |
 
-**Totals**: MSP 6 · OPUS 11 · MENTIS 5 · TEMPESTAS 6 · PORTUS 3 · FABRICUS 38 (35 range + 3) · DOMUS 1 = **70 cards**, all public.
+**Totals**: MSP 7 · OPUS 11 · MENTIS 5 · TEMPESTAS 6 · PORTUS 3 · FABRICUS 38 (35 range + 3) · DOMUS 1 = **71 cards**, all public. The hero stats ("7 divisions", "50+ projects") are unchanged.
 
 Retired, so no card: original single-tenant Calendi for Pine Rivers RSL, and the NEXUS division (3CX/NBN), replaced by OPUS.
 
@@ -373,6 +402,72 @@ Chris has real testimonials. They live in `src/data/testimonials.json`:
 - **Consent guard** (`tools/check.py`): fails if **any** entry, approved or not, lacks `consent.recorded` (a real date, not in the future) or `consent.method` (`email`, `written`, `form` or `sms`). It also fails if an entry has no quote, has neither a name nor a business, or if an unapproved quote appears in `dist/`.
 - **Rules**: I never write or paraphrase a testimonial. The repo ships with an empty `entries` list and an `_example` block showing the shape. Any key starting with `_` is ignored.
 
+### 2.4 Resources and Guides (29 Oct)
+
+**Recommended software** (`src/data/resources.json`). Each entry: name, **what it is**, **why use it** (plain English, my drafts for Chris to check), a link to the matching IT7Q guide (where one exists), and a **Download** button to the project's **official** download page. **IT7Q never hosts binaries**: no `.exe`, `.msi`, `.dmg`, `.apk`, `.zip` etc. in `dist/`, and the buttons go only to official sites.
+
+| Software | Official download page (I check each before the build) | Guide |
+|---|---|---|
+| Bitwarden | `bitwarden.com/download/` | ch. 1 |
+| LibreOffice | `libreoffice.org/download/` | ch. 3 |
+| OnlyOffice | `onlyoffice.com` (desktop editors download) | ch. 3 |
+| Thunderbird | `thunderbird.net` | ch. 8 |
+| GIMP | `gimp.org/downloads/` | ch. 8 |
+| Krita | `krita.org` (download page) | ch. 8 |
+| Inkscape | `inkscape.org/release/` | ch. 8 |
+| darktable | `darktable.org/install/` | ch. 8 |
+| Joplin | `joplinapp.org` (download page) | ch. 8 |
+| 7-Zip | `7-zip.org/download.html` | ch. 8 |
+| Nextcloud | `nextcloud.com/install/` | ch. 4 |
+| ClamAV | `clamav.net/downloads` | ch. 5 |
+| Pi-hole | `docs.pi-hole.net` (install page) | ch. 6 |
+| WireGuard | `wireguard.com/install/` | ch. 7 |
+| Jitsi | `jitsi.org/downloads/` | ch. 8 |
+
+- **Download-link guard** (`tools/check.py`): every Download URL must be `https://` and on that entry's allow-listed official domain (kept in `resources.json`), and no binary/archive file may appear in `dist/`. Download links open with `rel="noopener noreferrer"`.
+- Pi-hole's official quick install pipes a script into a shell. The guide shows the "download, read, then run" method instead.
+- **Wording clash, needs Chris (Q55)**: the public-wording guard (§3) bans **ClamAV** and **WireGuard** on public pages, so the site never hints at IT7Q's own stack. Chris now wants both listed. Plan: allow those two names **only** inside `/resources/` and the guide pages, as general recommendations for the reader, never "we use" or "our". The guard stays as is everywhere else (division pages, Services, Shop, the MSP hardening card).
+
+**Guides** (`src/data/guides.json`), on the Resources page. Each guide: **view in browser** + **PDF download**. Chris supplies the files; placeholders until then.
+
+*IT7Q Client Education Series* (11 chapters):
+1. Bitwarden
+2. Windows backup & recovery
+3. LibreOffice vs Microsoft Office
+4. Private cloud storage
+5. ClamAV
+6. Pi-hole
+7. WireGuard
+8. More FOSS tools
+9. Why FOSS
+10. Windows 11 editions
+11. Windows 11 privacy & security
+
+*Device-hardening manuals*: one per platform. The list of platforms comes from Chris (Q57).
+
+- **View in browser**: if Chris supplies HTML or Markdown, each guide gets its own page (`/resources/guides/<slug>/`), built like the legal pages, so it's accessible and searchable. If he supplies only PDFs, "View" opens the PDF in the browser's own viewer. No embedded PDF viewer, so the CSP doesn't change.
+- **PDFs** are served from `/resources/guides/pdf/`. Before they ship, `tools/check.py` scans each PDF for metadata (author, file paths, creator tool) and for the banned infrastructure words (§4.9), and fails if it finds any. Chris exports with metadata stripped.
+
+### 2.5 PORTUS discretion guard
+
+`tools/check.py` fails if any public file (`src/`, `dist/`) mentions domestic or family violence, abuse, refuges, escaping or similar wording near "PORTUS". Those words are allowed only in `gated/portus.json`. The public card, page title, meta description and image alt text all stay on "community safety".
+
+### 2.6 Website pages now vs separate future builds
+
+| Item | On this site at launch | Separate future project (not part of this site's launch) |
+|---|---|---|
+| MERCATOR | MSP featured card + `/shop/` Coming soon page | **The store itself** at `shop.it7q.com.au`: catalogue, cart, payments, stock |
+| Media | `/media/` Coming soon page | **Self-hosted video and podcast hosting** |
+| HERALD | `/news/` Coming soon page | **The HERALD app/feed** (publishing, RSS, archive) |
+| Athena CE | `/athena/` Coming soon page | Signed builds, a hosting decision, update channel (Q56) |
+| Resources | Full page: 15 software entries | — |
+| Guides | Section + guide pages; placeholders until Chris's files arrive | — |
+| Credentials | Full page; placeholders until Chris's list arrives | — |
+| Staff link | Footer link to one URL | The Cloudflare Access app behind it (Chris) |
+| Social links | Footer row; empty ones hidden | — |
+
+The separate projects get their own plans and repos. Nothing on this site depends on them, and their "Coming soon" pages link nowhere until each one is live.
+
 ---
 
 ## 3. Reuse from v2 vs rebuild
@@ -399,6 +494,9 @@ src/                 page sources + partials
   data/portfolio.json  p1–p9, published flag, snapshot_live flag
   data/services.json   public services list
   data/testimonials.json  quotes + recorded consent (§2.3)
+  data/resources.json  FOSS entries + official download domains (§2.4)
+  data/guides.json     Education Series chapters + hardening manuals (§2.4)
+  data/credentials.json  Chris's qualifications/certifications, no units (§2)
   assets/css|js|fonts|img
   assets/img/brand/mark.svg  four circle shapes, derived from the pack emblem, no colours
   _headers           security headers for Pages
@@ -435,7 +533,11 @@ _brand/              brand pack zips (git-ignored)
 - **Consent guard** (§2.3): every testimonial needs recorded consent.
 - **Font licence guard** (Q40): every shipped font needs its family's OFL file beside it.
 - **Pack-colour guard** (Q37): none of the pack hex values may appear in `src/` or `dist/`.
-- **Public-wording guard** (§4.9): `dist/` must not mention WireGuard, `wg0`, tunnels, cloudflared, Agent Smith, Wazuh, Velociraptor, ClamAV, n8n or internal hostnames (`*.nubius.com.au`). The webhook origin is allowed only in `_headers` and the JS config once Phase 3 adds it.
+- **Public-wording guard** (§4.9): `dist/` must not mention WireGuard, `wg0`, tunnels, cloudflared, Agent Smith, Wazuh, Velociraptor, ClamAV, n8n or internal hostnames (`*.nubius.com.au`). The webhook origin is allowed only in `_headers` and the JS config once Phase 3 adds it. v10: ClamAV and WireGuard allowed only under `/resources/`, pending Q55 (§2.4).
+- **Download-link guard** (v10, §2.4): Download buttons only to allow-listed official domains over HTTPS; no binaries or archives in `dist/`.
+- **Guide PDF guard** (v10, §2.4): no metadata and no banned words in shipped PDFs.
+- **PORTUS discretion guard** (v10, §2.5).
+- **Footer guard** (v10): exactly one "Staff" link, in the footer only, never in the nav or sitemap; its URL must be `https://` and not an internal hostname.
 
 ---
 
@@ -631,7 +733,9 @@ Screenshots are taken from the static snapshots (§6.3), so they match what the 
 | P-FAB-001…035, P-FAB-101…103 | 38 | F-001–F-035 product photos (real photos week of 2 Nov) + FABRICUS App, FORMAE, BIONICUS |
 | P-DOM-01 | 1 | Generic smart-home photo |
 
-That's **70 project images**, all watermarked at build (§5.1).
+Plus P-MSP-07 (MERCATOR: a generic photo of networking gear and peripherals, no brand logos visible). That's **71 project images**, all watermarked at build (§5.1).
+
+**v10 pages**: IMG-41 Shop category tiles ×3 (Networking, Office Peripherals, Storage Solutions; 800×500), IMG-42 Media/HERALD/Athena Coming soon art (HTML/CSS, no raster needed), IMG-43 software logos on Resources: **text only, no third-party logos**, to avoid trademark questions.
 
 **Gated** (served only via `nda-content`, never in `dist/`): G-<project-id> detail images where useful, ≤ 300 KB each, as data URIs. Investor presentation assets: G-INV-xx.
 
@@ -706,9 +810,10 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 1. ✅ **Phase 1 (27 Oct)**: `src/` structure with stub pages for every route, build/check tools with unit tests, watermark pipeline, brand tokens, base CSS, header/footer, placeholder component, animated logo, Home (hero stats, badge row, coming-soon teaser). Preview: §7.1.
 2. ✅ **Phase 2 (28 Oct, scope set by Chris)**: Divisions index + 7 division pages with all 70 cards from `projects.json`, MENTIS services list, Portfolio (`portfolio.json`), Services (`services.json`), Home testimonials (`testimonials.json`, consent guard). Plus Q40 fonts and Q43 JPEG/WebP watermarking. All images are placeholders.
 3. ✅ **Phase 3 (28 Oct)**: About, Contact (+ enquiry form), Privacy, Terms and NDA pages (drafts, legal check pending); NDA front end: `/access/` (read + sign + request, login, logged-in state), locked panels on every card, the gated-detail renderer with watermark, the logout bar, the `/investors/` locked shell; `tools/preview.py` mock with failure scenarios (§4.12).
+3b. **Phase 3b (v10 scope, next)**: MERCATOR card (P-MSP-07) + `/shop/`; `/resources/` with the 15 software entries + Guides section and guide pages (placeholders); `/media/`, `/news/`, `/athena/` Coming soon pages; `/credentials/`; nav update; footer social row, WhatsApp button and Staff link; About text from Q51; the four v10 guards (§3) with tests.
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
 5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
-6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text or "Draft" legal note.
+6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
 
 ### 7.1 Previewing locally
@@ -733,16 +838,23 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–43 and 47 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
+**Answered**: 1–43, 47 and 48 (see §1a; Q48 still needs the text, Q51). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
 
 **Still open**
 36. **Legal check** before launch: the NDA (`src/legal/nda-1.0.md`, reviewer notes in `docs/nda-draft.md`), plus the new Privacy and Terms drafts.
 44. **Proposed extra stats** (§2): approve any of the five, or none.
 45. **Card copy**: check the one-liners and "why it's unique" lines on the division pages, especially my drafts (TEMPESTAS "who it's for", COLLOQUIUM, PORTUS App/Jnr, FABRICUS App/FORMAE/BIONICUS) and the MENTIS automations list.
 46. **BlueVibes Music (p6)**: a few words on what it is, for a better one-liner. **Niuleaf (p8)**: the one-liner you said you'd supply.
-48. **About page**: a few lines from you on how IT7Q started and who's behind it (placeholder on the page now).
-49. **Messaging**: is WhatsApp on 0411 753 366 (the Contact page links `wa.me/61411753366`)? And the Facebook Messenger page link, if you want it listed.
+49. **Messaging**: is WhatsApp on 0411 753 366 (the Contact page and now the footer link `wa.me/61411753366`)? And the Facebook Messenger page link, if you want it listed.
 50. **Pillow on Pantheon**: `.venv/` has no pip yet; fix in §7.1 (needs `sudo`).
+51. **About text**: please paste the approved 2020 / Kallangur / four kids paragraph. It isn't in the repo, and I won't rewrite it from memory.
+52. **Staff URL**: the one URL the footer "Staff" link points to (the Cloudflare Access app). Ideally on an `it7q.com.au` name, so no internal hostname shows.
+53. **Credentials list**: qualifications and certifications (title, issuer, year), no units.
+54. **Social URLs**: Facebook, Instagram (`@it7q_qld` → `instagram.com/it7q_qld`?), LinkedIn, X, YouTube, Google Business, TikTok.
+55. **ClamAV / WireGuard on Resources**: OK to allow just those two names under `/resources/` only (§2.4)? The alternative is to keep them off the public site and put their entries and guides behind the NDA.
+56. **Athena CE**: when there's a build, where will it be hosted (e.g. the existing `downloads.it7q.com.au`), and will it be code-signed?
+57. **Hardening manuals**: which platforms (e.g. Windows 11, macOS, iPhone/iPad, Android, Linux, routers)?
+58. **Webhook hostname**: "no internal hostnames anywhere" vs the webhook origin `hooks.nubius.com.au`, which the browser has to call and so appears in `config.js` and the CSP. Keep it, or move the public webhooks to an `it7q.com.au` name (a Cloudflare change for you, later)?
 
 ---
 
@@ -751,7 +863,8 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - Admin portal login: better as a bookmark behind Cloudflare Access.
 - Neo website-evaluation workflow.
 - WordPress version: superseded.
-- Blog + Downloads, if fewer than 2–3 posts are ready at launch (Q17).
+- Blog + Downloads, if fewer than 2–3 posts are ready at launch (Q17). (HERALD may end up replacing the blog; decide when HERALD is planned.)
+- **Separate future builds** (§2.6), each with its own plan and repo: the **MERCATOR store** (`shop.it7q.com.au`), **self-hosted video/podcast hosting**, the **HERALD app**, and Athena CE distribution.
 
 ---
 
@@ -767,3 +880,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **27 Oct 2026: plan v7 + Phase 1.** Brand = business card. Phase 1 scaffold, tools and Home committed.
 - **28 Oct 2026: plan v8 + Phase 2.** Q40–Q43 answered, portfolio details, testimonials. Phase 2 built: cards, Portfolio, Services, testimonials, TTF fonts, JPEG/WebP watermarking.
 - **28 Oct 2026: plan v9 + Phase 3.** Q47 answered. About, Contact, Legal, NDA front end, enquiry form, local mock. NDA text moved to `src/legal/nda-1.0.md`.
+- **29 Oct 2026: plan v10.** Chris's new scope folded in: MERCATOR (MSP section) + Shop, Resources + Guides, Media, News (HERALD), Credentials, Athena CE page, footer Staff/social links, PORTUS discretion. Phase 3b planned; separate future builds listed in §2.6.
