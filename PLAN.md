@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v10, 29 Oct 2026. Phases 1–3 built; Phase 3b planned** (§2.4–2.6): v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v11, 29 Oct 2026. Phases 1–3 built; Phase 3b being built.** v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -129,13 +129,13 @@ Kept for the record. The packs used a different palette from the card; Chris cho
 | — | **Coming soon (MSP)**: "AI-powered security hardening for your small business and home". A card on the MSP page plus a teaser on Home. Public wording follows §4.9 (no WireGuard, tunnels, Agent Smith or internal tooling). |
 | — | **Testimonials** (28 Oct): a Home section driven by `src/data/testimonials.json`, consent recorded per entry, shown only when there are approved entries (§2.3). Chris fills in the real quotes; I never write any. |
 | — | **T3 Guard images** come from earlier marketing renders (Chris). Placeholder until then. |
-| 48 | **About page approved exactly as written** (29 Oct): the 2020 / Kallangur / four kids paragraph. **That paragraph isn't in the repo yet**: the page still has the Q48 placeholder. Chris pastes the approved text and I drop it in word for word (Q51). |
-| — | **Staff link** (29 Oct): one small "Staff" link in the footer only, pointing to a single URL that will sit behind Cloudflare Access. Placeholder until Chris gives the URL (Q52). The link text is just "Staff": no internal hostnames, service names or tool names anywhere on the public site. |
+| 48 / 51 | **About page approved** (29 Oct). Chris's paragraph (founded 2020 by Chris Lord, Kallangur, four kids, diploma in IT Systems Administration) replaces the placeholder **word for word** (Q51). |
+| — | **Staff link** (29 Oct): one small "Staff" link in the footer only, pointing to a single URL that will sit behind Cloudflare Access. URL: **`https://staff.it7q.com.au`** (Q52), behind Cloudflare Access, set up by Chris at launch. The link text is just "Staff": no internal hostnames, service names or tool names anywhere on the public site. |
 | — | **MERCATOR** (29 Oct): **not a new division**; IT7Q stays at seven (the "7" in the name). MERCATOR is MSP's **"Parts, Sales & Service"** section: a featured **Coming soon** card on the MSP page (P-MSP-07) and a **Shop** page in the main nav. Store: `shop.it7q.com.au` (separate build, §2.6). Launch categories: Networking, Office Peripherals, Storage Solutions, plus **"Supply + Install"** bundles. **No supplier names, prices or margins.** |
 | — | **Resources** (29 Oct): recommended FOSS software (15 entries) + the **Guides** section (IT7Q Client Education Series + device-hardening manuals). Download buttons go to each project's **official** download page; IT7Q never hosts binaries (§2.4). |
 | — | **Media** (IT7Q's own self-hosted video channel + podcast) and **News** (**HERALD**, IT7Q's own tech-news and updates feed): **Coming soon** placeholder pages only (§2.6). |
 | — | **Credentials** page: Chris's qualifications and certifications, from a list he supplies; **no individual unit details** (Q53). |
-| — | **Footer social links**: Facebook, Instagram (`@it7q_qld`), LinkedIn, X, YouTube, Google Business, TikTok (URLs to come; Q54), plus the WhatsApp button. |
+| — | **Footer social links**: Facebook, Instagram (`@it7q_qld`), LinkedIn, X, YouTube, Google Business, TikTok (Instagram: `https://www.instagram.com/it7q_qld` (Q54); the rest to come), plus the WhatsApp button. |
 | — | **Athena Browser Customer Edition**: a **Coming soon** download page. |
 | — | **PORTUS public wording**: presented as a **community safety tool**. Any domestic-violence use case is **gated detail only**, so the public card never puts a user at risk (§2.5). |
 
@@ -204,8 +204,8 @@ Home users first, small business second, all in plain English.
 - **Shop / MERCATOR**: "Coming soon": IT7Q's hardware store (`shop.it7q.com.au`, shown as text, not linked until it's live). Three launch categories (Networking, Office Peripherals, Storage Solutions) as simple tiles, and a "Supply + Install" panel: *we sell the gear and install it*. CTA: the enquiry form with service "Parts, sales & service". No supplier names, prices or margins (the price guard already fails on any `$`).
 - **Media**: "Coming soon": IT7Q's own video channel and podcast, self-hosted. Placeholder only; no YouTube or podcast embeds.
 - **News**: "Coming soon": **HERALD**, IT7Q's own tech-news and updates feed. Placeholder only.
-- **Credentials**: a list from `src/data/credentials.json` (title, issuer, year; optional "in progress"). Whole qualifications and certifications only, **no individual units**. Placeholder entries until Chris's list arrives (Q53). Linked from About and the footer.
-- **Athena CE**: "Coming soon": Athena Browser Customer Edition. No download button until there's a signed build and a hosting decision (Q56). The OPUS Athena card links here.
+- **Credentials**: a list from `src/data/credentials.json` (title, issuer, year; optional "in progress"). Whole qualifications and certifications only, **no individual units**. Placeholder entries until Chris's list arrives (Q53, later). Linked from About and the footer.
+- **Athena CE**: "Coming soon": Athena Browser Customer Edition. No download button until there's a signed build and a hosting decision (Q56, later). The OPUS Athena card links here.
 - **Parked**: client portal dashboard, admin portal login, Neo evaluation workflow, WordPress (§9).
 
 ### 2.1 Project inventory (public card list)
@@ -426,7 +426,7 @@ Chris has real testimonials. They live in `src/data/testimonials.json`:
 
 - **Download-link guard** (`tools/check.py`): every Download URL must be `https://` and on that entry's allow-listed official domain (kept in `resources.json`), and no binary/archive file may appear in `dist/`. Download links open with `rel="noopener noreferrer"`.
 - Pi-hole's official quick install pipes a script into a shell. The guide shows the "download, read, then run" method instead.
-- **Wording clash, needs Chris (Q55)**: the public-wording guard (§3) bans **ClamAV** and **WireGuard** on public pages, so the site never hints at IT7Q's own stack. Chris now wants both listed. Plan: allow those two names **only** inside `/resources/` and the guide pages, as general recommendations for the reader, never "we use" or "our". The guard stays as is everywhere else (division pages, Services, Shop, the MSP hardening card).
+- **ClamAV / WireGuard (Q55, decided)**: the public-wording guard (§3) still bans both names on every public page **except** `/resources/` and the guide pages (incl. guide PDFs), where they appear only as general recommendations for the reader. There, any sentence naming them that also says "we use", "we run", "our setup/servers/network" or similar fails the check. Everything else (division pages, Services, Shop, the MSP hardening card) stays blocked.
 
 **Guides** (`src/data/guides.json`), on the Resources page. Each guide: **view in browser** + **PDF download**. Chris supplies the files; placeholders until then.
 
@@ -443,7 +443,7 @@ Chris has real testimonials. They live in `src/data/testimonials.json`:
 10. Windows 11 editions
 11. Windows 11 privacy & security
 
-*Device-hardening manuals*: one per platform. The list of platforms comes from Chris (Q57).
+*Device hardening & setup manuals* (Q57), one guide each: **Windows**, **Chromebook**, **Android**, **iPhone/iPad**, **macOS**, **Ubuntu**, plus three cross-platform guides: **Family & Multi-User**, **Security Hardening Checklist**, **Ongoing Maintenance**. Windows and Android are written (Chris supplies the files); the rest are placeholders.
 
 - **View in browser**: if Chris supplies HTML or Markdown, each guide gets its own page (`/resources/guides/<slug>/`), built like the legal pages, so it's accessible and searchable. If he supplies only PDFs, "View" opens the PDF in the browser's own viewer. No embedded PDF viewer, so the CSP doesn't change.
 - **PDFs** are served from `/resources/guides/pdf/`. Before they ship, `tools/check.py` scans each PDF for metadata (author, file paths, creator tool) and for the banned infrastructure words (§4.9), and fails if it finds any. Chris exports with metadata stripped.
@@ -533,7 +533,7 @@ _brand/              brand pack zips (git-ignored)
 - **Consent guard** (§2.3): every testimonial needs recorded consent.
 - **Font licence guard** (Q40): every shipped font needs its family's OFL file beside it.
 - **Pack-colour guard** (Q37): none of the pack hex values may appear in `src/` or `dist/`.
-- **Public-wording guard** (§4.9): `dist/` must not mention WireGuard, `wg0`, tunnels, cloudflared, Agent Smith, Wazuh, Velociraptor, ClamAV, n8n or internal hostnames (`*.nubius.com.au`). The webhook origin is allowed only in `_headers` and the JS config once Phase 3 adds it. v10: ClamAV and WireGuard allowed only under `/resources/`, pending Q55 (§2.4).
+- **Public-wording guard** (§4.9): `dist/` must not mention WireGuard, `wg0`, tunnels, cloudflared, Agent Smith, Wazuh, Velociraptor, ClamAV, n8n or internal hostnames (`*.nubius.com.au`). The webhook origin is allowed only in `_headers` and the JS config once Phase 3 adds it. v10: ClamAV and WireGuard allowed only under `/resources/` (Q55, §2.4). **v11 (Q58)**: the webhook base is one value, `hooks` in `src/data/endpoints.json`; the build writes it into `config.js` and the CSP in `_headers`, and the check allows that exact value only there. Once Chris switches it to `https://forms.it7q.com.au/webhook` (Phase 6), `nubius` is no longer allowed anywhere in `dist/`, `_headers` included.
 - **Download-link guard** (v10, §2.4): Download buttons only to allow-listed official domains over HTTPS; no binaries or archives in `dist/`.
 - **Guide PDF guard** (v10, §2.4): no metadata and no banned words in shipped PDFs.
 - **PORTUS discretion guard** (v10, §2.5).
@@ -763,7 +763,10 @@ Nameservers are already on Cloudflare, so the zone is managed there. Adding a cu
 | `tc` / `rb` / `pr` / `aa.it7q.com.au` | Old portfolio names | Proxied placeholder record + redirect rule → `p1`–`p4` | §6.3 step 7 |
 | `downloads.it7q.com.au` | Existing (build pack) | unchanged | Confirm it stays |
 | MX / SPF / DKIM / DMARC | noreply@ and info@ on MXRoute | MXRoute | Check SPF/DKIM cover MXRoute's sending hosts |
-| `hooks.nubius.com.au` | Webhooks | Existing cloudflared tunnel | Different domain; no change |
+| `hooks.nubius.com.au` | Webhooks today | Existing cloudflared tunnel | Replaced for the public site by `forms.it7q.com.au` before launch (Q58) |
+| `forms.it7q.com.au` | Public webhook base (Q58) | Same tunnel, `/webhook/*` only, edge header + Turnstile as §4.2 | Chris, Phase 6; then `endpoints.json` → `https://forms.it7q.com.au/webhook` |
+| `staff.it7q.com.au` | Footer "Staff" link (Q52) | Behind Cloudflare Access | Chris, at launch |
+| `shop.it7q.com.au` | MERCATOR store | — | Separate future build (§2.6); no record until then |
 
 Turnstile needs no DNS, just the widget's allowed hostnames (`it7q.com.au`, `www`, the preview origin).
 
@@ -810,10 +813,10 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 1. ✅ **Phase 1 (27 Oct)**: `src/` structure with stub pages for every route, build/check tools with unit tests, watermark pipeline, brand tokens, base CSS, header/footer, placeholder component, animated logo, Home (hero stats, badge row, coming-soon teaser). Preview: §7.1.
 2. ✅ **Phase 2 (28 Oct, scope set by Chris)**: Divisions index + 7 division pages with all 70 cards from `projects.json`, MENTIS services list, Portfolio (`portfolio.json`), Services (`services.json`), Home testimonials (`testimonials.json`, consent guard). Plus Q40 fonts and Q43 JPEG/WebP watermarking. All images are placeholders.
 3. ✅ **Phase 3 (28 Oct)**: About, Contact (+ enquiry form), Privacy, Terms and NDA pages (drafts, legal check pending); NDA front end: `/access/` (read + sign + request, login, logged-in state), locked panels on every card, the gated-detail renderer with watermark, the logout bar, the `/investors/` locked shell; `tools/preview.py` mock with failure scenarios (§4.12).
-3b. **Phase 3b (v10 scope, next)**: MERCATOR card (P-MSP-07) + `/shop/`; `/resources/` with the 15 software entries + Guides section and guide pages (placeholders); `/media/`, `/news/`, `/athena/` Coming soon pages; `/credentials/`; nav update; footer social row, WhatsApp button and Staff link; About text from Q51; the four v10 guards (§3) with tests.
+3b. **Phase 3b (v10 scope, building 29 Oct)**: MERCATOR card (P-MSP-07) + `/shop/`; `/resources/` with the 15 software entries + Guides section and guide pages (placeholders); `/media/`, `/news/`, `/athena/` Coming soon pages; `/credentials/`; nav update; footer social row, WhatsApp button and Staff link; About text from Q51; the four v10 guards (§3) with tests.
 4. Gated content: feature-level `gated/` JSON (§4.9, Chris reviews), the n8n workflows (five webhooks + `nda-retention`), SQL, `deploy/` docs for Chris to review.
 5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
-6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
+6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: webhook base → `https://forms.it7q.com.au/webhook` in `endpoints.json` (Q58), Cloudflare Access on `staff.it7q.com.au` (Q52), Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
 
 ### 7.1 Previewing locally
@@ -838,7 +841,7 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–43, 47 and 48 (see §1a; Q48 still needs the text, Q51). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
+**Answered**: 1–43, 47, 48, 51, 52, 54 (Instagram), 55, 57 and 58 (see §1a). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
 
 **Still open**
 36. **Legal check** before launch: the NDA (`src/legal/nda-1.0.md`, reviewer notes in `docs/nda-draft.md`), plus the new Privacy and Terms drafts.
@@ -847,14 +850,10 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 46. **BlueVibes Music (p6)**: a few words on what it is, for a better one-liner. **Niuleaf (p8)**: the one-liner you said you'd supply.
 49. **Messaging**: is WhatsApp on 0411 753 366 (the Contact page and now the footer link `wa.me/61411753366`)? And the Facebook Messenger page link, if you want it listed.
 50. **Pillow on Pantheon**: `.venv/` has no pip yet; fix in §7.1 (needs `sudo`).
-51. **About text**: please paste the approved 2020 / Kallangur / four kids paragraph. It isn't in the repo, and I won't rewrite it from memory.
-52. **Staff URL**: the one URL the footer "Staff" link points to (the Cloudflare Access app). Ideally on an `it7q.com.au` name, so no internal hostname shows.
-53. **Credentials list**: qualifications and certifications (title, issuer, year), no units.
-54. **Social URLs**: Facebook, Instagram (`@it7q_qld` → `instagram.com/it7q_qld`?), LinkedIn, X, YouTube, Google Business, TikTok.
-55. **ClamAV / WireGuard on Resources**: OK to allow just those two names under `/resources/` only (§2.4)? The alternative is to keep them off the public site and put their entries and guides behind the NDA.
-56. **Athena CE**: when there's a build, where will it be hosted (e.g. the existing `downloads.it7q.com.au`), and will it be code-signed?
-57. **Hardening manuals**: which platforms (e.g. Windows 11, macOS, iPhone/iPad, Android, Linux, routers)?
-58. **Webhook hostname**: "no internal hostnames anywhere" vs the webhook origin `hooks.nubius.com.au`, which the browser has to call and so appears in `config.js` and the CSP. Keep it, or move the public webhooks to an `it7q.com.au` name (a Cloudflare change for you, later)?
+53. **Credentials list** (later): qualifications and certifications (title, issuer, year), no units.
+54. **Social URLs** (rest to come): Facebook, LinkedIn, X, YouTube, Google Business, TikTok. Instagram is done.
+56. **Athena CE** (later): where the build will be hosted, and whether it's code-signed.
+59. **Guide files**: Windows and Android hardening guides, then the Education Series chapters, as Markdown/HTML for view-in-browser plus a PDF each, with metadata stripped.
 
 ---
 
@@ -881,3 +880,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **28 Oct 2026: plan v8 + Phase 2.** Q40–Q43 answered, portfolio details, testimonials. Phase 2 built: cards, Portfolio, Services, testimonials, TTF fonts, JPEG/WebP watermarking.
 - **28 Oct 2026: plan v9 + Phase 3.** Q47 answered. About, Contact, Legal, NDA front end, enquiry form, local mock. NDA text moved to `src/legal/nda-1.0.md`.
 - **29 Oct 2026: plan v10.** Chris's new scope folded in: MERCATOR (MSP section) + Shop, Resources + Guides, Media, News (HERALD), Credentials, Athena CE page, footer Staff/social links, PORTUS discretion. Phase 3b planned; separate future builds listed in §2.6.
+- **29 Oct 2026: plan v11.** Q51, Q52, Q54, Q55, Q57, Q58 answered.
