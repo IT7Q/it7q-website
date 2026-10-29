@@ -3,7 +3,12 @@
 const wh = $('Webhook POST').first().json;
 const viewer = verifyAccess(wh, $input.first().json);
 if (!viewer) return page(403, 'Not allowed', '<p class="msg err">This page needs a Cloudflare Access login.</p>');
-if (header(wh.headers, 'origin') !== CFG.hook_origin) {
+const origin = header(wh.headers, 'origin');
+if (origin === 'null') {  // n8n's own sandbox CSP reached the browser: the step 6g Cloudflare rule is missing
+  return page(403, 'Not allowed', '<p class="msg err">Refused: the page arrived without the IT7Q security policy '
+    + '(DEPLOY.md step 6g). Nothing was changed.</p>');
+}
+if (origin !== CFG.hook_origin) {
   return page(403, 'Not allowed', '<p class="msg err">Changes can only be made from the review page itself.</p>');
 }
 const b = wh.body || {};

@@ -1,6 +1,6 @@
 // ---- common.js: shared by every IT7Q Code node (PLAN.md §4). tools/n8n_build.py pastes
 // this above each step, with CFG filled in from deploy/config.json, src/data/forms.json and
-// the NDA. Needs NODE_FUNCTION_ALLOW_BUILTIN=crypto on n8n (DEPLOY.md step 3).
+// the NDA. Needs `crypto` allowed in the n8n task runner (DEPLOY.md step 3).
 const crypto = require('crypto');
 const CFG = __CONFIG__;
 

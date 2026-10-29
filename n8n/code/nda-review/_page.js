@@ -1,5 +1,5 @@
 // ---- nda-review/_page.js: HTML for the review pages (pasted after common.js in this workflow).
-// The Page node sends these with a CSP of default-src 'none', no-store and no-referrer.
+// Sent with no-store and no-referrer; the CSP (default-src 'none') is set by Cloudflare (DEPLOY.md 6g).
 const REVIEW_URL = CFG.hook_base + '/nda-review';
 function page(status, title, inner) {
   return [{ json: { go: false, status, html: '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">'

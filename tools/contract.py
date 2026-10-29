@@ -12,6 +12,7 @@ workflows through Cloudflare:
 --email   also sends one real NDA request and one enquiry from that address (emails go out).
 --login   logs in as an approved viewer (asks for the password) and checks every division,
           the investor area, logout, and that the token is dead afterwards.
+--password-stdin   with --login: read the password from the first line of stdin (DEPLOY.md 9b).
 --prod    the Turnstile test secret must be gone: Cloudflare's dummy token must be refused.
 --turnstile TOKEN  token to send (default: Cloudflare's dummy token; the mock wants "mock-token").
 --origin ORIGIN    send this Origin and require it back in Access-Control-Allow-Origin.
@@ -206,7 +207,11 @@ def main(argv):
     turnstile = arg(argv, "--turnstile") or DUMMY_TOKEN
     login = None
     if arg(argv, "--login"):
-        login = (arg(argv, "--login"), getpass.getpass("Password for %s: " % arg(argv, "--login")))
+        who = arg(argv, "--login")
+        if "--password-stdin" in argv:  # run through sudo -u claude, where getpass can't reach the terminal
+            login = (who, sys.stdin.readline().rstrip("\r\n"))
+        else:
+            login = (who, getpass.getpass("Password for %s: " % who))
     contract = Contract(Client(argv[0], origin=arg(argv, "--origin")), turnstile)
     return 1 if contract.run(email=arg(argv, "--email"), login=login, prod="--prod" in argv) else 0
 

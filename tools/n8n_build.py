@@ -8,6 +8,7 @@ The JavaScript lives in n8n/code/ as plain files so it can be reviewed; this scr
 n8n/code/common.js (with CFG filled in from deploy/config.json, src/data/forms.json and the
 NDA) above each step and wires the nodes together. The output is what Chris imports into n8n
 (DEPLOY.md step 7). Credentials are referenced by name only; n8n links them on import.
+Node versions are checked against n8n 2.40.7 (DEPLOY.md, "Versions").
 """
 import base64
 import hashlib
@@ -28,11 +29,16 @@ NS = uuid.UUID("6f1c2b8e-58a4-4b7e-9a51-1f0c7d3e2a10")  # stable ids, so rebuild
 
 TURNSTILE_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 NO_STORE = {"name": "Cache-Control", "value": "no-store"}
+# n8n 2.x replaces any CSP on a webhook reply with its own `sandbox` policy (no allow-same-origin),
+# so the review form would post with Origin: null and be refused. Cloudflare sets this policy on
+# the way out instead (DEPLOY.md step 6g); n8n sends it too, for when its sandbox is off.
+REVIEW_CSP = ("default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; "
+              "base-uri 'none'; sandbox allow-forms allow-same-origin")
 PAGE_HEADERS = [
     {"name": "Content-Type", "value": "text/html; charset=utf-8"},
     NO_STORE,
-    {"name": "Content-Security-Policy",
-     "value": "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"},
+    {"name": "Content-Security-Policy", "value": REVIEW_CSP},
+    {"name": "X-Frame-Options", "value": "DENY"},
     {"name": "Referrer-Policy", "value": "no-referrer"},  # the review link carries its token
     {"name": "X-Content-Type-Options", "value": "nosniff"},
     {"name": "X-Robots-Tag", "value": "noindex"},

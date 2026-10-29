@@ -1,4 +1,6 @@
 """tools/contract.py passes against the mock, and can fail (PLAN.md §4.12, DEPLOY.md step 9)."""
+import contextlib
+import io
 import shutil
 import sys
 import tempfile
@@ -49,6 +51,19 @@ class ContractAgainstMock(unittest.TestCase):
         failures = self.run_contract(login=("investor@example.test", preview.MOCK_PASSWORD))
         self.assertEqual(failures, [], "\n".join(self.lines))
         self.assertTrue(any("investor area unlocks" in line for line in self.lines))
+
+    def test_password_from_stdin(self):
+        # DEPLOY.md 9b pipes the password in through sudo -u claude.
+        out = io.StringIO()
+        old = sys.stdin
+        sys.stdin = io.StringIO(preview.MOCK_PASSWORD + "\n")
+        try:
+            with contextlib.redirect_stdout(out):
+                code = contract.main([self.base, "--turnstile", "mock-token", "--login", "approved@example.test",
+                                      "--password-stdin"])
+        finally:
+            sys.stdin = old
+        self.assertEqual(code, 0, out.getvalue())
 
     def test_it_can_fail(self):
         self.mock.scenario = "down"

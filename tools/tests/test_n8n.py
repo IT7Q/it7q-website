@@ -157,6 +157,29 @@ class Workflows(unittest.TestCase):
         division = next(f for f in js["forms"]["enquiry"]["fields"] if f["name"] == "division")
         self.assertIn("fabricus", division["options"])
 
+    def test_node_versions_checked_against_n8n_2_40(self):
+        # Checked against the n8n 2.40.7 source (DEPLOY.md, "Versions"). A new node or version
+        # here means checking it again before Chris imports it.
+        checked = {("webhook", 2), ("code", 2), ("if", 2), ("httpRequest", 4.2), ("postgres", 2.5),
+                   ("emailSend", 2.1), ("respondToWebhook", 1.1), ("scheduleTrigger", 1.2)}
+        for name in self.wf:
+            for n in self.nodes(name).values():
+                self.assertIn((n["type"].split(".")[-1], n["typeVersion"]), checked, "%s/%s" % (name, n["name"]))
+
+    def test_review_page_policy_is_the_one_cloudflare_sets(self):
+        # n8n 2.x overwrites the CSP with its sandbox; DEPLOY.md 6g puts this one back at the edge.
+        csp = n8n_build.REVIEW_CSP
+        self.assertIn("sandbox allow-forms allow-same-origin", csp)
+        self.assertNotIn("allow-scripts", csp)
+        for n in self.nodes("nda-review").values():
+            if n["type"].endswith("respondToWebhook"):
+                self.assertIn({"name": "Content-Security-Policy", "value": csp},
+                              n["parameters"]["options"]["responseHeaders"]["entries"])
+        doc = (ROOT / "deploy/DEPLOY.md").read_text(encoding="utf-8")
+        self.assertIn("\n%s\n" % csp, doc)
+        post = (ROOT / "n8n/code/nda-review/verify-post.js").read_text(encoding="utf-8")
+        self.assertIn("origin === 'null'", post)  # refused, with a pointer to 6g
+
     def test_dummy_hash_is_well_formed(self):
         h = n8n_build.dummy_hash()
         check = re.search(r"password_hash ~ '(.*?)'\)", SQL["02-schema.sql"]).group(1).replace("\\$", r"\$")
@@ -260,3 +283,17 @@ class Deploy(unittest.TestCase):
             counts[div] = counts.get(div, 0) + 1
         expected = ", ".join("%s %d" % kv for kv in sorted(counts.items()))
         self.assertTrue(expected in " ".join(doc.split()), "DEPLOY.md step 8 should list: " + expected)
+
+    def test_deploy_doc_uses_pantheon_names_and_no_repo_access_for_chris(self):
+        doc = (ROOT / "deploy/DEPLOY.md").read_text(encoding="utf-8")
+        for placeholder in ("<postgres>", "<n8n>", "<pg-superuser>", "wget -", "python3 tools/"):
+            self.assertNotIn(placeholder, doc)
+        for path in SQL:
+            self.assertIn("sudo cat /srv/work/it7q-website/deploy/sql/%s | sudo docker exec -i postgres psql -U it7q"
+                          % path, doc)
+        for script in ("n8n_build.py", "gated_sql.py", "contract.py"):
+            self.assertIn("sudo -u claude /srv/work/it7q-website/.venv/bin/python /srv/work/it7q-website/tools/"
+                          + script, doc)
+        self.assertIn("rua=mailto:dmarc@it7q.com.au", doc)
+        self.assertIn("x._domainkey", doc)
+        self.assertIn("--password-stdin", doc)

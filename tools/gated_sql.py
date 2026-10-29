@@ -2,7 +2,10 @@
 """Turn gated/*.json into the SQL that loads web.nda_content (PLAN.md §4.9, DEPLOY.md step 8).
 
     python3 tools/gated_sql.py --validate      # shape and coverage only (tests use this)
-    python3 tools/gated_sql.py > gated.sql     # refuses unless every file says "reviewed": true
+    python3 tools/gated_sql.py                 # SQL on stdout; refuses unless every file says "reviewed": true
+
+DEPLOY.md step 8 pipes stdout straight into psql (sudo -u claude ... | sudo docker exec -i postgres
+psql ...), so the gated text never lands in a file outside the repo.
 
 The SQL replaces the whole table in one transaction, as it7q_web_owner. 'notes' fields are
 for Chris and are dropped here, so they never reach the database or the site.
