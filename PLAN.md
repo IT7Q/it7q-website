@@ -831,7 +831,7 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 4. ✅ **Phase 4 (29 Oct)**: gated content (`gated/`, awaiting Chris's review, Q63), the n8n workflows (five webhooks + `nda-retention`), SQL with a self-test, the contract test, and `deploy/DEPLOY.md` (§4.13). Deploying it is Chris's, following DEPLOY.md.
 5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
 6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: webhook base → `https://forms.it7q.com.au/webhook` in `endpoints.json` (Q58), Cloudflare Access on `staff.it7q.com.au` (Q52), Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
-   **Prepared 3 Nov (v15)**: webhook base switched (the build now refuses a nubius base); `PLACEHOLDER-turnstile-site-key` in `endpoints.json` (the build writes an empty key, so forms fail closed); `check.py --launch` fails on a missing/placeholder site key or a legal draft note (empty social URLs and the Staff URL were already guarded in every build); `deploy/LAUNCH.md` (Direct Upload, apex + www redirect, staff placeholder behind Access, post-launch checks). Pillow hashes (Q47) are no longer needed for Pages, since the build runs on Pantheon. Waiting on: the site key (Q66) and the legal check (Q36).
+   **Prepared 3 Nov (v15)**: webhook base switched (the build now refuses a nubius base); `PLACEHOLDER-turnstile-site-key` in `endpoints.json` (the build writes an empty key, so forms fail closed); `check.py --launch` fails on a missing/placeholder site key or a legal draft note (empty social URLs and the Staff URL were already guarded in every build); `deploy/LAUNCH.md` (Direct Upload, apex + www redirect, staff placeholder behind Access, post-launch checks). Pillow hashes (Q47) are no longer needed for Pages, since the build runs on Pantheon. Site key set 3 Nov (Q66). Waiting on: the legal check (Q36), the only `--launch` gate still failing.
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
 
 ### 7.1 Previewing locally
@@ -856,7 +856,7 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–43, 47, 48, 51, 52, 50 (`.venv/` now has pip and Pillow 12.0.0, checked 29 Oct), 54 (all but Google Business), 55, 57, 58, 60, 61, 62, 64 (Access team `it7qqld`, the review app's AUD tag, login `chris@it7q.com.au`; in `deploy/config.json`) and 65 (n8n 2.40.7 with `n8n-runners`, Postgres 17.11, superuser `it7q`; see §4.13). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
+**Answered**: 1–43, 47, 48, 51, 52, 50 (`.venv/` now has pip and Pillow 12.0.0, checked 29 Oct), 54 (all but Google Business), 55, 57, 58, 60, 61, 62, 66 (Turnstile site key `0x4AAAAAAFtgBBWih0dvAPoY`, public, in `endpoints.json`), 64 (Access team `it7qqld`, the review app's AUD tag, login `chris@it7q.com.au`; in `deploy/config.json`) and 65 (n8n 2.40.7 with `n8n-runners`, Postgres 17.11, superuser `it7q`; see §4.13). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
 
 **Still open**
 36. **Legal check** before launch: the NDA (`src/legal/nda-1.0.md`, reviewer notes in `docs/nda-draft.md`), plus the new Privacy and Terms drafts.
@@ -869,7 +869,6 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 56. **Athena CE** (later): where the build will be hosted, and whether it's code-signed.
 59. **Guide files**: Windows and Android hardening guides, then the Education Series chapters, as Markdown/HTML for view-in-browser plus a PDF each, with metadata stripped.
 63. **Gated content review**: read `gated/*.json` (entries with `notes` are my drafts where the build pack was thin: MSP-05/06, OPUS-10/11, MEN-05, the T1–T5 tier details, PORTUS, FABRICUS App/BIONICUS). Edit or tell me changes, then set `"reviewed": true` per file.
-66. **Turnstile site key** (LAUNCH.md step 1): public, starts `0x`; I put it in `endpoints.json`.
 
 ---
 
@@ -908,3 +907,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **29 Oct 2026: Phase 4 revised for n8n 2.40.7 (Q65).** Node versions checked against the 2.40.7 source; review-page CSP moved to a Cloudflare response rule (DEPLOY.md 6g); `contract.py --password-stdin`; DEPLOY.md rewritten with real container names, `sudo cat | psql` for SQL, `[chris · sudo]` / `[claude]` / `[browser]` tags, a `node`-based test 7a, DMARC `rua` on `dmarc@` and DKIM selector `x`.
 - **2 Nov 2026: Q64 answered; DEPLOY steps 1–6 done by Chris** (6a–6g deployed; 6a test 404s, Access redirects to `it7qqld.cloudflareaccess.com`). Access team and AUD tag set in `deploy/config.json`; workflows rebuilt for step 7.
 - **3 Nov 2026: Phase 6 prepared.** DEPLOY steps 1–7 done (8 deferred). Webhook base → `forms.it7q.com.au`, nubius refused, site-key placeholder, `check.py --launch`, `deploy/LAUNCH.md` (Direct Upload recommended), `deploy/staff/` placeholder. Q66 asked.
+- **3 Nov 2026: Q66 answered.** Turnstile site key in `endpoints.json`; `check.py --launch` now fails only on the legal draft notes (Q36). `contract.py` paces live runs under the 6e burst rule (DEPLOY 9a hit 429s).
