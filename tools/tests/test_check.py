@@ -1,5 +1,6 @@
 """Each guard in tools/check.py must actually fire. Builds once, then breaks a copy of dist/."""
 import datetime
+import html
 import json
 import re
 import shutil
@@ -12,6 +13,7 @@ from pathlib import Path
 
 TOOLS = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(TOOLS))
+import build  # noqa: E402
 import check  # noqa: E402
 import pngmark  # noqa: E402
 
@@ -226,10 +228,24 @@ class CheckGuards(unittest.TestCase):
 
     def test_launch_gates(self):
         self.assertEqual(check.run(self.dist).failures, [])
-        out = "\n".join(check.run(self.dist, launch=True).failures)
-        self.assertNotIn("turnstile_site_key is", out)  # the real key (Q66) is set and built in
-        self.assertNotIn("built without the site key", out)
-        self.assertIn("legal/nda/index.html: launch: still marked as a legal draft", out)
+        self.assertEqual(check.run(self.dist, launch=True).failures, [])  # key set (Q66), launch decision made
+
+        def launch_after(rel, transform):
+            f = self.dist / rel
+            original = f.read_text(encoding="utf-8")
+            f.write_text(transform(original), encoding="utf-8")
+            try:
+                return "\n".join(check.run(self.dist, launch=True).failures)
+            finally:
+                f.write_text(original, encoding="utf-8")
+
+        out = launch_after("legal/terms/index.html", lambda s: s.replace(
+            "</main>", '<p class="draft-note">Draft. Being checked by a lawyer.</p></main>'))
+        self.assertIn("legal/terms/index.html: launch: still marked as a legal draft", out)
+        out = launch_after("legal/privacy/index.html", lambda s: s.replace("Last updated:", "Updated"))
+        self.assertIn("legal/privacy/index.html: launch: no 'Last updated: <date>' line", out)
+        out = launch_after("access/index.html", lambda s: s.replace("nda-explainer", "x"))
+        self.assertIn("access/index.html: launch: no 'How access works' box", out)
         out = self.with_endpoints("PLACEHOLDER-turnstile-site-key")
         self.assertIn("launch: turnstile_site_key is 'PLACEHOLDER-turnstile-site-key'", out)
         out = self.with_endpoints("0x4AAAAAAAexampleKey00")
@@ -309,3 +325,31 @@ class ConsentGuard(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NdaExplainer(unittest.TestCase):
+    """The 'How access works' box quotes the NDA word for word (3 Nov launch decision)."""
+
+    def test_quotes_are_the_ndas_own_words(self):
+        nda = build.load_nda()
+        plain = " ".join(nda["text"].replace("**", "").split())
+        for page in ("access/index.html", "legal/nda/index.html"):
+            text = (ROOT / "dist" / page).read_text(encoding="utf-8")
+            box = re.search(r'<div class="panel-box nda-explainer">.*?</div>', text, re.S).group(0)
+            quotes = [html.unescape(q) for q in re.findall(r"<q>(.*?)</q>", box)]
+            self.assertGreaterEqual(len(quotes), 8, page)
+            for q in quotes:
+                self.assertIn(" ".join(q.split()), plain, page)
+            for words in ("three (3) years", "two (2) years after the Term ends", "trade secret",
+                          "within a few business days"):
+                self.assertIn(words, box, page)
+
+    def test_explainer_refuses_a_misquote(self):
+        ctx = {"nda": build.load_nda()}
+        with self.assertRaises(build.BuildError):
+            build.nda_quote(ctx, "runs for five (5) years")
+
+    def test_every_nda_version_needs_a_date(self):
+        with self.assertRaises(build.BuildError):
+            build.load_legal({"version": "9.9", "sha256": "", "text": ""})
+        self.assertEqual(build.load_legal(build.load_nda())["nda"], "28 October 2026")

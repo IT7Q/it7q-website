@@ -1,0 +1,6 @@
+{
+ "_about": "When each legal text last changed (PLAN.md §4.7). Pages show these as 'Last updated: <date>'. Change a date only when that text changes. 'nda' is keyed by NDA version: a new src/legal/nda-<version>.md needs its date here, or the build fails (re-acceptance, PLAN.md §4.14).",
+ "privacy": "2026-10-28",
+ "terms": "2026-10-28",
+ "nda": {"1.0": "2026-10-28"}
+}

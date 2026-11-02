@@ -14,6 +14,7 @@ Anything unresolved fails the build. Raster images are watermarked on the way
 to dist/ (§5.1); sources in src/ are never modified. Stdlib only, except that
 JPEG/WebP sources need Pillow (requirements.txt, Q43).
 """
+import datetime
 import hashlib
 import html
 import json
@@ -591,7 +592,7 @@ def c_nda_text(ctx):
 
 def c_nda_text_embedded(ctx):
     return (
-        '<div class="legal-text legal-text--scroll" tabindex="0" role="region" aria-label="NDA text">%s</div>'
+        '<div class="legal-text legal-text--scroll" id="nda-text" tabindex="0" role="region" aria-label="NDA text">%s</div>'
         % render_md(ctx["nda"]["text"], top=3)
     )
 
@@ -603,9 +604,88 @@ def c_nda_meta(ctx):
     )
 
 
-def c_legal_draft(ctx):
-    return ('<p class="draft-note"><strong>Draft.</strong> This text is being checked by a lawyer '
-            "before the site launches, so it may still change.</p>")
+def load_legal(nda):
+    """Last-updated dates for the legal texts (src/data/legal.json); every NDA version needs one."""
+    legal = load_json("legal.json")
+    dates = {"privacy": legal["privacy"], "terms": legal["terms"], "nda": legal["nda"].get(nda["version"])}
+    if not dates["nda"]:
+        raise BuildError("src/data/legal.json: no date for NDA version %s" % nda["version"])
+    out = {}
+    for doc, value in dates.items():
+        try:
+            d = datetime.date.fromisoformat(value)
+        except ValueError:
+            raise BuildError("src/data/legal.json: %s date %r is not YYYY-MM-DD" % (doc, value))
+        out[doc] = "%d %s" % (d.day, d.strftime("%B %Y"))
+    return out
+
+
+def c_legal_updated(ctx):
+    doc = ctx["meta"].get("legal_doc", "")
+    if doc not in ctx["legal"]:
+        raise BuildError("legal_updated: page needs legal_doc: privacy, terms or nda")
+    return '<p class="legal-meta">Last updated: %s</p>' % esc(ctx["legal"][doc])
+
+
+def nda_quote(ctx, text):
+    """A phrase quoted word for word from the current NDA (the build fails if the NDA doesn't say it)."""
+    plain = " ".join(ctx["nda"]["text"].replace("**", "").split())
+    if " ".join(text.split()) not in plain:
+        raise BuildError("nda_explainer: the NDA %s doesn't say %r; update the box" % (ctx["nda"]["version"], text))
+    return "<q>%s</q>" % esc(text)
+
+
+def c_nda_explainer(ctx):
+    """"How access works" (§4.3): plain English, with the NDA's terms quoted from its own text."""
+    q = lambda t: nda_quote(ctx, t)  # noqa: E731
+    on_access_page = ctx["meta"].get("nda_explainer") == "access"
+    read = ('Read <a href="#nda-text">the full NDA below</a> before you sign. You can also '
+            '<a href="/legal/nda/">open it on its own page</a>.' if on_access_page else
+            'The full NDA is below. To sign it, use the form on the '
+            '<a href="/access/#request-heading">investors &amp; partners page</a>.')
+    return (
+        '<div class="panel-box nda-explainer">'
+        '<h2 class="nda-explainer__title">How access works</h2>'
+        '<ol class="mini-steps">'
+        "<li>You read the NDA and request access by signing it online.</li>"
+        "<li>We review every request manually, usually within a few business days.</li>"
+        "<li>If we approve it, we email you a login.</li>"
+        "<li>You log in, and the full project details unlock.</li>"
+        "</ol>"
+        "<h3>Why project details are locked</h3>"
+        "<p>The detailed information about our projects is confidential. We only share it under a "
+        "non-disclosure agreement (NDA).</p>"
+        "<h3>What you agree to</h3>"
+        "<p>In plain English: keep it confidential, use it only to consider working with or investing in "
+        "IT7Q, and don't copy or share it. In the NDA's own words, you agree to:</p>"
+        "<ul>"
+        "<li>%s;</li>"
+        "<li>%s, which is %s;</li>"
+        "<li>%s; and</li>"
+        "<li>%s.</li>"
+        "</ul>"
+        "<p>You can share it with your own employees or professional advisers only if they need it for the "
+        "Purpose and are bound by confidentiality duties at least as strict (clause 4).</p>"
+        "<h3>How long it lasts</h3>"
+        "<ul>"
+        "<li>The agreement %s from when you accept it (the <em>Term</em>).</li>"
+        "<li>%s. IT7Q can also end access earlier (clause 6).</li>"
+        "<li>Confidentiality continues after that: for trade secrets, %s, and for everything else, %s.</li>"
+        "</ul>"
+        "<p>%s</p>"
+        "</div>"
+        % (q("keep the Confidential Information confidential"),
+           q("use it only for the Purpose"),
+           q("to consider a possible investment, partnership, customer or supplier relationship, or other "
+             "business dealing with IT7Q"),
+           q("not copy, download, screenshot, record or reproduce it, except as reasonably needed for the Purpose"),
+           q("not share your login, or let anyone else use your access"),
+           q("runs for three (3) years"),
+           q("Your access to the protected area ends when the Term ends"),
+           q("for as long as it remains a trade secret"),
+           q("for two (2) years after the Term ends"),
+           read)
+    )
 
 
 def c_nda_bar(ctx):
@@ -671,7 +751,7 @@ def render_form(key, ctx):
     fid = "f-%s" % key.replace("_", "-")
     fields = "\n".join(form_field(key, f, ctx) for f in spec["fields"])
     return (
-        '<noscript><p class="draft-note">This form needs JavaScript. You can also call '
+        '<noscript><p class="note">This form needs JavaScript. You can also call '
         '<a href="{{site.phone_href}}">{{site.phone}}</a> or email <a href="mailto:{{site.email}}">{{site.email}}</a>.</p></noscript>'
         '<form class="form needs-js" id="%s" data-form="%s" data-hook="%s" data-turnstile-action="%s" '
         'data-success="%s" novalidate>'
@@ -721,7 +801,8 @@ COMPONENTS = {
     "nda_text": c_nda_text,
     "nda_text_embedded": c_nda_text_embedded,
     "nda_meta": c_nda_meta,
-    "legal_draft": c_legal_draft,
+    "legal_updated": c_legal_updated,
+    "nda_explainer": c_nda_explainer,
     "nda_bar": c_nda_bar,
     "form_nda_request": c_form_nda_request,
     "form_nda_login": c_form_nda_login,
@@ -946,12 +1027,13 @@ def build(mock=False):
     check_resources(resources, guides)
     mark_text, viewbox, sprite, favicon = load_mark()
     partials = {p.stem: p.read_text(encoding="utf-8") for p in (SRC / "partials").glob("*.html")}
+    nda = load_nda()
     base_ctx = {
         "site": site, "divisions": divisions, "sprite": sprite, "mark_viewbox": viewbox,
         "projects": projects, "project_index": {p["id"]: p for p in projects},
         "portfolio": load_json("portfolio.json"), "services": load_json("services.json"),
         "testimonials": approved_testimonials(load_json("testimonials.json")),
-        "forms": load_json("forms.json"), "nda": load_nda(),
+        "forms": load_json("forms.json"), "nda": nda, "legal": load_legal(nda),
         "lock_divisions": {d["slug"] for d in divisions} | {"investors"},
         "resources": resources, "guides_data": guides_data, "guides": guides,
         "credentials": check_credentials(load_json("credentials.json")),

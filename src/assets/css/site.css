@@ -382,8 +382,13 @@ p { margin: 0 0 1em; }
 .mock-banner { margin: 0; padding: 0.4rem var(--gutter); background: var(--orange); color: var(--navy); font-weight: 700; text-align: center; }
 
 /* ---------- Legal text */
-.draft-note { padding: 0.9rem 1.1rem; border-left: 4px solid var(--orange); background: var(--navy-2); border-radius: 0 var(--radius) var(--radius) 0; }
+.note { padding: 0.9rem 1.1rem; border-left: 4px solid var(--orange); background: var(--navy-2); border-radius: 0 var(--radius) var(--radius) 0; }
 .legal-meta { color: var(--text-muted); font-size: 0.9rem; }
+.nda-explainer { margin: 1.5rem 0; }
+.nda-explainer__title { font-size: 1.4rem; margin-top: 0; }
+.nda-explainer h3 { font-size: 1.1rem; margin: 1.2rem 0 0.4rem; }
+.nda-explainer ul { padding-left: 1.2rem; }
+.nda-explainer p:last-child { margin-bottom: 0; }
 .hash { font-size: 0.8rem; word-break: break-all; }
 .legal-text h2 { font-size: 1.5rem; margin-top: 2rem; }
 .legal-text h3 { font-size: 1.2rem; margin-top: 1.5rem; }

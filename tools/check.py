@@ -6,7 +6,8 @@
 --mock accepts a local mock build (tools/build.py --mock); without it the
 generated config must point at the production webhooks.
 --launch adds the production-upload gates (deploy/LAUNCH.md): a real Turnstile
-site key built in, the forms webhook base, and no legal page still marked draft.
+site key built in, the forms webhook base, no legal page marked draft, a
+'Last updated' date on Privacy, Terms and the NDA, and the 'How access works' box.
 
 Exits non-zero if anything fails. tools/build.py runs this after every build;
 LAUNCH.md runs it again with --launch before anything is uploaded.
@@ -83,7 +84,10 @@ PRICE = re.compile(r"\$\s?\d[\d,.]*")
 
 LAUNCH_HOOKS = "https://forms.it7q.com.au/webhook"  # Q58
 TURNSTILE_KEY = re.compile(r"0x[0-9A-Za-z_-]{16,}")  # Cloudflare site keys start 0x
-LEGAL_DRAFT = 'class="draft-note"'
+LEGAL_DRAFT = re.compile(r'class="draft-note"|being checked by a lawyer', re.I)
+# Launch decision (3 Nov, PLAN.md §4.7): no public draft notes; dated legal texts; the NDA explained up front
+LEGAL_DATED = ("legal/privacy/index.html", "legal/terms/index.html", "legal/nda/index.html")
+NDA_EXPLAINED = ("access/index.html", "legal/nda/index.html")
 
 
 def prod_hooks():
@@ -359,8 +363,16 @@ def check_launch(dist, r):
     if TURNSTILE_KEY.fullmatch(key) and '"turnstileSiteKey": %s' % json.dumps(key) not in config:
         r.fail(CONFIG_JS, "launch: built without the site key in endpoints.json; rebuild")
     for f in sorted(dist.rglob("*.html")):
-        if LEGAL_DRAFT in f.read_text(encoding="utf-8", errors="replace"):
+        if LEGAL_DRAFT.search(f.read_text(encoding="utf-8", errors="replace")):
             r.fail(str(f.relative_to(dist)), "launch: still marked as a legal draft (Q36)")
+    for page in LEGAL_DATED:
+        text = (dist / page).read_text(encoding="utf-8") if (dist / page).exists() else ""
+        if not re.search(r'<p class="legal-meta">Last updated: \d{1,2} [A-Z][a-z]+ \d{4}</p>', text):
+            r.fail(page, "launch: no 'Last updated: <date>' line")
+    for page in NDA_EXPLAINED:
+        text = (dist / page).read_text(encoding="utf-8") if (dist / page).exists() else ""
+        if 'class="panel-box nda-explainer"' not in text:
+            r.fail(page, "launch: no 'How access works' box before the NDA")
 
 
 def check_fonts(dist, r):
