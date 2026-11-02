@@ -1,6 +1,6 @@
 # IT7Q website rebuild — plan
 
-Status: **v14, 29 Oct 2026. Phases 1–4 built (3b, 3c included).** v14: Phase 4 revised for Pantheon's real setup (Q65: n8n 2.40.7 with external task runners, Postgres 17.11): node versions checked against 2.40.7, a Cloudflare response rule for the review page's CSP (n8n 2.x overwrites it), and DEPLOY.md rewritten with the real container names and who runs each step. v13: Phase 3c (About trim, footer social URLs; Q60, Q62 answered) and Phase 4: the back end as reviewable files (SQL, six n8n workflows, gated content, contract test) plus `deploy/DEPLOY.md`, Chris's step-by-step deploy guide (§4.13). Nothing is deployed yet; that's Chris's, step by step. v12 folds in Chris's answers to Q61 (About overlap) and the rest of Q54 (social URLs); Q60 is Chris's click-test, Q53 and Q59 still to come. The site changes they need are queued as Phase 3c (§7). v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
+Status: **v15, 3 Nov 2026. Phases 1–4 built (3b, 3c included); Phase 6 prepared, not deployed.** v15: DEPLOY.md steps 1–7 done by Chris (step 8 deferred); the webhook base switched to `forms.it7q.com.au` with a nubius guard; `check.py --launch` gates (real Turnstile site key, no legal draft note); hosting changed to Pages **Direct Upload** of a `dist/` built and checked on Pantheon (§6); `deploy/LAUNCH.md` and a staff placeholder (`deploy/staff/`) behind Access. v14: Phase 4 revised for Pantheon's real setup (Q65: n8n 2.40.7 with external task runners, Postgres 17.11): node versions checked against 2.40.7, a Cloudflare response rule for the review page's CSP (n8n 2.x overwrites it), and DEPLOY.md rewritten with the real container names and who runs each step. v13: Phase 3c (About trim, footer social URLs; Q60, Q62 answered) and Phase 4: the back end as reviewable files (SQL, six n8n workflows, gated content, contract test) plus `deploy/DEPLOY.md`, Chris's step-by-step deploy guide (§4.13). Nothing is deployed yet; that's Chris's, step by step. v12 folds in Chris's answers to Q61 (About overlap) and the rest of Q54 (social URLs); Q60 is Chris's click-test, Q53 and Q59 still to come. The site changes they need are queued as Phase 3c (§7). v11 folds in Chris's answers to Q51, Q52, Q54, Q55, Q57 and Q58 (Q53 and Q56 later). v10 adds Chris's 29 Oct scope: Shop (MERCATOR, inside MSP), Resources + Guides, Media, News (HERALD), Credentials, Athena CE download page, footer Staff + social links, and discreet PORTUS wording. The MERCATOR store, video/podcast hosting and the HERALD app are **separate future builds**, not part of this site's launch (§2.6). v9 built Phase 3 (About, Contact with the enquiry form, Legal pages, the NDA front end and a local mock of the webhooks; §4.12). v8 folds in Chris's answers to Q40–Q43: Pillow allowed for JPEG/WebP watermarking, TTF fonts in place, provisional division colours kept, portfolio details (current clients are only Niuleaf and Pro Energy Solutions). It also adds a consent-checked Testimonials section.
 Target: `it7q.com.au`, pure HTML/CSS/JS, no frameworks, Australian English.
 
 ---
@@ -757,12 +757,12 @@ Plus P-MSP-07 (MERCATOR: a generic photo of networking gear and peripherals, no 
 ## 6. Deployment approach
 
 **Cloudflare Pages, free plan.**
-- Private repo → Pages build command `pip install -r requirements.txt && python3 tools/build.py`, environment variable `PYTHON_VERSION=3.13` → publishes `dist/` only. `gated/`, `n8n/`, `deploy/`, `_brand/` and `_source/` never publish.
-- `_headers`: strict CSP (`default-src 'self'`; `script-src` self + `challenges.cloudflare.com` + `static.cloudflareinsights.com`; `connect-src` self + `https://hooks.nubius.com.au` + `https://cloudflareinsights.com`; `frame-src challenges.cloudflare.com`; `img-src 'self' data:`; `frame-ancestors 'none'`), HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy`.
+- **Direct Upload (v15, replaces Git integration)**: `dist/` is built and checked (`check.py --launch`) on Pantheon, copied to Chris's home folder and uploaded in the dashboard (`deploy/LAUNCH.md`). Cloudflare never sees the repo, so `gated/`, `n8n/`, `deploy/`, `_brand/` and `_source/` stay off third-party build servers; no API token, Node or GitHub app is needed. A Direct Upload project can't later switch to Git; that would be a new project.
+- `_headers`: strict CSP (`default-src 'self'`; `script-src` self + `challenges.cloudflare.com` + `static.cloudflareinsights.com`; `connect-src` self + `https://forms.it7q.com.au` (v15) + `https://cloudflareinsights.com`; `frame-src challenges.cloudflare.com`; `img-src 'self' data:`; `frame-ancestors 'none'`), HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy`.
 - **Cloudflare Web Analytics** (Q20): enabled on the Pages project. Cookieless, so no banner.
-- Preview deploys on `<project>.pages.dev` for testing.
+- First upload is checked on `it7q-website.pages.dev` before the custom domains go on (forms only work on `it7q.com.au`/`www`).
 - Free-plan limits: 500 builds/month, 20,000 files. Neither is an issue here.
-- Release flow: branch → PR → Chris reviews → merge to `main` → Pages deploys.
+- Release flow: I change, test and push → build + `check.py --launch` on Pantheon → Chris copies `dist/` and uploads it as a Production deployment → post-launch checks 8a–8d. Rollback is one click on an earlier deployment.
 
 ### 6.1 DNS: records needed (listed only; Chris decides and makes the changes)
 
@@ -831,6 +831,7 @@ Nothing in §6.3 touches DNS until Chris does steps 6–8.
 4. ✅ **Phase 4 (29 Oct)**: gated content (`gated/`, awaiting Chris's review, Q63), the n8n workflows (five webhooks + `nda-retention`), SQL with a self-test, the contract test, and `deploy/DEPLOY.md` (§4.13). Deploying it is Chris's, following DEPLOY.md.
 5. Investor content (the shell and its renderer exist since Phase 3); Blog + Downloads only if 2–3 posts are ready (Q17).
 6. QA (§6.2), preview deploy, Chris walk-through, DNS (Chris), go live. Launch switches: webhook base → `https://forms.it7q.com.au/webhook` in `endpoints.json` (Q58), Cloudflare Access on `staff.it7q.com.au` (Q52), Turnstile site key in `endpoints.json`, Pillow hashes in `requirements.txt` (Q47), a check that fails on any remaining PLACEHOLDER text, "Draft" legal note, empty social URL or placeholder Staff URL.
+   **Prepared 3 Nov (v15)**: webhook base switched (the build now refuses a nubius base); `PLACEHOLDER-turnstile-site-key` in `endpoints.json` (the build writes an empty key, so forms fail closed); `check.py --launch` fails on a missing/placeholder site key or a legal draft note (empty social URLs and the Staff URL were already guarded in every build); `deploy/LAUNCH.md` (Direct Upload, apex + www redirect, staff placeholder behind Access, post-launch checks). Pillow hashes (Q47) are no longer needed for Pages, since the build runs on Pantheon. Waiting on: the site key (Q66) and the legal check (Q36).
 7. Portfolio snapshots (§6.3), one site at a time. This can run alongside phases 2–6.
 
 ### 7.1 Previewing locally
@@ -868,10 +869,13 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 56. **Athena CE** (later): where the build will be hosted, and whether it's code-signed.
 59. **Guide files**: Windows and Android hardening guides, then the Education Series chapters, as Markdown/HTML for view-in-browser plus a PDF each, with metadata stripped.
 63. **Gated content review**: read `gated/*.json` (entries with `notes` are my drafts where the build pack was thin: MSP-05/06, OPUS-10/11, MEN-05, the T1–T5 tier details, PORTUS, FABRICUS App/BIONICUS). Edit or tell me changes, then set `"reviewed": true` per file.
+66. **Turnstile site key** (LAUNCH.md step 1): public, starts `0x`; I put it in `endpoints.json`.
 
 ---
 
 ## 9. Parked (pins)
+
+- `it7q-website.pages.dev` stays publicly reachable as a copy of the site after launch (Pages can't redirect it). Harmless; a canonical tag or a small check could come later.
 - Client portal dashboard / SSO (Jan spec): needs its own auth design and shouldn't advertise internal hostnames.
 - Admin portal login: better as a bookmark behind Cloudflare Access.
 - Neo website-evaluation workflow.
@@ -903,3 +907,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **29 Oct 2026: Phase 4 built.** SQL (roles, tables, nine definer functions, self-test), six n8n workflows generated from reviewable JS, gated content for 70 projects (unreviewed), contract test, `deploy/DEPLOY.md`. Q63–Q65 asked.
 - **29 Oct 2026: Phase 4 revised for n8n 2.40.7 (Q65).** Node versions checked against the 2.40.7 source; review-page CSP moved to a Cloudflare response rule (DEPLOY.md 6g); `contract.py --password-stdin`; DEPLOY.md rewritten with real container names, `sudo cat | psql` for SQL, `[chris · sudo]` / `[claude]` / `[browser]` tags, a `node`-based test 7a, DMARC `rua` on `dmarc@` and DKIM selector `x`.
 - **2 Nov 2026: Q64 answered; DEPLOY steps 1–6 done by Chris** (6a–6g deployed; 6a test 404s, Access redirects to `it7qqld.cloudflareaccess.com`). Access team and AUD tag set in `deploy/config.json`; workflows rebuilt for step 7.
+- **3 Nov 2026: Phase 6 prepared.** DEPLOY steps 1–7 done (8 deferred). Webhook base → `forms.it7q.com.au`, nubius refused, site-key placeholder, `check.py --launch`, `deploy/LAUNCH.md` (Direct Upload recommended), `deploy/staff/` placeholder. Q66 asked.
