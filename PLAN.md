@@ -855,7 +855,7 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 
 ## 8. Open questions for Chris
 
-**Answered**: 1–43, 47, 48, 51, 52, 50 (`.venv/` now has pip and Pillow 12.0.0, checked 29 Oct), 54 (all but Google Business), 55, 57, 58, 60, 61, 62 and 65 (n8n 2.40.7 with `n8n-runners`, Postgres 17.11, superuser `it7q`; see §4.13). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
+**Answered**: 1–43, 47, 48, 51, 52, 50 (`.venv/` now has pip and Pillow 12.0.0, checked 29 Oct), 54 (all but Google Business), 55, 57, 58, 60, 61, 62, 64 (Access team `it7qqld`, the review app's AUD tag, login `chris@it7q.com.au`; in `deploy/config.json`) and 65 (n8n 2.40.7 with `n8n-runners`, Postgres 17.11, superuser `it7q`; see §4.13). Q35's defaults are in the §2.1 table for Chris to correct later. Q39 and Q41 are checked in the preview.
 
 **Still open**
 36. **Legal check** before launch: the NDA (`src/legal/nda-1.0.md`, reviewer notes in `docs/nda-draft.md`), plus the new Privacy and Terms drafts.
@@ -868,7 +868,6 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 56. **Athena CE** (later): where the build will be hosted, and whether it's code-signed.
 59. **Guide files**: Windows and Android hardening guides, then the Education Series chapters, as Markdown/HTML for view-in-browser plus a PDF each, with metadata stripped.
 63. **Gated content review**: read `gated/*.json` (entries with `notes` are my drafts where the build pack was thin: MSP-05/06, OPUS-10/11, MEN-05, the T1–T5 tier details, PORTUS, FABRICUS App/BIONICUS). Edit or tell me changes, then set `"reviewed": true` per file.
-64. **Cloudflare Access values** (DEPLOY.md step 6f): the team name and the review application's AUD tag (neither is secret), and the email you log in to Access with if it isn't `chris@it7q.com.au`.
 
 ---
 
@@ -903,3 +902,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **29 Oct 2026: Phase 3c built.** Q60 (all 15 downloads confirmed) and Q62 (TikTok hidden) answered. About trimmed, footer social URLs in, hidden-link and no-Reddit/Etsy guards with tests.
 - **29 Oct 2026: Phase 4 built.** SQL (roles, tables, nine definer functions, self-test), six n8n workflows generated from reviewable JS, gated content for 70 projects (unreviewed), contract test, `deploy/DEPLOY.md`. Q63–Q65 asked.
 - **29 Oct 2026: Phase 4 revised for n8n 2.40.7 (Q65).** Node versions checked against the 2.40.7 source; review-page CSP moved to a Cloudflare response rule (DEPLOY.md 6g); `contract.py --password-stdin`; DEPLOY.md rewritten with real container names, `sudo cat | psql` for SQL, `[chris · sudo]` / `[claude]` / `[browser]` tags, a `node`-based test 7a, DMARC `rua` on `dmarc@` and DKIM selector `x`.
+- **2 Nov 2026: Q64 answered; DEPLOY steps 1–6 done by Chris** (6a–6g deployed; 6a test 404s, Access redirects to `it7qqld.cloudflareaccess.com`). Access team and AUD tag set in `deploy/config.json`; workflows rebuilt for step 7.

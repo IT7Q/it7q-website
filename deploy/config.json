@@ -10,8 +10,8 @@
     "chris": "chris@it7q.com.au"
   },
   "access": {
-    "team": "PLACEHOLDER-team-name",
-    "aud": "PLACEHOLDER-application-audience-tag",
+    "team": "it7qqld",
+    "aud": "381e033c588758c98680d05c78e1c42e14aa1eeeaa6830470b6b00af7a1c69ff",
     "allowed_emails": ["chris@it7q.com.au"]
   },
   "credentials": {
