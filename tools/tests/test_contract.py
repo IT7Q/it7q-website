@@ -1,5 +1,6 @@
 """tools/contract.py passes against the mock, and can fail (PLAN.md §4.12, DEPLOY.md step 9)."""
 import contextlib
+import http.server
 import io
 import shutil
 import sys
@@ -75,3 +76,75 @@ class ContractAgainstMock(unittest.TestCase):
     def test_prod_check_needs_the_dummy_token_refused(self):
         # The mock refuses anything but "mock-token", like the real secret refuses the dummy token.
         self.assertEqual(self.run_contract(prod=True), [], "\n".join(self.lines))
+
+
+class Pacing(unittest.TestCase):
+    """The live burst rule (DEPLOY.md 6e): pace real targets, retry a 429 once, keep the mock fast."""
+
+    def test_default_pace(self):
+        self.assertEqual(contract.Client("http://127.0.0.1:8000/webhook").pace, 0)
+        self.assertEqual(contract.Client("http://localhost:8000/webhook").pace, 0)
+        self.assertEqual(contract.Client("https://forms.it7q.com.au/webhook").pace, contract.LIVE_PACE)
+        self.assertEqual(contract.Client("https://forms.it7q.com.au/webhook", pace=1.5).pace, 1.5)
+
+    def serve(self, statuses, json_429=False):
+        hits = []
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                self.rfile.read(int(self.headers.get("Content-Length", 0)))
+                hits.append(self.path)
+                status = statuses.pop(0) if statuses else 200
+                cloudflare = status == 429 and not json_429
+                self.send_response(status)
+                self.send_header("Content-Type", "text/html" if cloudflare else "application/json")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                self.wfile.write(b"<p>error code: 1015</p>" if cloudflare else b'{"error": "rate_limited"}')
+
+            def log_message(self, *a):
+                pass
+
+        server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        return "http://127.0.0.1:%d/webhook" % server.server_address[1], hits
+
+    def client(self, base, pace):
+        sleeps, notes = [], []
+        c = contract.Client(base, pace=pace, sleep=sleeps.append, note=notes.append)
+        return c, sleeps, notes
+
+    def test_429_waits_and_retries_once(self):
+        base, hits = self.serve([429])
+        c, sleeps, notes = self.client(base, pace=0)
+        status, _, _ = c.post("nda-login", {})
+        self.assertEqual(status, 200)
+        self.assertEqual(len(hits), 2)
+        self.assertEqual(sleeps, [contract.RETRY_WAIT])
+        self.assertEqual(c.retries, 1)
+        self.assertIn("nda-login: 429 (rate limited), waiting 11 s and retrying once", notes[0])
+
+    def test_second_429_is_reported_not_retried_again(self):
+        base, hits = self.serve([429, 429])
+        c, _, _ = self.client(base, pace=0)
+        status, _, _ = c.post("nda-login", {})
+        self.assertEqual(status, 429)
+        self.assertEqual(len(hits), 2)
+
+    def test_our_own_json_429_is_never_retried(self):
+        base, hits = self.serve([429], json_429=True)  # login lockout: the answer the check wants
+        c, sleeps, _ = self.client(base, pace=0)
+        status, _, data = c.post("nda-login", {})
+        self.assertEqual((status, data), (429, {"error": "rate_limited"}))
+        self.assertEqual((len(hits), sleeps, c.retries), (1, [], 0))
+
+    def test_requests_are_spaced(self):
+        base, hits = self.serve([])
+        c, sleeps, _ = self.client(base, pace=0.6)
+        for _ in range(3):
+            c.post("nda-content", {})
+        self.assertEqual(len(hits), 3)
+        self.assertEqual(len(sleeps), 2)  # none before the first request
+        self.assertTrue(all(0 < w <= 0.6 for w in sleeps), sleeps)

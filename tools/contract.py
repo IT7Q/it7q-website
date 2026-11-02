@@ -16,6 +16,9 @@ workflows through Cloudflare:
 --prod    the Turnstile test secret must be gone: Cloudflare's dummy token must be refused.
 --turnstile TOKEN  token to send (default: Cloudflare's dummy token; the mock wants "mock-token").
 --origin ORIGIN    send this Origin and require it back in Access-Control-Allow-Origin.
+--pace SECONDS     wait between requests (default 0.6 for a real target, 0 for localhost), so the
+                   Cloudflare burst rule (20 requests per 10 s per IP, DEPLOY.md 6e) isn't tripped.
+                   A Cloudflare 429 anyway (not JSON): wait 11 s, retry that request once, and say so.
 
 Uses the login lockout on purpose (5 wrong passwords for a made-up address), so the calling IP
 collects 5 failed logins per run (the IP limit is 20 per 15 minutes).
@@ -24,7 +27,9 @@ import getpass
 import json
 import secrets
 import sys
+import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -35,11 +40,43 @@ DUMMY_TOKEN = "XXXX.DUMMY.TOKEN.XXXX"
 DIVISIONS = [d["slug"] for d in build.load_json("divisions.json")]
 
 
+LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1"}
+LIVE_PACE = 0.6      # seconds between requests: ~16 per 10 s, under the 20 per 10 s burst rule
+RETRY_WAIT = 11      # the burst rule blocks for 10 s
+
+
 class Client:
-    def __init__(self, base, origin=None, timeout=20):
+    def __init__(self, base, origin=None, timeout=20, pace=None, retry_wait=RETRY_WAIT, sleep=time.sleep,
+                 note=print):
         self.base, self.origin, self.timeout = base.rstrip("/"), origin, timeout
+        if pace is None:  # the local mock stays fast
+            pace = 0 if urllib.parse.urlsplit(self.base).hostname in LOCAL_HOSTS else LIVE_PACE
+        self.pace, self.retry_wait, self.sleep, self.note = pace, retry_wait, sleep, note
+        self.last = None
+        self.retries = 0
 
     def post(self, hook, body, content_type="application/json"):
+        status, headers, data = self._post(hook, body, content_type)
+        # Cloudflare's burst block is an HTML page. A JSON 429 is our own answer (lockout, limits)
+        # and is what the checks expect, so it's never retried.
+        if status == 429 and not isinstance(data, dict):
+            self.retries += 1
+            self.note("      %s: 429 (rate limited), waiting %g s and retrying once" % (hook, self.retry_wait))
+            self.sleep(self.retry_wait)
+            status, headers, data = self._post(hook, body, content_type)
+        return status, headers, data
+
+    def _post(self, hook, body, content_type):
+        if self.pace and self.last is not None:
+            wait = self.pace - (time.monotonic() - self.last)
+            if wait > 0:
+                self.sleep(wait)
+        try:
+            return self._send(hook, body, content_type)
+        finally:
+            self.last = time.monotonic()
+
+    def _send(self, hook, body, content_type):
         raw = body if isinstance(body, bytes) else json.dumps(body).encode()
         req = urllib.request.Request(self.base + "/" + hook, data=raw, method="POST",
                                      headers={"Content-Type": content_type, "User-Agent": "it7q-contract-test"})
@@ -212,8 +249,13 @@ def main(argv):
             login = (who, sys.stdin.readline().rstrip("\r\n"))
         else:
             login = (who, getpass.getpass("Password for %s: " % who))
-    contract = Contract(Client(argv[0], origin=arg(argv, "--origin")), turnstile)
-    return 1 if contract.run(email=arg(argv, "--email"), login=login, prod="--prod" in argv) else 0
+    pace = float(arg(argv, "--pace")) if arg(argv, "--pace") else None
+    client = Client(argv[0], origin=arg(argv, "--origin"), pace=pace)
+    contract = Contract(client, turnstile)
+    failed = contract.run(email=arg(argv, "--email"), login=login, prod="--prod" in argv)
+    if client.retries:
+        print("(%d request(s) were rate limited and retried; consider a larger --pace)" % client.retries)
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

@@ -406,7 +406,9 @@ for you, or you run:
 ```
 sudo -u claude /srv/work/it7q-website/.venv/bin/python /srv/work/it7q-website/tools/contract.py https://forms.it7q.com.au/webhook --origin https://it7q.com.au --email <your test address>
 ```
-It must end in `PASSED`. Then check your inboxes:
+It must end in `PASSED`. It spaces its requests 0.6 s apart to stay under the 6e burst rule, so
+a run takes under a minute. If Cloudflare still answers 429, it waits 11 s, retries that request
+once and says so; if that happens often, add `--pace 1`. Then check your inboxes:
 - the test address: "Your IT7Q NDA: copy for your records", with the acceptance record and the full NDA text;
 - `chris@`: "NDA request to review: Contract Test (IT7Q)", with a **Review this request** link;
 - `chris@`: "Website enquiry: Something else (Contract Test)". Hitting Reply must address the test address.
