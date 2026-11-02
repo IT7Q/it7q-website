@@ -1,5 +1,5 @@
 {
- "_about": "Public values only (PLAN.md §4.1). 'hooks' is the one webhook base (Q58): tools/build.py writes it into assets/js/config.js and the CSP in _headers, and tools/check.py allows it only there and refuses any nubius base. The Turnstile site key is public: replace the PLACEHOLDER with the real one (deploy/LAUNCH.md step 1). Until then the build writes an empty key, so the forms stay switched off, and tools/check.py --launch fails.",
+ "_about": "Public values only (PLAN.md \u00a74.1). 'hooks' is the one webhook base (Q58): tools/build.py writes it into assets/js/config.js and the CSP in _headers, and tools/check.py allows it only there and refuses any nubius base. The Turnstile site key is public (Q66, LAUNCH.md step 1); a value starting PLACEHOLDER builds as empty, so the forms stay off, and tools/check.py --launch fails.",
  "hooks": "https://forms.it7q.com.au/webhook",
- "turnstile_site_key": "PLACEHOLDER-turnstile-site-key"
+ "turnstile_site_key": "0x4AAAAAAFtgBBWih0dvAPoY"
 }

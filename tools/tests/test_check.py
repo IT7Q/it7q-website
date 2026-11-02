@@ -212,24 +212,29 @@ class CheckGuards(unittest.TestCase):
         self.assertIn("hooks must not be on nubius", out)
         self.assertIn("hooks must be https://hooks.nubius.com.au/webhook", out)
 
-    def test_launch_gates(self):
-        self.assertEqual(check.run(self.dist).failures, [])
-        out = "\n".join(check.run(self.dist, launch=True).failures)
-        self.assertIn("launch: turnstile_site_key is 'PLACEHOLDER-turnstile-site-key'", out)
-        self.assertIn("legal/nda/index.html: launch: still marked as a legal draft", out)
-        self.assertNotIn("PLACEHOLDER", (self.dist / "assets/js/config.js").read_text(encoding="utf-8"))
+    def with_endpoints(self, key):
+        """check.run(launch=True) failures with endpoints.json swapped for one holding this site key."""
         real = check.ENDPOINTS
         tmp = Path(tempfile.mkdtemp())
         try:
-            key = "0x4AAAAAAAexampleKey00"
             (tmp / "endpoints.json").write_text(json.dumps({"hooks": check.LAUNCH_HOOKS, "turnstile_site_key": key}))
             check.ENDPOINTS = tmp / "endpoints.json"
-            out = "\n".join(check.run(self.dist, launch=True).failures)
-            self.assertIn("built without the site key", out)  # dist predates the key
-            self.assertNotIn("turnstile_site_key is", out)
+            return "\n".join(check.run(self.dist, launch=True).failures)
         finally:
             check.ENDPOINTS = real
             shutil.rmtree(tmp)
+
+    def test_launch_gates(self):
+        self.assertEqual(check.run(self.dist).failures, [])
+        out = "\n".join(check.run(self.dist, launch=True).failures)
+        self.assertNotIn("turnstile_site_key is", out)  # the real key (Q66) is set and built in
+        self.assertNotIn("built without the site key", out)
+        self.assertIn("legal/nda/index.html: launch: still marked as a legal draft", out)
+        out = self.with_endpoints("PLACEHOLDER-turnstile-site-key")
+        self.assertIn("launch: turnstile_site_key is 'PLACEHOLDER-turnstile-site-key'", out)
+        out = self.with_endpoints("0x4AAAAAAAexampleKey00")
+        self.assertIn("built without the site key", out)  # dist was built with a different key
+        self.assertNotIn("turnstile_site_key is", out)
         self.assertEqual(check.main([str(self.dist), "--mock", "--launch"]), 1)
 
 
@@ -238,7 +243,7 @@ class LaunchDoc(unittest.TestCase):
         doc = (ROOT / "deploy/LAUNCH.md").read_text(encoding="utf-8")
         site = json.loads((ROOT / "src/data/site.json").read_text(encoding="utf-8"))
         self.assertEqual(site["staff_url"], "https://staff.it7q.com.au")
-        for needle in ("tools/check.py --launch", check.LAUNCH_HOOKS, "PLACEHOLDER-turnstile-site-key",
+        for needle in ("tools/check.py --launch", check.LAUNCH_HOOKS,
                        "it7q-staff.pages.dev", "*.it7q-staff.pages.dev", "it7qqld.cloudflareaccess.com"):
             self.assertIn(needle, doc)
         for f in re.findall(r"\b(assets/(?:js|css)/[\w.-]+)", doc):
