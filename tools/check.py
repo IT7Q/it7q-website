@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Pre-deploy checks for the IT7Q site (PLAN.md §2.3, §3, §4.9, §5.1, §6.2).
 
-    python3 tools/check.py [dist_dir] [--mock]
+    python3 tools/check.py [dist_dir] [--mock | --launch]
 
 --mock accepts a local mock build (tools/build.py --mock); without it the
 generated config must point at the production webhooks.
+--launch adds the production-upload gates (deploy/LAUNCH.md): a real Turnstile
+site key built in, the forms webhook base, and no legal page still marked draft.
 
-Exits non-zero if anything fails. tools/build.py runs this after every build,
-so a failing check also fails the Cloudflare Pages deploy.
+Exits non-zero if anything fails. tools/build.py runs this after every build;
+LAUNCH.md runs it again with --launch before anything is uploaded.
 """
 import datetime
 import html
@@ -77,6 +79,11 @@ FINANCIAL = re.compile(
     re.I,
 )
 PRICE = re.compile(r"\$\s?\d[\d,.]*")
+
+
+LAUNCH_HOOKS = "https://forms.it7q.com.au/webhook"  # Q58
+TURNSTILE_KEY = re.compile(r"0x[0-9A-Za-z_-]{16,}")  # Cloudflare site keys start 0x
+LEGAL_DRAFT = 'class="draft-note"'
 
 
 def prod_hooks():
@@ -336,6 +343,24 @@ def check_scripts(dist, r, mock=False):
         r.fail(CONFIG_JS, "hooks must be %s (endpoints.json)" % prod_hooks())
     if not prod_hooks().startswith("https://"):
         r.fail(rel(ENDPOINTS), "hooks must be an https:// URL")
+    if "nubius" in prod_hooks().lower():
+        r.fail(rel(ENDPOINTS), "hooks must not be on nubius (Q58): use %s" % LAUNCH_HOOKS)
+
+
+def check_launch(dist, r):
+    """check.py --launch: the extra gates for a production upload (LAUNCH.md)."""
+    endpoints = json.loads(ENDPOINTS.read_text(encoding="utf-8"))
+    if endpoints["hooks"] != LAUNCH_HOOKS:
+        r.fail(rel(ENDPOINTS), "launch: hooks must be %s" % LAUNCH_HOOKS)
+    key = endpoints["turnstile_site_key"]
+    if not TURNSTILE_KEY.fullmatch(key):
+        r.fail(rel(ENDPOINTS), "launch: turnstile_site_key is %r, not a real site key (LAUNCH.md step 1)" % key)
+    config = (dist / CONFIG_JS).read_text(encoding="utf-8") if (dist / CONFIG_JS).exists() else ""
+    if TURNSTILE_KEY.fullmatch(key) and '"turnstileSiteKey": %s' % json.dumps(key) not in config:
+        r.fail(CONFIG_JS, "launch: built without the site key in endpoints.json; rebuild")
+    for f in sorted(dist.rglob("*.html")):
+        if LEGAL_DRAFT in f.read_text(encoding="utf-8", errors="replace"):
+            r.fail(str(f.relative_to(dist)), "launch: still marked as a legal draft (Q36)")
 
 
 def check_fonts(dist, r):
@@ -542,7 +567,7 @@ def approved_prices():
     }
 
 
-def run(dist, mock=False):
+def run(dist, mock=False, launch=False):
     r = Report()
     for required in ("index.html", "404.html", "_headers", "favicon.svg"):
         if not (dist / required).exists():
@@ -560,17 +585,23 @@ def run(dist, mock=False):
     check_pdfs(dist, r)
     check_portus(dist, r)
     check_footer_links(dist, r)
+    if launch:
+        check_launch(dist, r)
     return r
 
 
 def main(argv):
     mock = "--mock" in argv
-    argv = [a for a in argv if a != "--mock"]
+    launch = "--launch" in argv
+    argv = [a for a in argv if a not in ("--mock", "--launch")]
     dist = Path(argv[0]) if argv else ROOT / "dist"
     if not dist.is_dir():
         print("CHECK FAILED: %s does not exist; run tools/build.py first" % dist, file=sys.stderr)
         return 1
-    r = run(dist.resolve(), mock)
+    if mock and launch:
+        print("CHECK FAILED: a mock build can never be a launch build", file=sys.stderr)
+        return 1
+    r = run(dist.resolve(), mock, launch)
     if r.failures:
         print("CHECK FAILED (%d):" % len(r.failures), file=sys.stderr)
         for f in r.failures:
@@ -578,7 +609,7 @@ def main(argv):
         return 1
     pages = len(list(dist.rglob("*.html")))
     print("check passed: %d pages, links, CSP, wording, prices, pack colours, SVGs, watermarks, fonts, consent, "
-          "downloads, PDFs, PORTUS, footer" % pages)
+          "downloads, PDFs, PORTUS, footer%s" % (pages, ", LAUNCH gates" if launch else ""))
     return 0
 
 

@@ -1,6 +1,7 @@
 """Each guard in tools/check.py must actually fire. Builds once, then breaks a copy of dist/."""
 import datetime
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -94,7 +95,7 @@ class CheckGuards(unittest.TestCase):
 
     def test_mock_config_refused_unless_mock(self):
         def to_mock(s):
-            return s.replace('"mock": false', '"mock": true').replace("https://hooks.nubius.com.au/webhook", "/webhook")
+            return s.replace('"mock": false', '"mock": true').replace("https://forms.it7q.com.au/webhook", "/webhook")
         self.assertIn("LOCAL MOCK build", self.failures_after("assets/js/config.js", to_mock))
         self.assertEqual(check.run(self.dist, mock=True).failures, [])
         out = self.failures_after("assets/js/config.js", lambda s: s.replace('"mock": true', '"mock": false'))
@@ -200,16 +201,53 @@ class CheckGuards(unittest.TestCase):
 
     def test_hooks_base_is_one_value(self):
         headers = (self.dist / "_headers").read_text(encoding="utf-8")
-        self.assertIn("connect-src 'self' https://hooks.nubius.com.au ", headers)
+        self.assertIn("connect-src 'self' https://forms.it7q.com.au ", headers)
+        self.assertEqual(check.prod_hooks(), check.LAUNCH_HOOKS)  # Phase 6 switch (Q58)
         real = check.prod_hooks
-        check.prod_hooks = lambda: "https://forms.it7q.com.au/webhook"  # Phase 6 switch (Q58)
+        check.prod_hooks = lambda: "https://hooks.nubius.com.au/webhook"  # switching back is refused
         try:
             out = "\n".join(check.run(self.dist).failures)
         finally:
             check.prod_hooks = real
-        self.assertIn("_headers: public-wording guard: 'nubius'", out)
-        self.assertIn("assets/js/config.js: public-wording guard: 'nubius'", out)
-        self.assertIn("hooks must be https://forms.it7q.com.au/webhook", out)
+        self.assertIn("hooks must not be on nubius", out)
+        self.assertIn("hooks must be https://hooks.nubius.com.au/webhook", out)
+
+    def test_launch_gates(self):
+        self.assertEqual(check.run(self.dist).failures, [])
+        out = "\n".join(check.run(self.dist, launch=True).failures)
+        self.assertIn("launch: turnstile_site_key is 'PLACEHOLDER-turnstile-site-key'", out)
+        self.assertIn("legal/nda/index.html: launch: still marked as a legal draft", out)
+        self.assertNotIn("PLACEHOLDER", (self.dist / "assets/js/config.js").read_text(encoding="utf-8"))
+        real = check.ENDPOINTS
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            key = "0x4AAAAAAAexampleKey00"
+            (tmp / "endpoints.json").write_text(json.dumps({"hooks": check.LAUNCH_HOOKS, "turnstile_site_key": key}))
+            check.ENDPOINTS = tmp / "endpoints.json"
+            out = "\n".join(check.run(self.dist, launch=True).failures)
+            self.assertIn("built without the site key", out)  # dist predates the key
+            self.assertNotIn("turnstile_site_key is", out)
+        finally:
+            check.ENDPOINTS = real
+            shutil.rmtree(tmp)
+        self.assertEqual(check.main([str(self.dist), "--mock", "--launch"]), 1)
+
+
+class LaunchDoc(unittest.TestCase):
+    def test_launch_doc_matches_the_repo(self):
+        doc = (ROOT / "deploy/LAUNCH.md").read_text(encoding="utf-8")
+        site = json.loads((ROOT / "src/data/site.json").read_text(encoding="utf-8"))
+        self.assertEqual(site["staff_url"], "https://staff.it7q.com.au")
+        for needle in ("tools/check.py --launch", check.LAUNCH_HOOKS, "PLACEHOLDER-turnstile-site-key",
+                       "it7q-staff.pages.dev", "*.it7q-staff.pages.dev", "it7qqld.cloudflareaccess.com"):
+            self.assertIn(needle, doc)
+        for f in re.findall(r"\b(assets/(?:js|css)/[\w.-]+)", doc):
+            self.assertTrue(f == check.CONFIG_JS or (ROOT / "src" / f).exists(), f)  # config.js is generated
+        staff = ROOT / "deploy/staff"
+        self.assertIn("noindex", (staff / "index.html").read_text(encoding="utf-8"))
+        headers = (staff / "_headers").read_text(encoding="utf-8")
+        self.assertIn("default-src 'none'", headers)
+        self.assertIn("X-Robots-Tag: noindex", headers)
 
 
 class ConsentGuard(unittest.TestCase):
