@@ -19,10 +19,12 @@ Cloudflare dashboard.
 - **Already done in the repo** (commit "Phase 6 prep"): `src/data/endpoints.json` points at
   `https://forms.it7q.com.au/webhook`, and `tools/check.py` now fails any build whose webhook
   base is on nubius.
-- **The legal check (Q36).** `tools/check.py --launch` fails while the NDA, Privacy and Terms
-  pages still carry their "Draft" note: that's the plan's launch gate. Send me the lawyer's
-  changes, or tell me you've decided to launch with the current text, and I'll update the
-  pages either way. I won't switch the gate off.
+- **Legal pages (decided 3 Nov).** The NDA, Privacy and Terms go live without the lawyer's review,
+  and you approve NDA requests from launch. The review is planned **when funds allow** (PLAN.md
+  §4.15). Until then, gated content stays at feature level (PLAN.md §4.9). After the review, a
+  changed NDA becomes a new version and approved viewers re-accept it at their next login
+  (PLAN.md §4.14). The pages show "Last updated" dates, not draft notes, and
+  `tools/check.py --launch` fails if a draft note comes back.
 
 ## How it's hosted: Direct Upload (recommended), not Git integration
 
@@ -242,7 +244,7 @@ reports with `noreply@` mail passing.
 | Symptom | Likely cause |
 |---|---|
 | `check.py --launch` fails on `turnstile_site_key` | Step 1 not done yet, or the key isn't the `0x...` site key |
-| `check.py --launch` fails on "legal draft" | Q36 (see *Before you start*) |
+| `check.py --launch` fails on "legal draft", "Last updated" or "How access works" | A legal page lost its date or box, or a draft note was added back; tell me |
 | No CSP or HSTS header live | `_headers` wasn't in the upload: drag the folder, not its contents, and check `ls -a` in step 3 |
 | Forms say they can't send, on `it7q.com.au` | Turnstile widget hostnames (DEPLOY.md step 4), the real secret (step 10), or the workflows unpublished. Run 8e |
 | Forms fail only on `www` | The step 6 redirect isn't on, so `www` serves the site directly; it still should work (both origins are allowed). Run 8e with the `www` origin |
