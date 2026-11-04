@@ -117,7 +117,7 @@ class Workflows(unittest.TestCase):
                     headers = n["parameters"]["options"]["responseHeaders"]["entries"]
                     self.assertIn({"name": "Cache-Control", "value": "no-store"}, headers)
                     if n["parameters"]["respondWith"] == "text":
-                        self.assertIn({"name": "Referrer-Policy", "value": "no-referrer"}, headers)
+                        self.assertIn({"name": "Referrer-Policy", "value": "same-origin"}, headers)
 
     def test_sql_calls_match_granted_functions(self):
         granted = set(re.search(r"GRANT EXECUTE ON FUNCTION(.*?)TO it7q_web", SQL["03-functions.sql"], re.S)
@@ -179,6 +179,29 @@ class Workflows(unittest.TestCase):
         self.assertIn("\n%s\n" % csp, doc)
         post = (ROOT / "n8n/code/nda-review/verify-post.js").read_text(encoding="utf-8")
         self.assertIn("origin === 'null'", post)  # refused, with a pointer to 6g
+
+    def test_review_forms_keep_their_origin_and_csrf_guard(self):
+        # no-referrer makes Chrome send Origin: null on the page's own posts (step 9b bug).
+        self.assertEqual(n8n_build.REVIEW_REFERRER, "same-origin")
+        for n in self.nodes("nda-review").values():
+            if n["type"].endswith("respondToWebhook"):
+                entries = n["parameters"]["options"]["responseHeaders"]["entries"]
+                self.assertIn({"name": "Referrer-Policy", "value": "same-origin"}, entries)
+                self.assertNotIn("no-referrer", json.dumps(entries))
+        code = ROOT / "n8n/code/nda-review"
+        post = (code / "verify-post.js").read_text(encoding="utf-8")
+        # Origin: null only with the browser's own same-origin navigation headers, and always the form token.
+        self.assertIn("header(wh.headers, 'sec-fetch-site') === 'same-origin'", post)
+        self.assertIn("header(wh.headers, 'sec-fetch-mode') === 'navigate'", post)
+        self.assertIn("if (!formTokenOk(wh, one(b.f)))", post)
+        self.assertLess(post.index("verifyAccess("), post.index("formTokenOk("))
+        self.assertLess(post.index("formTokenOk("), post.index("const action"))
+        render = (code / "render.js").read_text(encoding="utf-8")
+        self.assertEqual(render.count('<form '), render.count("'\">' + f"), "every review form carries the token")
+        doc = (ROOT / "deploy/DEPLOY.md").read_text(encoding="utf-8")
+        self.assertIn('not starts_with(http.request.uri.path, "/cdn-cgi/")', doc)
+        self.assertIn("header `Referrer-Policy`, value `same-origin`", doc)
+        self.assertIn("**Email Obfuscation** → *Off*", doc)
 
     def test_dummy_hash_is_well_formed(self):
         h = n8n_build.dummy_hash()

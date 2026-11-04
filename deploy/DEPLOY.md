@@ -244,12 +244,12 @@ sends, so the header can't be faked from outside.
 **6d. Block everything else (WAF custom rule).** *Security → WAF → Custom rules → Create*,
 name `forms: allow-list`, action **Block**:
 ```
-(http.host eq "forms.it7q.com.au" and not (
-  http.request.uri.path in {"/webhook/nda-submission" "/webhook/nda-login" "/webhook/nda-content" "/webhook/website-enquiry" "/webhook/nda-review"}
-  and http.request.method in {"POST" "OPTIONS" "GET"}
-))
+(http.host eq "forms.it7q.com.au" and not starts_with(http.request.uri.path, "/cdn-cgi/") and not (http.request.uri.path in {"/webhook/nda-submission" "/webhook/nda-login" "/webhook/nda-content" "/webhook/website-enquiry" "/webhook/nda-review"} and http.request.method in {"POST" "OPTIONS" "GET"}))
 ```
-GET is only answered by `nda-review`; n8n returns 404 for GET on the others.
+GET is only answered by `nda-review`; n8n returns 404 for GET on the others. `/cdn-cgi/` is
+Cloudflare's own: the Access login comes back through `/cdn-cgi/access/authorized`, so blocking
+it breaks the 6f login. Those paths are answered by Cloudflare itself and never reach the tunnel
+or n8n (the 6a route only matches the five `/webhook/` paths anyway).
 
 **6e. Rate limit.** *Security → WAF → Rate limiting rules* (the free plan allows one):
 name `forms: burst`, expression `(http.host eq "forms.it7q.com.au")`, counting by IP,
@@ -271,18 +271,26 @@ Self-hosted*:
 
 **6g. Review page security policy (response Transform Rule).** n8n 2.x puts its own
 `Content-Security-Policy: sandbox ...` on every webhook reply and overwrites ours. That sandbox
-gives the page no origin, so the browser sends `Origin: null` with the review forms. The
-workflow refuses those (on purpose: it can't tell them from a forged post), and Access's
-cookie may not be sent either. Cloudflare puts the right policy back on the way out:
+gives the page no origin, so the browser sends `Origin: null` with the review forms. A
+`Referrer-Policy: no-referrer` does the same in Chrome. The workflow refuses an `Origin: null`
+post unless the browser's own `Sec-Fetch-Site: same-origin` and `Sec-Fetch-Mode: navigate`
+headers vouch for it, and Access's cookie may not be sent either. Cloudflare puts the right
+policy back on the way out:
 *Rules → Transform Rules → Modify Response Header → Create*. Name `IT7Q review CSP`. Custom filter
 expression:
 ```
 (http.host eq "forms.it7q.com.au" and http.request.uri.path eq "/webhook/nda-review")
 ```
-Then: *Set static*, header `Content-Security-Policy`, value (one line, exactly):
+Then two header operations in the same rule:
+1. *Set static*, header `Content-Security-Policy`, value (one line, exactly):
 ```
 default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'; sandbox allow-forms allow-same-origin
 ```
+2. *Add* → *Set static*, header `Referrer-Policy`, value `same-origin`. The workflow sends this
+   too; setting it here as well means nothing between n8n and the browser can turn it back into
+   `no-referrer`. `same-origin` still keeps the review link (and its token) away from every
+   other site.
+
 This is stricter than n8n's sandbox: no scripts at all, and nothing loads from anywhere. It
 only covers this one path, and it changes nothing for your other n8n workflows.
 
@@ -294,6 +302,17 @@ curl -si https://forms.it7q.com.au/webhook-test/nda-login | head -1 # 403 or 404
 curl -si https://forms.it7q.com.au/webhook/nda-review | grep -i '^location'   # → ...cloudflareaccess.com/...
 ```
 The 6g rule is checked in step 9b, once the review page can show something.
+
+**6h. Email Obfuscation off for forms.** Cloudflare's Email Obfuscation rewrites any email
+address in an HTML page as `[email protected]` and adds a script to decode it. The review page
+allows no scripts (6g), so the address stays hidden. Turn it off for this hostname only:
+*Rules → Configuration Rules → Create*. Name `forms: no email obfuscation`. Custom filter
+expression:
+```
+(http.host eq "forms.it7q.com.au")
+```
+Then *+ Add* → **Email Obfuscation** → *Off* → *Deploy*. The rest of the zone (the website)
+keeps its current setting. Check in 9b: the request's email shows as the real address.
 
 ---
 
@@ -421,7 +440,11 @@ All three must come from `noreply@it7q.com.au` and pass SPF/DKIM/DMARC as in ste
    - **Check 6g first.** Open the browser's developer tools → *Network* → reload → click the
      `nda-review` request → *Response headers*. `content-security-policy` must start with
      `default-src 'none'`. If it starts with `sandbox allow-downloads`, the 6g rule isn't
-     applied, and the Approve button will be refused.
+     applied, and the Approve button will be refused. `referrer-policy` must be
+     `same-origin` (one value, not `no-referrer`). The email address must show in full
+     (6h), not as `[email protected]`.
+   - If **Approve** is refused, open the `nda-review` POST in *Network* → *Request headers*
+     and send me `Origin`, `Referer`, `Sec-Fetch-Site` and `Sec-Fetch-Mode` (no cookies).
    - Leave all seven divisions ticked and the investor box unticked → **Approve and email
      login**. The test address gets "Your IT7Q access is approved" with a password.
 2. [claude, run by you] Run the logged-in checks. This one has to be you, because only you
@@ -489,7 +512,7 @@ Turnstile site key, then the walk-through in PLAN.md §6.2.
 ## Undo
 
 - [browser] Unpublish the six workflows. It's instant, and the site fails closed (PLAN.md §4.1).
-- [browser] Disable the Cloudflare rules from 6b–6e and 6g, and remove the 6a public hostname.
+- [browser] Disable the Cloudflare rules from 6b–6e, 6g and 6h, and remove the 6a public hostname.
 - [chris · sudo] Database. This deletes every NDA record, so export first if any are real:
   ```
   sudo docker exec postgres psql -U it7q -d postgres -c 'DROP DATABASE it7q_web' -c 'DROP ROLE it7q_web' -c 'DROP ROLE it7q_web_owner'
@@ -511,6 +534,9 @@ Turnstile site key, then the walk-through in PLAN.md §6.2.
 | `permission denied for function` | `03-functions.sql` not re-run after a change, or run against the wrong database |
 | No `access-control-allow-origin` in 7c | Send me the 7c output. I'll add the header to the Reply nodes instead |
 | Review page: "needs a Cloudflare Access login" while logged in | `access.team` / `access.aud` not set yet (Q64), the updated workflow not re-imported, or the Access email differs from `allowed_emails` |
-| Review page: "arrived without the IT7Q security policy" | The 6g rule is missing, or its path or host doesn't match |
+| Review page: "the browser hid where this came from" | The page arrived with `no-referrer` or n8n's sandbox CSP: check both 6g headers in DevTools, and that the updated `nda-review` is re-imported and published |
+| Review page: "This page is out of date" | The form was loaded before your Access login was renewed (24 h), or from an old copy of the workflow. Reload the page and try again |
+| Access login loops or ends on a Cloudflare block page | The 6d rule is missing its `/cdn-cgi/` exemption |
+| Emails on the review page show as `[email protected]` | 6h not deployed, or its expression doesn't match the host |
 | Emails missing | SMTP credential, then spam folders, then SPF/DKIM (step 1, selector `x`) |
 | `sudo: unable to change directory` or `could not change to directory` warnings with `sudo -u claude` | Harmless. Or `cd /` first |

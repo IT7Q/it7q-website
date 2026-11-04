@@ -1,6 +1,18 @@
 // ---- nda-review/_page.js: HTML for the review pages (pasted after common.js in this workflow).
-// Sent with no-store and no-referrer; the CSP (default-src 'none') is set by Cloudflare (DEPLOY.md 6g).
+// Sent with no-store and Referrer-Policy: same-origin; the CSP (default-src 'none') is set by
+// Cloudflare (DEPLOY.md 6g).
 const REVIEW_URL = CFG.hook_base + '/nda-review';
+// Per-page form token: tied to this Access login (the JWT Cloudflare adds to each request), so
+// another site can't fill it in. A new Access login makes old pages stale: reload them.
+function formToken(wh) {
+  return sha256hex('it7q-review-form|' + header(wh.headers, 'cf-access-jwt-assertion'));
+}
+function formTokenOk(wh, sent) {
+  const want = Buffer.from(formToken(wh));
+  const got = Buffer.from(String(sent || ''));
+  return got.length === want.length && crypto.timingSafeEqual(got, want);
+}
+function formField(wh) { return '<input type="hidden" name="f" value="' + esc(formToken(wh)) + '">'; }
 function page(status, title, inner) {
   return [{ json: { go: false, status, html: '<!doctype html><html lang="en-AU"><head><meta charset="utf-8">'
     + '<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">'

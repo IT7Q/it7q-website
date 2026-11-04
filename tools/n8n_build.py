@@ -34,12 +34,15 @@ NO_STORE = {"name": "Cache-Control", "value": "no-store"}
 # the way out instead (DEPLOY.md step 6g); n8n sends it too, for when its sandbox is off.
 REVIEW_CSP = ("default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; "
               "base-uri 'none'; sandbox allow-forms allow-same-origin")
+REVIEW_REFERRER = "same-origin"
 PAGE_HEADERS = [
     {"name": "Content-Type", "value": "text/html; charset=utf-8"},
     NO_STORE,
     {"name": "Content-Security-Policy", "value": REVIEW_CSP},
     {"name": "X-Frame-Options", "value": "DENY"},
-    {"name": "Referrer-Policy", "value": "no-referrer"},  # the review link carries its token
+    # Not no-referrer: with it, Chrome sends Origin: null on the page's own form posts. same-origin
+    # still keeps the review link (and its token) away from every other site.
+    {"name": "Referrer-Policy", "value": REVIEW_REFERRER},
     {"name": "X-Content-Type-Options", "value": "nosniff"},
     {"name": "X-Robots-Tag", "value": "noindex"},
 ]

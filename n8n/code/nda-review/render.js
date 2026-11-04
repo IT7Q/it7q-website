@@ -1,6 +1,7 @@
 // nda-review GET, step 2: one request (from the email's one-time link) or the full list.
 const r = $input.first().json.r;
 const t = $('Verify GET').first().json.t;
+const f = formField($('Webhook GET').first().json);
 if (r.mode === 'invalid') {
   return page(410, 'Link expired', '<p class="msg err">This review link has expired or was already used. '
     + 'Find the request in the list below to send yourself a new one.</p>');
@@ -8,7 +9,7 @@ if (r.mode === 'invalid') {
 if (r.mode === 'request') {
   const q = r.request;
   return page(200, 'Review NDA request', requestTable(q)
-    + '<form method="post" action="' + esc(REVIEW_URL) + '"><input type="hidden" name="t" value="' + esc(t) + '">'
+    + '<form method="post" action="' + esc(REVIEW_URL) + '">' + f + '<input type="hidden" name="t" value="' + esc(t) + '">'
     + '<fieldset><legend>Divisions to unlock</legend>' + divisionBoxes(CFG.divisions) + '</fieldset>'
     + '<fieldset><legend>Investor area</legend><label><input type="checkbox" name="investor" value="1"'
     + (q.wants_investor ? ' checked' : '') + '> Give access to the investor area</label></fieldset>'
@@ -17,7 +18,7 @@ if (r.mode === 'request') {
     + '<p>Approving creates a password and emails it with the login link. The NDA term ends 3 years after signing.</p>');
 }
 const rows = r.requests.map((q) => {
-  const btn = (action, label, cls) => '<form class="inline" method="post" action="' + esc(REVIEW_URL) + '">'
+  const btn = (action, label, cls) => '<form class="inline" method="post" action="' + esc(REVIEW_URL) + '">' + f
     + '<input type="hidden" name="request_id" value="' + esc(q.id) + '">'
     + (action === 'revoke' || action === 'reset'
       ? '<label><input type="checkbox" name="confirm" value="1" required> sure</label>' : '')
