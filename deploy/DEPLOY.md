@@ -488,6 +488,14 @@ Must end in `PASSED`. The line `Turnstile dummy token is refused (test secret re
 the test secret is gone. From now on only the real website's widget can submit forms. The
 website gets its site key and the new webhook base at Phase 6.
 
+With `--prod` there are no wrong-password or lockout checks. `nda-login` checks Turnstile before
+the password, so the real secret answers the dummy token with 400 before any password is
+looked at. In their place, one line must pass: `dummy-token login gets the Turnstile refusal`.
+**The lockout can only be tested in test-secret mode**, and that was done in 9a. To test it
+again later, put the test secret from the step 5 table back for a few minutes, run 9a, then
+redo this step.
+Don't combine `--prod` with `--login`: that login uses the dummy token, so it gets the same 400.
+
 ---
 
 ## 11. Retention job

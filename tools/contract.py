@@ -14,14 +14,16 @@ workflows through Cloudflare:
           the investor area, logout, and that the token is dead afterwards.
 --password-stdin   with --login: read the password from the first line of stdin (DEPLOY.md 9b).
 --prod    the Turnstile test secret must be gone: Cloudflare's dummy token must be refused.
+          nda-login checks Turnstile before the password, so the wrong-password and lockout
+          checks can't run; one dummy-token login must get the Turnstile 400 instead.
 --turnstile TOKEN  token to send (default: Cloudflare's dummy token; the mock wants "mock-token").
 --origin ORIGIN    send this Origin and require it back in Access-Control-Allow-Origin.
 --pace SECONDS     wait between requests (default 0.6 for a real target, 0 for localhost), so the
                    Cloudflare burst rule (20 requests per 10 s per IP, DEPLOY.md 6e) isn't tripped.
                    A Cloudflare 429 anyway (not JSON): wait 11 s, retry that request once, and say so.
 
-Uses the login lockout on purpose (5 wrong passwords for a made-up address), so the calling IP
-collects 5 failed logins per run (the IP limit is 20 per 15 minutes).
+Without --prod, uses the login lockout on purpose (5 wrong passwords for a made-up address), so
+the calling IP collects 5 failed logins per run (the IP limit is 20 per 15 minutes).
 """
 import getpass
 import json
@@ -184,6 +186,14 @@ class Contract:
                         lambda d: None if d == {"error": "login_failed"} else "body %r" % (d,))
         self.expect("6th try is locked out", "nda-login", body, (429,))
 
+    def login_turnstile(self):
+        # --prod: the real secret refuses the dummy token before any password is checked, so the
+        # lockout can only be tested with the test secret (DEPLOY.md step 9).
+        probe = "contract-%s@example.invalid" % secrets.token_hex(4)
+        body = self.system(email=probe, password="wrong-password-%s" % secrets.token_hex(4), turnstile=DUMMY_TOKEN)
+        self.expect("dummy-token login gets the Turnstile refusal (lockout tested in step 9)", "nda-login", body,
+                    (400,), lambda d: None if isinstance(d, dict) and d.get("error") == "invalid" else "body %r" % (d,))
+
     def content_without_login(self):
         self.expect("made-up token gets 401", "nda-content", {"token": secrets.token_urlsafe(32), "division": "msp"},
                     (401,))
@@ -226,7 +236,10 @@ class Contract:
         if prod:
             self.prod()
         self.content_without_login()
-        self.login_lockout()
+        if prod:
+            self.login_turnstile()
+        else:
+            self.login_lockout()
         if login:
             self.logged_in(*login)
         self.out("\n%s: %d problem(s)" % ("FAILED" if self.failures else "PASSED", len(self.failures)))

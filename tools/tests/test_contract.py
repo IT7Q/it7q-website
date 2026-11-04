@@ -76,6 +76,16 @@ class ContractAgainstMock(unittest.TestCase):
     def test_prod_check_needs_the_dummy_token_refused(self):
         # The mock refuses anything but "mock-token", like the real secret refuses the dummy token.
         self.assertEqual(self.run_contract(prod=True), [], "\n".join(self.lines))
+        text = "\n".join(self.lines)
+        self.assertIn("dummy-token login gets the Turnstile refusal", text)
+        self.assertNotIn("wrong login", text)  # the real secret answers 400 before the password check
+        self.assertNotIn("locked out", text)
+
+    def test_lockout_still_checked_without_prod(self):
+        self.assertEqual(self.run_contract(), [], "\n".join(self.lines))
+        text = "\n".join(self.lines)
+        self.assertIn("6th try is locked out", text)
+        self.assertNotIn("Turnstile refusal", text)
 
 
 class Pacing(unittest.TestCase):
