@@ -402,10 +402,9 @@ def portfolio_card(e, heading="h3", with_id=True):
     meta = '<span class="tag">%s</span>' % ("Current client" if current else "Past client")
     if e.get("status"):
         meta += " " + status_pill(e["status"])
-    if e.get("one_liner"):
-        text = "<p>%s</p>" % esc(e["one_liner"])
-    else:
-        text = '<p class="text-ph">PLACEHOLDER: one-liner to come from Chris</p>'
+    if not e.get("one_liner"):
+        raise BuildError("portfolio.json %s: a published entry needs a one_liner" % e["id"])
+    text = "<p>%s</p>" % esc(e["one_liner"])
     if current and e.get("link"):
         host = re.sub(r"^https://|/$", "", e["link"])
         link = '<a class="link-arrow" href="%s" rel="noopener">Visit %s</a>' % (esc(e["link"]), esc(host))
@@ -512,7 +511,7 @@ def c_resources(ctx):
     for e in ctx["resources"]["entries"]:
         host = e["domain"]
         guide = ""
-        if e.get("guide"):
+        if e.get("guide") and guide_ready(ctx["guides"][e["guide"]]):
             guide = ' <a class="link-arrow" href="/resources/guides/%s/">IT7Q guide</a>' % esc(e["guide"])
         items.append(
             '<li class="rcard"><h3 class="rcard__title">%s</h3>'
@@ -525,8 +524,13 @@ def c_resources(ctx):
     return '<ul class="rcards">%s</ul>' % "\n".join(items)
 
 
+def guide_ready(g):
+    """A guide gets its page and links only once Chris's .md or .pdf is in src/guides/."""
+    return g["md"] or g["pdf"]
+
+
 def guide_status(g):
-    if g["md"] or g["pdf"]:
+    if guide_ready(g):
         return '<span class="status status--done">Available</span>'
     return status_pill("Coming soon")
 
@@ -538,13 +542,17 @@ def c_guides(ctx):
         for item in section["guides"]:
             g = ctx["guides"][item["slug"]]
             chapter = '<span class="tag">Chapter %d</span> ' % g["chapter"] if g.get("chapter") else ""
-            pdf = ""
-            if g["pdf"]:
-                pdf = ' <a class="link-arrow" href="/%s/%s.pdf" download>PDF</a>' % (GUIDE_PDF_DIR, esc(g["slug"]))
+            links = ""
+            if guide_ready(g):
+                pdf = ""
+                if g["pdf"]:
+                    pdf = ' <a class="link-arrow" href="/%s/%s.pdf" download>PDF</a>' % (GUIDE_PDF_DIR, esc(g["slug"]))
+                links = ('<p class="gcard__links"><a class="link-arrow" href="/resources/guides/%s/">Read in browser</a>%s</p>'
+                         % (esc(g["slug"]), pdf))
             cards.append(
-                '<li class="gcard"><p class="pcard__meta">%s%s</p><h4 class="gcard__title">%s</h4><p>%s</p>'
-                '<p class="gcard__links"><a class="link-arrow" href="/resources/guides/%s/">Read in browser</a>%s</p></li>'
-                % (chapter, guide_status(g), esc(g["title"]), esc(g["summary"]), esc(g["slug"]), pdf)
+                '<li class="gcard%s"><p class="pcard__meta">%s%s</p><h4 class="gcard__title">%s</h4><p>%s</p>%s</li>'
+                % ("" if guide_ready(g) else " gcard--soon", chapter, guide_status(g), esc(g["title"]),
+                   esc(g["summary"]), links)
             )
         out.append(
             '<h3 id="guides-%s" class="guides__title">%s</h3><p class="section__lead">%s</p><ul class="gcards">%s</ul>'
@@ -567,16 +575,13 @@ def c_guide_body(ctx):
     if g["md"]:
         text = (GUIDES_SRC / (g["slug"] + ".md")).read_text(encoding="utf-8")
         return '<div class="legal-text">%s</div>' % render_md(text, top=2)
-    if g["pdf"]:
-        return "<p>This guide is a PDF. Use the buttons above to read it in your browser or save a copy.</p>"
-    return ('<p class="text-ph">PLACEHOLDER: guide text and PDF to come from Chris.</p>'
-            "<p>This guide is on its way. In the meantime, if you'd like a hand, just ask.</p>")
+    return "<p>This guide is a PDF. Use the buttons above to read it in your browser or save a copy.</p>"
 
 
 def c_credentials(ctx):
     entries = ctx["credentials"]
     if not entries:
-        return '<p class="text-ph">PLACEHOLDER: qualifications and certifications to come from Chris.</p>'
+        raise BuildError("credentials page built with no entries")
     items = []
     for e in entries:
         meta = " · ".join(esc(e[k]) for k in ("issuer", "year") if str(e.get(k, "")).strip())
@@ -584,6 +589,16 @@ def c_credentials(ctx):
         items.append('<li><h3 class="list-card__title">%s%s</h3>%s</li>'
                      % (esc(e["title"]), extra, "<p>%s</p>" % meta if meta else ""))
     return '<ul class="list-cards credentials">%s</ul>' % "".join(items)
+
+
+def c_credentials_link(ctx):
+    return '<li><a href="/credentials/">Credentials</a></li>' if ctx["credentials"] else ""
+
+
+def c_credentials_about(ctx):
+    if not ctx["credentials"]:
+        return ""
+    return '<p><a class="link-arrow" href="/credentials/">Qualifications and certifications</a></p>'
 
 
 def c_nda_text(ctx):
@@ -814,6 +829,8 @@ COMPONENTS = {
     "guide_actions": c_guide_actions,
     "guide_body": c_guide_body,
     "credentials": c_credentials,
+    "credentials_link": c_credentials_link,
+    "credentials_about": c_credentials_about,
 }
 
 
@@ -1159,11 +1176,14 @@ def build(mock=False):
     for src in sorted((SRC / "pages").rglob("*.html")):
         rel = src.relative_to(SRC / "pages")
         meta, body = parse_page(src.read_text(encoding="utf-8"), str(rel))
+        if meta.get("needs") and not base_ctx[meta["needs"]]:
+            continue  # e.g. Credentials, until Chris's list is in (no placeholder pages)
         outputs[rel] = render_page(meta, body, base_ctx, partials, meta.get("nav", ""), str(rel))
 
     render_template_pages("division.html", [(Path("divisions", d["slug"], "index.html"), {"d": d}) for d in divisions],
                           base_ctx, partials, outputs)
-    render_template_pages("guide.html", [(Path("resources/guides", g, "index.html"), {"g": guides[g]}) for g in guides],
+    render_template_pages("guide.html", [(Path("resources/guides", g, "index.html"), {"g": guides[g]})
+                                         for g in guides if guide_ready(guides[g])],
                           base_ctx, partials, outputs)
 
     for rel, page in outputs.items():

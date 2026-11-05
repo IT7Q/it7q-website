@@ -373,6 +373,9 @@ def check_launch(dist, r):
         text = (dist / page).read_text(encoding="utf-8") if (dist / page).exists() else ""
         if 'class="panel-box nda-explainer"' not in text:
             r.fail(page, "launch: no 'How access works' box before the NDA")
+    for f in sorted(dist.rglob("*")):
+        if f.is_file() and b"PLACEHOLDER" in f.read_bytes():
+            r.fail(str(f.relative_to(dist)), "launch: 'PLACEHOLDER' must not appear anywhere in dist/")
 
 
 def check_fonts(dist, r):

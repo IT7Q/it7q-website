@@ -1,5 +1,5 @@
 {
- "_about": "IT7Q guides on the Resources page (PLAN.md §2.4). Each guide gets /resources/guides/<slug>/. Drop src/guides/<slug>.md in for the browser view and src/guides/<slug>.pdf for the download; until then the page shows a placeholder.",
+ "_about": "IT7Q guides on the Resources page (PLAN.md §2.4). Each guide gets /resources/guides/<slug>/. Drop src/guides/<slug>.md in for the browser view and src/guides/<slug>.pdf for the download; until then the guide shows as a Coming soon card on Resources, with no page and no links.",
  "sections": [
   {
    "key": "series",

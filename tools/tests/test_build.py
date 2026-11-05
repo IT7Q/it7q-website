@@ -219,18 +219,43 @@ class Phase3b(unittest.TestCase):
             with self.assertRaises(build.BuildError):
                 build.check_social({"social": [bad]})
 
+    def test_credentials_hidden_until_the_list_is_in(self):
+        self.assertEqual(build.c_credentials_link({"credentials": []}), "")
+        self.assertEqual(build.c_credentials_about({"credentials": []}), "")
+        entry = [{"title": "Diploma of IT"}]
+        self.assertIn('href="/credentials/"', build.c_credentials_link({"credentials": entry}))
+        self.assertIn('href="/credentials/"', build.c_credentials_about({"credentials": entry}))
+        meta, _ = build.parse_page((build.SRC / "pages/credentials/index.html").read_text(encoding="utf-8"), "c")
+        self.assertEqual(meta.get("needs"), "credentials")
+
+    def test_published_portfolio_needs_a_one_liner(self):
+        e = {"id": "px", "name": "X", "client": "current", "image": "IMG-1", "link": None, "published": True}
+        with self.assertRaises(build.BuildError):
+            build.portfolio_card(e)
+        self.assertIn("<p>Launching soon.</p>", build.portfolio_card(dict(e, one_liner="Launching soon.")))
+
     def test_about_paragraph_stands_alone(self):
         """Q61: the overlapping lines are gone, Chris's paragraph and the Credentials link stay."""
         text = (build.SRC / "pages/about/index.html").read_text(encoding="utf-8")
         self.assertNotIn("started in 2020 in Kallangur", text)
         self.assertNotIn("seven divisions under one roof", text)
         self.assertIn("IT7Q was founded in 2020 by Chris Lord", text)
-        self.assertIn('href="/credentials/"', text)
+        self.assertIn("{{> credentials_about}}", text)  # the Credentials link, once the list is in
 
-    def test_guide_without_files_is_a_placeholder(self):
+    def test_guide_without_files_is_a_coming_soon_card(self):
         g = dict(self.guides["harden-windows"], md=False, pdf=False)
-        self.assertIn("Coming soon", build.c_guide_actions({"g": g}))
-        self.assertIn("PLACEHOLDER", build.c_guide_body({"g": g}))
+        guides = dict(self.guides, **{"harden-windows": g})
+        data = {"sections": [{"key": "m", "title": "Manuals", "intro": "i", "guides": [{"slug": "harden-windows"}]}]}
+        card = build.c_guides({"guides_data": data, "guides": guides})
+        self.assertIn("gcard--soon", card)
+        self.assertIn("Coming soon", card)
+        self.assertIn(g["title"], card)
+        self.assertNotIn("href=", card)  # no page, no download until the file exists
+        ready = build.c_guides({"guides_data": data, "guides": dict(guides, **{"harden-windows": dict(g, pdf=True)})})
+        self.assertIn('href="/resources/guides/harden-windows/"', ready)
+        res = {"entries": [{"name": "X", "what": "w", "why": "y", "download": "https://x.example/", "domain": "x.example",
+                            "guide": "harden-windows"}]}
+        self.assertNotIn("IT7Q guide", build.c_resources({"resources": res, "guides": guides}))
         out = build.c_guide_actions({"g": dict(g, pdf=True)})
         self.assertIn('href="/resources/guides/pdf/harden-windows.pdf" download', out)
 

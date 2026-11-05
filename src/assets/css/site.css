@@ -253,7 +253,6 @@ p { margin: 0 0 1em; }
 }
 .pfcard { --d: var(--purple); }
 .pfcard__link { margin: auto 0 0; padding-top: 0.75rem; }
-.text-ph { color: var(--text-muted); font-style: italic; border: 1px dashed var(--navy-3); padding: 0.4rem 0.6rem; border-radius: 0.4rem; }
 
 /* ---------- Divisions index */
 .dcards { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); gap: 1.25rem; }
@@ -474,5 +473,6 @@ p { margin: 0 0 1em; }
 .gcard__title { font-size: 1.2rem; margin-bottom: 0.3rem; }
 .gcard__links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
 .gcard .gcard__links { margin: auto 0 0; }
+.gcard--soon { border-left-color: var(--navy-3); }
 .guide-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
 .credentials li { border-top-color: var(--cyan); }

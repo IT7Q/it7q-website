@@ -134,6 +134,9 @@ class CheckGuards(unittest.TestCase):
             return s.replace("</main>", "<p>ClamAV and WireGuard are worth a look.</p></main>")
         self.assertNotIn("public-wording guard", self.failures_after("resources/index.html", add))
         self.assertIn("public-wording guard", self.failures_after("shop/index.html", add))
+        guide = self.dist / "resources/guides/clamav/index.html"  # built once Chris's file is in
+        guide.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(self.dist / "resources/index.html", guide)
         out = self.failures_after("resources/guides/clamav/index.html",
                                   lambda s: s.replace("</main>", "<p>We use ClamAV on our servers.</p></main>"))
         self.assertIn("reads as IT7Q's own setup (Q55)", out)
@@ -253,6 +256,10 @@ class CheckGuards(unittest.TestCase):
         self.assertIn("legal/privacy/index.html: launch: no 'Last updated: <date>' line", out)
         out = launch_after("access/index.html", lambda s: s.replace("nda-explainer", "x"))
         self.assertIn("access/index.html: launch: no 'How access works' box", out)
+        out = launch_after("portfolio/index.html", lambda s: s.replace("</main>", "<p>PLACEHOLDER: later</p></main>"))
+        self.assertIn("portfolio/index.html: launch: 'PLACEHOLDER' must not appear anywhere in dist/", out)
+        out = launch_after("assets/css/site.css", lambda s: s + "/* PLACEHOLDER */")
+        self.assertIn("assets/css/site.css: launch: 'PLACEHOLDER'", out)
         out = self.with_endpoints("PLACEHOLDER-turnstile-site-key")
         self.assertIn("launch: turnstile_site_key is 'PLACEHOLDER-turnstile-site-key'", out)
         out = self.with_endpoints("0x4AAAAAAAexampleKey00")
