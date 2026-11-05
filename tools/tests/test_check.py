@@ -184,6 +184,13 @@ class CheckGuards(unittest.TestCase):
         out = self.inject("<p>PORTUS can help people escaping abuse.</p>")
         self.assertIn("PORTUS discretion guard", out)
 
+    def test_artwork_guard(self):
+        out = self.failures_after("index.html", lambda s: s.replace(
+            "<main", '<div class="ph ph--1x1"><span class="ph__id">IMG-99</span></div><main', 1))
+        self.assertIn("index.html: visible image placeholder left", out)
+        out = self.failures_after("index.html", lambda s: re.sub(r' data-img="[^"]+"', "", s, count=1))
+        self.assertIn("index.html: artwork without role, label or image id", out)
+
     def test_footer_guard(self):
         out = self.failures_after("index.html", lambda s: s.replace(
             '<nav id="site-nav"', '<a href="https://staff.it7q.com.au">Staff</a><nav id="site-nav"'))

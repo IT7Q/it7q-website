@@ -198,11 +198,11 @@ p { margin: 0 0 1em; }
 .mission { font-family: var(--font-head); font-weight: 600; font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.35; }
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
 .split--feature { align-items: center; }
-.panel .ph { margin-bottom: 1.25rem; }
+.panel .art { margin-bottom: 1.25rem; }
 .grid { display: grid; gap: 1.25rem; margin-bottom: 1.5rem; }
 .grid--3 { grid-template-columns: repeat(3, 1fr); }
 .card { padding: 1.25rem; border-radius: var(--radius); background: var(--navy-2); border: 1px solid var(--navy-3); }
-.card .ph { margin: -1.25rem -1.25rem 1.25rem; border-radius: var(--radius) var(--radius) 0 0; }
+.card .art { margin: -1.25rem -1.25rem 1.25rem; border-radius: var(--radius) var(--radius) 0 0; }
 .card__title { font-size: 1.35rem; }
 .card--soon { border-color: color-mix(in srgb, var(--c-msp) 60%, var(--navy-3)); }
 @media (max-width: 48rem) { .split, .grid--3 { grid-template-columns: 1fr; } }
@@ -235,7 +235,7 @@ p { margin: 0 0 1em; }
   scroll-margin-top: 5.5rem;
 }
 .pcard:target { outline: 2px solid var(--d, var(--cyan)); outline-offset: 3px; }
-.pcard .ph { border-radius: 0; border-width: 0 0 2px; }
+.pcard .art { border-radius: 0; border-bottom: 1px solid var(--navy-3); }
 .pcard__body { display: flex; flex-direction: column; gap: 0.1rem; padding: 1.1rem 1.25rem 1.25rem; flex: 1; }
 .pcard__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
 .pcard__title { font-size: 1.35rem; color: var(--text); margin-bottom: 0.35rem; }
@@ -245,11 +245,11 @@ p { margin: 0 0 1em; }
 .pcard--compact .pcard__title { font-size: 1.15rem; }
 .pcard--compact .pcard__body { padding: 0.9rem 1rem 1rem; font-size: 0.95rem; }
 .pcard--featured { grid-column: 1 / -1; display: grid; grid-template-columns: 3fr 2fr; }
-.pcard--featured .ph { height: 100%; border-width: 0 2px 0 0; }
+.pcard--featured .art { height: 100%; border-bottom: 0; border-right: 1px solid var(--navy-3); }
 .pcard--featured .pcard__title { font-size: clamp(1.6rem, 3vw, 2.1rem); }
 @media (max-width: 48rem) {
   .pcard--featured { grid-template-columns: 1fr; }
-  .pcard--featured .ph { border-width: 0 0 2px; }
+  .pcard--featured .art { border-right: 0; border-bottom: 1px solid var(--navy-3); }
 }
 .pfcard { --d: var(--purple); }
 .pfcard__link { margin: auto 0 0; padding-top: 0.75rem; }
@@ -398,18 +398,41 @@ p { margin: 0 0 1em; }
 .legal-text--scroll { max-height: 26rem; overflow-y: auto; padding: 0.5rem 1.25rem 1rem; border: 1px solid var(--navy-3); border-radius: var(--radius); background: var(--navy); }
 .legal-text--scroll h3:first-child { margin-top: 0.8rem; }
 
-/* ---------- Image placeholders (PLAN.md §5) */
-.ph {
-  position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.35rem;
-  width: 100%; padding: 1rem; text-align: center; border-radius: var(--radius);
-  border: 2px dashed var(--navy-3); color: var(--text-muted); font-size: 0.85rem;
-  background: repeating-linear-gradient(45deg, var(--navy-2) 0 12px, color-mix(in srgb, var(--navy-2) 70%, var(--navy-3)) 12px 24px);
+/* ---------- Image artwork (PLAN.md §5): drawn by build.py until the real photo exists */
+.art {
+  --d: var(--cyan);
+  position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.6rem;
+  width: 100%; overflow: hidden; text-align: center; border-radius: var(--radius); container-type: inline-size;
+  background:
+    radial-gradient(circle at 72% 28%, color-mix(in srgb, var(--d) 30%, transparent), transparent 58%),
+    linear-gradient(135deg, color-mix(in srgb, var(--d) 16%, var(--navy)), var(--navy) 72%);
 }
 .ph--16x9 { aspect-ratio: 16 / 9; }
 .ph--16x10 { aspect-ratio: 16 / 10; }
 .ph--1x1 { aspect-ratio: 1; }
 .ph--og { aspect-ratio: 40 / 21; }
-.ph__id { font-family: var(--font-head); font-weight: 700; font-size: 1.1rem; color: var(--text); letter-spacing: 0.06em; }
+.art__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.art__deco { opacity: 0.16; }
+.art__deco--faint { opacity: 0.08; }
+.art__ring { fill: none; stroke: var(--d); stroke-width: 2; opacity: 0.28; vector-effect: non-scaling-stroke; }
+.art--brand { background: radial-gradient(circle at 70% 25%, color-mix(in srgb, var(--cyan) 22%, transparent), transparent 55%), radial-gradient(circle at 20% 85%, color-mix(in srgb, var(--purple) 22%, transparent), transparent 55%), var(--navy); }
+.art--brand .art__deco { opacity: 0.22; }
+/* TEMPESTAS shield */
+.art__shield-rim { fill: var(--d); }
+.art__shield-field { fill: var(--navy-2); }
+.art__shield-half { fill: color-mix(in srgb, var(--d) 24%, var(--navy-2)); }
+.art__chev { fill: none; stroke: color-mix(in srgb, var(--d) 70%, white); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
+.art__rivet { fill: color-mix(in srgb, var(--d) 45%, white); }
+/* FABRICUS range: photo on the way */
+.art--soon { background: linear-gradient(135deg, color-mix(in srgb, var(--d) 14%, var(--navy-2)), var(--navy-2)); color: var(--d-text, var(--text)); }
+.art__icon { width: clamp(2.2rem, 16cqi, 3.5rem); height: auto; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linejoin: round; opacity: 0.85; }
+.art__soon { font-family: var(--font-head); font-weight: 600; font-size: clamp(0.95rem, 6cqi, 1.3rem); letter-spacing: 0.04em; }
+/* Portfolio: branded card with the client's name */
+.art--client { --d: var(--purple); background: radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--cyan) 26%, transparent), transparent 50%), radial-gradient(circle at 10% 95%, color-mix(in srgb, var(--purple) 34%, transparent), transparent 55%), var(--navy); }
+.art__client { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem 1.25rem; }
+.art__mark { width: clamp(2.2rem, 12cqi, 3.6rem); height: auto; }
+.art__name { font-family: var(--font-head); font-weight: 700; font-size: clamp(1.15rem, 7.5cqi, 2.4rem); line-height: 1.15; color: var(--text); text-wrap: balance; }
+.art__by { font-size: clamp(0.75rem, 3.6cqi, 0.95rem); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .stub-note { margin-top: 2rem; padding: 1rem 1.25rem; border-left: 4px solid var(--lime); background: var(--navy-2); border-radius: 0 var(--radius) var(--radius) 0; color: var(--text-muted); }
 
 /* ---------- Footer */

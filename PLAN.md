@@ -708,7 +708,7 @@ Chris's decision: the NDA, Privacy and Terms go live **without** the lawyer's re
 
 ## 5. Image and media list
 
-Every image starts as a visible placeholder (`PLACEHOLDER <ID> — description (w×h)`, `role="img"` + matching `aria-label`), drawn in HTML/CSS so it isn't a raster. **Public images must not reveal gated detail**: no schematics, board close-ups, admin screens or architecture diagrams.
+Every image slot (`<x-ph id w h>`) is drawn by `tools/build.py` as **on-brand inline SVG artwork** until the real photo exists (6 Nov, Chris): project cards = the division badge on division-coloured abstract circles; TEMPESTAS tiers T1–T5 = an illustrated heraldic shield, one chevron per tier, **no prices or specs**; the FABRICUS range = a "Photo coming soon" card; portfolio = a branded card with the client's name; About and Shop = IT7Q brand artwork in the four card colours. Colours come only from CSS tokens. Each keeps its image id (`data-img`), `role="img"` + an `aria-label`, and its aspect ratio, so a real photo (watermarked, §5.1) replaces it with no layout change. `check.py` fails on any grey placeholder box or artwork without its id. **Public images must not reveal gated detail**: no schematics, board close-ups, admin screens or architecture diagrams.
 
 ### 5.1 Watermark (build time)
 
@@ -929,3 +929,4 @@ rm -rf .venv && python3 -m venv .venv  # recreate it, now with pip
 - **3 Nov 2026: Phase 6 prepared.** DEPLOY steps 1–7 done (8 deferred). Webhook base → `forms.it7q.com.au`, nubius refused, site-key placeholder, `check.py --launch`, `deploy/LAUNCH.md` (Direct Upload recommended), `deploy/staff/` placeholder. Q66 asked.
 - **3 Nov 2026: Q66 answered.** Turnstile site key in `endpoints.json`; `check.py --launch` now fails only on the legal draft notes (Q36). `contract.py` paces live runs under the 6e burst rule (DEPLOY 9a hit 429s).
 - **3 Nov 2026: launch decision (plan v16).** Draft notes removed; "Last updated" dates from `src/data/legal.json`; a "How access works" box on Access and the NDA page, quoting the NDA verbatim (the build fails on a misquote); `--launch` gate updated and passing; re-acceptance planned (§4.14); legal review when funds allow (§4.15).
+- **6 Nov 2026: image artwork.** LAUNCH step 4 done (Pages project live on `pages.dev`). All 86 image placeholders replaced by SVG artwork (§5); new `check.py` artwork gate.

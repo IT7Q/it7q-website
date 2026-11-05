@@ -58,9 +58,64 @@ class Projects(unittest.TestCase):
             build.check_projects(self.projects + [self.projects[0]], self.divisions)
 
     def test_placeholder_label_escaped_once(self):
-        out = build.render_placeholders('<x-ph id="X" w="800" h="500">Tea &amp; towels</x-ph>', "t")
+        specs = {"X": {"kind": "client", "name": "Tea & towels"}}
+        out = build.render_placeholders('<x-ph id="X" w="800" h="500">Tea &amp; towels</x-ph>', "t", specs)
         self.assertIn("Tea &amp; towels", out)
         self.assertNotIn("&amp;amp;", out)
+
+
+class Artwork(unittest.TestCase):
+    """Image slots are on-brand artwork that keeps the image id for the real photo later."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.specs = build.art_specs(build.load_json("projects.json"), build.load_json("portfolio.json"))
+
+    def draw(self, pid, w=800, h=500):
+        return build.render_placeholders('<x-ph id="%s" w="%d" h="%d">label</x-ph>' % (pid, w, h), "t", self.specs)
+
+    def test_kinds(self):
+        kinds = {pid: s["kind"] for pid, s in self.specs.items()}
+        self.assertEqual({k for k, v in kinds.items() if v == "shield"},
+                         {"P-TEM-01", "P-TEM-02", "P-TEM-03", "P-TEM-04", "P-TEM-05"})
+        self.assertEqual(kinds["P-TEM-06"], "project")  # the carrier board isn't a tier
+        self.assertEqual(kinds["P-FAB-001"], "soon")
+        self.assertEqual(kinds["P-FAB-101"], "project")  # the FABRICUS App is software, not a photo
+        self.assertEqual(kinds["IMG-19"], "client")
+        self.assertNotIn("IMG-29", kinds)  # about and shop get brand artwork
+
+    def test_id_and_ratio_kept(self):
+        for pid, w, h, ratio in (("P-MSP-01", 800, 500, "16x10"), ("IMG-30", 1600, 900, "16x9"),
+                                 ("IMG-29", 800, 800, "1x1")):
+            out = self.draw(pid, w, h)
+            self.assertIn('data-img="%s"' % pid, out)
+            self.assertIn("ph--%s" % ratio, out)
+            self.assertIn('role="img"', out)
+            self.assertNotIn("PLACEHOLDER", out)
+
+    def test_shield_has_one_chevron_per_tier_and_no_text(self):
+        for n in range(1, 6):
+            out = self.draw("P-TEM-0%d" % n)
+            self.assertEqual(out.count('class="art__chev"'), n)
+            self.assertNotIn("<text", out)
+            self.assertIsNone(re.search(r"\$|\bGB\b|\bMHz\b|\bWi-?Fi\b", out, re.I))  # prices stay gated
+            self.assertIn("d-tempestas", out)
+
+    def test_clip_ids_unique_on_a_page(self):
+        page = "".join('<x-ph id="P-TEM-0%d" w="800" h="500">x</x-ph>' % n for n in range(1, 6))
+        ids = re.findall(r'clipPath id="([^"]+)"', build.render_placeholders(page, "t", self.specs))
+        self.assertEqual(len(ids), len(set(ids)), ids)
+
+    def test_project_art_is_division_badge_no_hex(self):
+        out = self.draw("P-OPUS-01")
+        self.assertIn("d-opus", out)
+        self.assertIn('class="badge__t1"', out)
+        self.assertIsNone(re.search(r"#[0-9A-Fa-f]{3,6}\b", out))  # colours come from CSS only
+
+    def test_soon_and_client(self):
+        self.assertIn("Photo coming soon", self.draw("P-FAB-010"))
+        out = self.draw("IMG-21", 1600, 1000)
+        self.assertIn('<span class="art__name">Pine Rivers RSL Sub Branch</span>', out)
 
 
 class LegalAndForms(unittest.TestCase):

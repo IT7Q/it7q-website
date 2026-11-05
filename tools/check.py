@@ -567,6 +567,20 @@ def check_footer_links(dist, r, site=None):
                 r.fail(where, "footer guard: hidden social link %s is on the page" % h)
 
 
+ART_DIV = re.compile(r'<div class="art (?:[^"]*)"([^>]*)>')
+
+
+def check_artwork(dist, r):
+    """No grey placeholder boxes: every image slot is artwork that keeps its image id (PLAN.md §5)."""
+    for f in dist.rglob("*.html"):
+        text = f.read_text(encoding="utf-8")
+        if re.search(r'class="ph[ "]|ph__|PLACEHOLDER (?:IMG|P)-', text):
+            r.fail(rel(f), "visible image placeholder left")
+        for m in ART_DIV.finditer(text):
+            if not re.search(r' role="img" aria-label="[^"]+" data-img="[\w-]+"', m.group(1)):
+                r.fail(rel(f), "artwork without role, label or image id: %r" % m.group(0)[:120])
+
+
 def approved_prices():
     """Dollar amounts named in projects.json public_price fields (Q28: SCUTUM only)."""
     path = SRC / "data/projects.json"
@@ -597,6 +611,7 @@ def run(dist, mock=False, launch=False):
     check_pdfs(dist, r)
     check_portus(dist, r)
     check_footer_links(dist, r)
+    check_artwork(dist, r)
     if launch:
         check_launch(dist, r)
     return r
@@ -621,7 +636,7 @@ def main(argv):
         return 1
     pages = len(list(dist.rglob("*.html")))
     print("check passed: %d pages, links, CSP, wording, prices, pack colours, SVGs, watermarks, fonts, consent, "
-          "downloads, PDFs, PORTUS, footer%s" % (pages, ", LAUNCH gates" if launch else ""))
+          "downloads, PDFs, PORTUS, footer, artwork%s" % (pages, ", LAUNCH gates" if launch else ""))
     return 0
 
 

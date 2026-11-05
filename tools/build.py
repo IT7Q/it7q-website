@@ -9,7 +9,7 @@
 Pages are src/pages/**/*.html with a small front-matter block. Templating:
     {{site.key}} / {{d.key}}   escaped value from data
     {{> component}}            generated HTML block (see COMPONENTS)
-    <x-ph id w h>text</x-ph>   visible image placeholder
+    <x-ph id w h>text</x-ph>   image slot: on-brand SVG artwork until the real photo exists
 Anything unresolved fails the build. Raster images are watermarked on the way
 to dist/ (§5.1); sources in src/ are never modified. Stdlib only, except that
 JPEG/WebP sources need Pillow (requirements.txt, Q43).
@@ -847,7 +847,109 @@ def render_vars(text, ctx, where, escape=True):
     return re.sub(r"\{\{\s*([\w.]+)\s*\}\}", sub, text)
 
 
-def render_placeholders(text, where):
+# ---------------------------------------------------------------- artwork
+# Every <x-ph> image slot is drawn as on-brand SVG artwork until a real photo or render exists.
+# The image id stays on the element (data-img) and the box keeps its aspect ratio, so the photo
+# replaces it later with no layout change. Colours come from CSS (tokens.css), never hex here.
+TIER_NAME = re.compile(r"^T(\d) ")
+
+
+def art_specs(projects, portfolio):
+    """Image id -> how to draw it. Ids not listed (about, shop) get IT7Q brand artwork."""
+    specs = {}
+    for p in projects:
+        tier = TIER_NAME.match(p["name"])
+        if p["division"] == "tempestas" and tier:
+            kind = "shield"
+        elif p["division"] == "fabricus" and p.get("group") == "range":
+            kind = "soon"
+        else:
+            kind = "project"
+        specs[p["id"]] = {"kind": kind, "d": p["division"], "name": p["name"],
+                          "tier": int(tier.group(1)) if tier else 0}
+    for e in portfolio:
+        specs[e["image"]] = {"kind": "client", "name": e["name"]}
+    return specs
+
+
+def _seed(pid, n):
+    return int(hashlib.sha256(pid.encode()).hexdigest()[:8], 16) % n
+
+
+def _mark_at(x, y, size, uses, css="", transform=""):
+    """The four circle shapes (sprite #m-*), as a size x size square at x, y."""
+    inner = "".join('<use href="#m-%s" class="%s"/>' % u for u in uses)
+    t = ' transform="%s"' % transform if transform else ""
+    return ('<g%s%s><svg x="%g" y="%g" width="%g" height="%g" viewBox="{{mark_viewbox}}">%s</svg></g>'
+            % (' class="%s"' % css if css else "", t, x, y, size, size, inner))
+
+
+BADGE_USES = [("tl", "badge__t1"), ("tr", "badge__t2"), ("bl", "badge__t2"), ("br", "badge__t1")]
+MASTER_USES = [("tl", "mark__tl"), ("tr", "mark__tr"), ("bl", "mark__bl"), ("br", "mark__br")]
+
+
+def _art_svg(w, h, inner):
+    return ('<svg class="art__svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid slice" aria-hidden="true" '
+            'focusable="false">%s</svg>' % (w, h, inner))
+
+
+def art_project(pid, w, h):
+    """Division badge on division-coloured abstract circles."""
+    turn = (_seed(pid, 8) - 4) * 9
+    big = h * 1.35
+    deco = (_mark_at(w * 0.52 + _seed(pid, 7) * h * 0.04, -h * 0.3, big, BADGE_USES, "art__deco",
+                     "rotate(%d %g %g)" % (turn, w * 0.52 + big / 2, -h * 0.3 + big / 2))
+            + _mark_at(-h * 0.25, h * 0.5, h * 0.75, BADGE_USES, "art__deco art__deco--faint"))
+    size = h * 0.46
+    rings = "".join('<circle class="art__ring" cx="%g" cy="%g" r="%g"/>' % (w / 2, h / 2, size * k) for k in (0.68, 0.9))
+    return _art_svg(w, h, deco + rings + _mark_at((w - size) / 2, (h - size) / 2, size, BADGE_USES))
+
+
+SHIELD_OUTER = "M50 3 L94 15 V50 C94 84 73 104 50 117 C27 104 6 84 6 50 V15 Z"
+SHIELD_FIELD = "M50 11 L86 21 V50 C86 79 68 96 50 107 C32 96 14 79 14 50 V21 Z"
+
+
+def art_shield(pid, w, h, tier, clip_id):
+    """A plain heraldic shield: one chevron per tier. No prices or specs, ever (gated, §4.9)."""
+    sh = h * 0.8
+    sw = sh * 100 / 120
+    chevrons = "".join('<polyline class="art__chev" points="18,%d 50,%d 82,%d"/>' % (y + 10, y - 6, y + 10)
+                       for y in (60 + 10 * i for i in range(tier)))
+    rivets = "".join('<circle class="art__rivet" cx="%g" cy="%g" r="1.8"/>' % xy
+                     for xy in ((10, 18), (90, 18), (50, 7), (10, 48), (90, 48), (50, 112)))
+    shield = (
+        '<svg x="%g" y="%g" width="%g" height="%g" viewBox="0 0 100 120">'
+        '<defs><clipPath id="%s"><path d="%s"/></clipPath></defs>'
+        '<path class="art__shield-rim" d="%s"/><path class="art__shield-field" d="%s"/>'
+        '<g clip-path="url(#%s)"><rect class="art__shield-half" x="50" y="0" width="50" height="120"/>%s</g>'
+        '%s%s</svg>'
+        % ((w - sw) / 2, (h - sh) / 2, sw, sh, clip_id, SHIELD_FIELD, SHIELD_OUTER, SHIELD_FIELD, clip_id,
+           chevrons, rivets, _mark_at(39, 24, 22, BADGE_USES))
+    )
+    rings = "".join('<circle class="art__ring" cx="%g" cy="%g" r="%g"/>' % (w / 2, h / 2, sh * k) for k in (0.55, 0.72))
+    return _art_svg(w, h, _mark_at(w * 0.6, -h * 0.35, h * 1.4, BADGE_USES, "art__deco art__deco--faint") + rings + shield)
+
+
+def art_brand(pid, w, h):
+    """IT7Q master mark on soft circles in the four business-card colours."""
+    corners = [("tl", "mark__tl"), ("tr", "mark__tr"), ("bl", "mark__bl"), ("br", "mark__br")]
+    k = _seed(pid, 4)
+    first, second = corners[k], corners[(k + 2) % 4]
+    deco = (_mark_at(w * 0.55, -h * 0.35, h * 1.4, [first], "art__deco mark--master")
+            + _mark_at(-h * 0.3, h * 0.35, h * 1.1, [second], "art__deco mark--master"))
+    size = h * 0.42
+    return _art_svg(w, h, deco + _mark_at((w - size) / 2, (h - size) / 2, size, MASTER_USES, "mark--master"))
+
+
+CAMERA = ('<svg class="art__icon" viewBox="0 0 48 40" aria-hidden="true" focusable="false">'
+          '<path d="M6 10h9l4-6h10l4 6h9a3 3 0 0 1 3 3v21a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V13a3 3 0 0 1 3-3z"/>'
+          '<circle cx="24" cy="23" r="8"/></svg>')
+
+
+def render_placeholders(text, where, specs=None):
+    specs = specs or {}
+    clips = iter(range(1, 10000))
+
     def sub(m):
         attrs = dict(re.findall(r'(\w+)="([^"]*)"', m.group(1)))
         label = html.unescape(m.group(2).strip())  # components pass escaped text; escape exactly once below
@@ -858,13 +960,26 @@ def render_placeholders(text, where):
         g = gcd(w, h)
         ratio = PH_RATIOS.get((w // g, h // g))
         if not ratio:
-            raise BuildError("%s: no placeholder style for %dx%d" % (where, w, h))
-        text_ = "PLACEHOLDER %s — %s (%d×%d)" % (pid, label, w, h)
-        return (
-            '<div class="ph ph--%s" role="img" aria-label="%s">'
-            '<span class="ph__id">%s</span><span class="ph__text">%s</span></div>'
-            % (ratio, esc("Placeholder: " + label), esc(pid), esc(text_))
-        )
+            raise BuildError("%s: no image style for %dx%d" % (where, w, h))
+        spec = specs.get(pid, {"kind": "brand"})
+        kind, name = spec["kind"], spec.get("name", label)
+        cls = "art art--%s ph--%s" % (kind, ratio) + (" d-%s" % spec["d"] if spec.get("d") else "")
+        if kind == "shield":
+            aria, inner = "%s: illustrated TEMPESTAS shield" % name, art_shield(pid, w, h, spec["tier"],
+                                                                               "art-clip-%d" % next(clips))
+        elif kind == "project":
+            aria, inner = "%s: %s artwork" % (name, spec["d"].upper()), art_project(pid, w, h)
+        elif kind == "soon":
+            aria = "Photo coming soon: %s" % name
+            inner = '%s<span class="art__soon">Photo coming soon</span>' % CAMERA
+        elif kind == "client":
+            aria = "%s: IT7Q client" % name
+            inner = ('<span class="art__client">%s<span class="art__name">%s</span>'
+                     '<span class="art__by">Website by IT7Q</span></span>'
+                     % (mark_svg("art__mark mark mark--master"), esc(name)))
+        else:
+            aria, inner = "IT7Q artwork", art_brand(pid, w, h)
+        return '<div class="%s" role="img" aria-label="%s" data-img="%s">%s</div>' % (cls, esc(aria), esc(pid), inner)
     return re.sub(r"<x-ph\s+([^>]*)>(.*?)</x-ph>", sub, text, flags=re.S)
 
 
@@ -884,7 +999,7 @@ def page_scripts(meta, where):
 def render_page(meta, body, ctx, partials, nav_key, where):
     ctx = dict(ctx, meta=meta)
     body = render_components(body, ctx, where)
-    body = render_placeholders(body, where)
+    body = render_placeholders(body, where, ctx.get("art"))
     nav_items = "\n".join(
         '        <li><a href="%s"%s>%s</a></li>'
         % (esc(n["href"]), ' aria-current="page"' if n["key"] == nav_key else "", esc(n["label"]))
@@ -1038,6 +1153,7 @@ def build(mock=False):
         "resources": resources, "guides_data": guides_data, "guides": guides,
         "credentials": check_credentials(load_json("credentials.json")),
     }
+    base_ctx["art"] = art_specs(projects, base_ctx["portfolio"])
 
     outputs = {}
     for src in sorted((SRC / "pages").rglob("*.html")):
