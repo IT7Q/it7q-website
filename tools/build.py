@@ -1105,6 +1105,13 @@ def copy_assets(mark_svg_text, image_opts):
 
 # ---------------------------------------------------------------- main
 
+def form_keys():
+    """forms.json field names per form: forms.js sends these and nothing else (plus its system fields)."""
+    forms = load_json("forms.json")
+    return {k: {"fields": [f["name"] for f in v["fields"]], "system": v.get("system", [])}
+            for k, v in forms.items() if not k.startswith("_")}
+
+
 def config_js(nda, mock):
     endpoints = load_json("endpoints.json")
     site_key = endpoints["turnstile_site_key"]
@@ -1116,6 +1123,7 @@ def config_js(nda, mock):
         "mock": mock,
         "ndaVersion": nda["version"],
         "ndaSha256": nda["sha256"],
+        "forms": form_keys(),
     }
     if not mock and not cfg["turnstileSiteKey"]:
         print("warning: no Turnstile site key yet (endpoints.json); forms stay switched off until it's set (LAUNCH.md step 1)")

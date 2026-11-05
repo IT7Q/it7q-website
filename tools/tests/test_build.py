@@ -262,3 +262,57 @@ class Phase3b(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FormPayloads(unittest.TestCase):
+    """No form may send a key the webhooks don't know (the live cf-turnstile-response bug, 400 invalid).
+
+    There's no JS runtime on Pantheon, so this checks the code paths statically: what the built
+    forms contain, what config.js allows, and every key forms.js or nda.js can put in a body."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.forms = {k: v for k, v in build.load_json("forms.json").items() if not k.startswith("_")}
+        cls.js = (build.SRC / "assets/js/forms.js").read_text(encoding="utf-8")
+        cls.nda_js = (build.SRC / "assets/js/nda.js").read_text(encoding="utf-8")
+        common = (build.ROOT / "n8n/code/common.js").read_text(encoding="utf-8")
+        cls.server_system = json.loads(re.search(r"const SYSTEM_FIELDS = (\[.*?\]);", common).group(1).replace("'", '"'))
+
+    def allowed(self, key):
+        return {f["name"] for f in self.forms[key]["fields"]} | set(self.server_system) | set(
+            self.forms[key].get("system", []))
+
+    def test_config_lists_exactly_the_forms_json_fields(self):
+        keys = build.form_keys()
+        self.assertEqual(set(keys), set(self.forms))
+        for k, v in keys.items():
+            self.assertEqual(v["fields"], [f["name"] for f in self.forms[k]["fields"]])
+            self.assertEqual(v["system"], self.forms[k].get("system", []))
+
+    def test_rendered_forms_hold_only_known_inputs(self):
+        ctx = {"forms": self.forms, "divisions": build.load_json("divisions.json"),
+               "site": build.load_json("site.json"), "nda": build.load_nda()}
+        for key in self.forms:
+            out = build.render_form(key, ctx)
+            names = set(re.findall(r'<(?:input|select|textarea)\b[^>]*\bname="([^"]+)"', out))
+            self.assertEqual(names, {f["name"] for f in self.forms[key]["fields"]} | {"website"}, key)
+
+    def test_forms_js_never_reads_the_whole_form(self):
+        self.assertNotIn("FormData", self.js + self.nda_js)
+        self.assertNotRegex(self.js, r'querySelectorAll\("input\[name\]')
+        self.assertIn('"response-field": false', self.js)  # Turnstile adds no cf-turnstile-response input
+        js_system = json.loads(re.search(r"var SYSTEM_FIELDS = (\[.*?\]);", self.js).group(1))
+        self.assertEqual(set(js_system), set(self.server_system))
+        # The allowlist is the last thing applied before posting.
+        submit = self.js[self.js.index('form.addEventListener("submit"'):]
+        self.assertLess(submit.index("body = pick(body, key);"), submit.index("post(hook, body)"))
+        self.assertGreater(submit.index("body = pick(body, key);"), submit.index("h.extra(body)"))
+
+    def test_every_key_the_scripts_set_is_allowed(self):
+        set_here = set(re.findall(r"\bbody\.(\w+) =", self.js))
+        self.assertTrue(set_here <= set(self.server_system), set_here)
+        parts = re.split(r'F\.register\("(\w+)"', self.nda_js)  # [before, key1, block1, key2, block2, ...]
+        self.assertEqual(sorted(parts[1::2]), ["nda_login", "nda_request"])
+        for key, block in zip(parts[1::2], parts[2::2]):
+            extra = set(re.findall(r"\bbody\.(\w+) =", block))
+            self.assertTrue(extra <= self.allowed(key), (key, extra - self.allowed(key)))

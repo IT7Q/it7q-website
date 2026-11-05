@@ -74,6 +74,7 @@
         t.id = window.turnstile.render(box, {
           sitekey: CFG.turnstileSiteKey,
           action: form.getAttribute("data-turnstile-action"),
+          "response-field": false, // no hidden cf-turnstile-response input: the token goes in body.turnstile
           callback: function (token) { t.token = token; },
           "expired-callback": function () { t.token = ""; },
           "error-callback": function () { t.token = ""; }
@@ -91,13 +92,32 @@
 
   // ------------------------------------------------------------ fields
 
-  function controls(form) {
-    return Array.prototype.slice.call(form.querySelectorAll("input[name], select[name], textarea[name]"));
+  // The only keys a form may send: its fields in forms.json (CFG.forms, from the build), the
+  // system fields set below, and its own extras (nda_version, nda_sha256). The form is never read
+  // whole: Turnstile or a browser extension can add inputs, and the webhooks refuse unknown keys.
+  var SYSTEM_FIELDS = ["website", "turnstile", "elapsed_ms"];
+
+  function spec(key) {
+    return (CFG.forms || {})[key] || { fields: [], system: [] };
   }
 
-  function collect(form) {
+  function controls(form, key) {
+    return spec(key).fields.concat(["website"]).map(function (name) {
+      return form.elements.namedItem(name);
+    }).filter(function (el) { return el && el.name; });
+  }
+
+  function pick(body, key) {
+    var out = {};
+    spec(key).fields.concat(SYSTEM_FIELDS, spec(key).system).forEach(function (name) {
+      if (Object.prototype.hasOwnProperty.call(body, name)) out[name] = body[name];
+    });
+    return out;
+  }
+
+  function collect(form, key) {
     var body = {};
-    controls(form).forEach(function (el) {
+    controls(form, key).forEach(function (el) {
       if (el.type === "checkbox") body[el.name] = el.checked;
       else if (el.type === "password") body[el.name] = el.value;
       else body[el.name] = el.value.trim();
@@ -119,9 +139,9 @@
     return s.trim().replace(/\s+/g, " ").toLowerCase();
   }
 
-  function validate(form) {
+  function validate(form, key) {
     var bad = [];
-    controls(form).forEach(function (el) {
+    controls(form, key).forEach(function (el) {
       if (el.name === "website") return;
       var msg = "";
       var value = el.type === "checkbox" ? el.checked : el.value.trim();
@@ -169,7 +189,7 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (form.getAttribute("aria-busy") === "true") return;
-      var bad = validate(form);
+      var bad = validate(form, key);
       if (bad.length) {
         showStatus(status, "error", "Please fix the highlighted " + (bad.length === 1 ? "field." : "fields."));
         bad[0].focus();
@@ -183,11 +203,12 @@
         showStatus(status, "error", "Please complete the security check first.");
         return;
       }
-      var body = collect(form);
+      var body = collect(form, key);
       body.turnstile = check.token;
       body.elapsed_ms = Date.now() - loadedAt;
       var h = handlers[key] || {};
       if (h.extra) h.extra(body);
+      body = pick(body, key);
 
       form.setAttribute("aria-busy", "true");
       button.disabled = true;
