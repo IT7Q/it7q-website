@@ -6,11 +6,11 @@ Source: `gated/mentis.json` (`reviewed: true`). Public one-liners from `src/data
 
 ## 1. Project Persephone (`P-MEN-01`)
 
-**Public one-liner:** A team of AI agents running IT7Q's back office.
+**Public one-liner:** A planned team of specialised AI agents running IT7Q's back office.
 
 **Gated text:**
 
-> A workforce of 21 specialised AI agents, run on IT7Q's own systems, that handles much of the back office.
+> A planned workforce of 21 specialised AI agents, run on IT7Q's own systems, that handles much of the back office.
 >
 > **Agents at work**
 >

@@ -169,7 +169,7 @@ Source: `gated/opus.json` (`reviewed: true`). Public one-liners from `src/data/p
 
 ## 10. Andromeda CE (`P-OPUS-10`)
 
-**Public one-liner:** A friendly AI companion app that works with more than one AI provider.
+**Public one-liner:** A cut-down AI helper with just the basics, for help when something goes wrong with your PC.
 
 **Gated text:**
 

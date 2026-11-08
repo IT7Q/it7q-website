@@ -150,7 +150,7 @@ Source: `gated/tempestas.json` (`reviewed: true`). Public one-liners from `src/d
 
 ## 6. TEMPESTAS carrier board (`P-TEM-06`)
 
-**Public one-liner:** Our own Australian-designed board that powers the TEMPESTAS range.
+**Public one-liner:** Our own Australian-designed board that powers TEMPESTAS T1 to T4.
 
 **Gated text:**
 
