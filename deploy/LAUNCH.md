@@ -170,19 +170,20 @@ Run these once everything above is Active. Send me any output that doesn't match
 **8a. Headers and the webhook base** (any computer):
 ```
 curl -sI https://it7q.com.au/ | grep -iE '^(content-security-policy|strict-transport-security|x-content-type-options|referrer-policy|permissions-policy|cross-origin-opener-policy)'
-curl -s https://it7q.com.au/assets/js/config.js
+f=$(curl -s https://it7q.com.au/access/ | grep -oE 'config[.][0-9a-f]{10}[.]js'); curl -s "https://it7q.com.au/assets/js/$f"
 ```
-All six headers present. The CSP's `connect-src` names `https://forms.it7q.com.au`. `config.js`
-shows `"hooks": "https://forms.it7q.com.au/webhook"`, `"mock": false` and your site key.
+All six headers present. The CSP's `connect-src` names `https://forms.it7q.com.au`. CSS and JS
+files carry a content hash in their names (e.g. `config.0201723bc0.js`), so the second line finds
+the current one from the page first. `config.js` shows `"hooks": "https://forms.it7q.com.au/webhook"`, `"mock": false` and your site key.
 
 **8b. Live is exactly what passed the checks** (as `chris` on Pantheon, no sudo):
 ```
-for f in assets/js/config.js assets/js/forms.js assets/js/nda.js assets/css/site.css; do
-  a=$(curl -s "https://it7q.com.au/$f" | sha256sum | cut -c1-16); b=$(sha256sum "/home/chris/it7q-release/$f" | cut -c1-16)
-  [ "$a" = "$b" ] && echo "same     $f" || echo "DIFFERENT $f"
-done
+cd /home/chris/it7q-release && for f in assets/js/*.js assets/css/*.css; do
+  a=$(curl -s "https://it7q.com.au/$f" | sha256sum | cut -c1-16); b=$(sha256sum "$f" | cut -c1-16)
+  [ "$a" = "$b" ] && echo "same      $f" || echo "DIFFERENT $f"
+done; cd
 ```
-All four say `same`.
+All seven CSS and JS files say `same`. (Pages aren't compared: Web Analytics can add its script to the live HTML.)
 
 **8c. Pages and the 404:**
 ```
@@ -194,7 +195,9 @@ done
 
 **8d. Nothing internal leaked:**
 ```
-curl -s https://it7q.com.au/ https://it7q.com.au/assets/js/config.js https://it7q.com.au/assets/js/forms.js | grep -ciE 'nubius|n8n|pantheon'
+{ curl -s https://it7q.com.au/ https://it7q.com.au/access/
+  for f in $(curl -s https://it7q.com.au/access/ | grep -oE '/assets/js/[a-z]+[.][0-9a-f]{10}[.]js'); do curl -s "https://it7q.com.au$f"; done
+} | grep -ciE 'nubius|n8n|pantheon'
 ```
 Must print `0`. (`check.py` already blocks these at build time; this proves the live copy matches.)
 
@@ -219,6 +222,31 @@ Both end in `PASSED`.
 `it7q.com.au`, *Web Analytics* shows visits, and `dmarc@` (forwarded to you) starts getting
 reports with `noreply@` mail passing.
 
+**8h. After every release (standing step)**, once the new deployment is live:
+
+1. **Cache** (as `chris` on Pantheon, no sudo). Confirm the live pages point at this release's
+   hashed CSS and JS, and the cache headers are right:
+   ```
+   a=$(curl -s https://it7q.com.au/access/ | grep -oE '[a-z]+[.][0-9a-f]{10}[.](css|js)' | sort | tr '\n' ' ')
+   b=$(grep -oE '[a-z]+[.][0-9a-f]{10}[.](css|js)' /home/chris/it7q-release/access/index.html | sort | tr '\n' ' ')
+   [ "$a" = "$b" ] && echo "live matches the release" || echo "STALE"
+   curl -sI https://it7q.com.au/ | grep -i '^cache-control'
+   curl -sI "https://it7q.com.au/assets/js/$(echo "$b" | grep -oE 'site[.][0-9a-f]{10}[.]js')" | grep -i '^cache-control'
+   ```
+   Expect `live matches the release`, then `max-age=0, must-revalidate` for the page (Pages'
+   default for HTML), then `max-age=31536000, immutable` for the script. If it says `STALE`:
+   Cloudflare → `it7q.com.au` → *Caching* → *Configuration* → **Purge Everything**, wait a
+   minute and run it again. A changed CSS or JS file always gets a new name, so a stale page is
+   the only thing a purge can fix; the old hashed files are harmless.
+2. **Real browser** on `https://it7q.com.au` (not `pages.dev`), with a test address:
+   - *Contact*: send an enquiry. It arrives at `chris@` from `noreply@`.
+   - *Access*: request NDA access. The test address gets its NDA copy, and you get the review email.
+   - Log in with the test address: a generic refusal while it's pending (or the approved
+     divisions open, if you approve it first). Revoke or reject the test request afterwards.
+
+   Check both emails actually arrived (not in spam). If any step fails, roll back
+   (*Undo* below) and send me what you saw.
+
 ---
 
 ## Releasing changes later
@@ -226,7 +254,7 @@ reports with `noreply@` mail passing.
 1. I make the change, the tests pass, and I push. Then step 2 (build) and step 3 (copy).
 2. Project `it7q-website` → *Deployments* → *Create deployment* → **Production** → upload the
    `it7q-release` folder → *Save and deploy*.
-3. 8a–8d again.
+3. 8a–8d again, then **8h** (cache check and the real-browser enquiry, NDA request and login).
 
 ## Undo
 
