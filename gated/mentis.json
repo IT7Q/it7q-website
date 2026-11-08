@@ -8,6 +8,9 @@
       "sections": [
         {
           "heading": "Agents at work",
+          "paragraphs": [
+            "A planned team of 21 agents, including:"
+          ],
           "items": [
             "Oracle: watches the health of IT7Q's systems",
             "A security agent that watches for attacks and blocks repeat offenders",

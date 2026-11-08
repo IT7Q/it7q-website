@@ -8,7 +8,7 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 
 **Public one-liner:** Our flagship security appliance: AI-accelerated threat detection in a box.
 
-> ⚠️ **Note in file:** Tier-specific features beyond the build pack are drafted; Chris to confirm per tier, plus each tier's price.
+> ⚠️ **Note in file:** Tier-specific features beyond the build pack are drafted; Chris to confirm per tier.
 
 **Gated text:**
 
@@ -22,6 +22,10 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 > - A radio sensor that watches for wireless attacks
 > - A 7-inch touch screen for status and control
 >
+> **Price**
+>
+> - $449–$499 (AUD)
+>
 > **The range**
 >
 > The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499.
@@ -30,7 +34,7 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 
 **Public one-liner:** An entry-level security box that blocks ads, trackers and known bad sites for the whole home.
 
-> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features and price.
+> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features.
 
 **Gated text:**
 
@@ -41,6 +45,10 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 > - IT7Q's carrier board
 > - A small status screen on the front
 >
+> **Price**
+>
+> - $149–$179 (AUD)
+>
 > **The range**
 >
 > The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499.
@@ -49,7 +57,7 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 
 **Public one-liner:** A firewall that protects every device in a busy household.
 
-> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features and price.
+> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features.
 
 **Gated text:**
 
@@ -60,6 +68,10 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 > - IT7Q's carrier board
 > - A small status screen on the front
 >
+> **Price**
+>
+> - $249–$299 (AUD)
+>
 > **The range**
 >
 > The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499.
@@ -68,7 +80,7 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 
 **Public one-liner:** Stronger protection for offices with more people and more devices.
 
-> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features and price.
+> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features.
 
 **Gated text:**
 
@@ -80,6 +92,10 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 > - Touch screen
 > - Fast networking for more traffic
 >
+> **Price**
+>
+> - $799–$999 (AUD)
+>
 > **The range**
 >
 > The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499.
@@ -88,7 +104,7 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 
 **Public one-liner:** Our most powerful appliance, for larger networks.
 
-> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features and price.
+> ⚠️ **Note in file:** Tier detail drafted; Chris to confirm features.
 
 **Gated text:**
 
@@ -99,6 +115,10 @@ Source: `gated/tempestas.json` (`reviewed: false`). Public one-liners from `src/
 > - IT7Q's carrier board with AI acceleration
 > - Touch screen
 > - The most headroom for larger networks
+>
+> **Price**
+>
+> - $1,299–$1,499 (AUD)
 >
 > **The range**
 >

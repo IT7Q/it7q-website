@@ -17,13 +17,19 @@
           ]
         },
         {
+          "heading": "Price",
+          "items": [
+            "$449–$499 (AUD)"
+          ]
+        },
+        {
           "heading": "The range",
           "paragraphs": [
             "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
           ]
         }
       ],
-      "notes": "Tier-specific features beyond the build pack are drafted; Chris to confirm per tier, plus each tier's price."
+      "notes": "Tier-specific features beyond the build pack are drafted; Chris to confirm per tier."
     },
     "P-TEM-01": {
       "summary": "The entry-level box: blocks ads, trackers and known bad sites for every device in a smaller home.",
@@ -36,13 +42,19 @@
           ]
         },
         {
+          "heading": "Price",
+          "items": [
+            "$149–$179 (AUD)"
+          ]
+        },
+        {
           "heading": "The range",
           "paragraphs": [
             "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
           ]
         }
       ],
-      "notes": "Tier detail drafted; Chris to confirm features and price."
+      "notes": "Tier detail drafted; Chris to confirm features."
     },
     "P-TEM-02": {
       "summary": "A firewall for a busy household: every device protected, with family-friendly controls.",
@@ -55,13 +67,19 @@
           ]
         },
         {
+          "heading": "Price",
+          "items": [
+            "$249–$299 (AUD)"
+          ]
+        },
+        {
           "heading": "The range",
           "paragraphs": [
             "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
           ]
         }
       ],
-      "notes": "Tier detail drafted; Chris to confirm features and price."
+      "notes": "Tier detail drafted; Chris to confirm features."
     },
     "P-TEM-04": {
       "summary": "Built for growing offices: more people, more devices and more traffic, with AI-accelerated protection.",
@@ -75,13 +93,19 @@
           ]
         },
         {
+          "heading": "Price",
+          "items": [
+            "$799–$999 (AUD)"
+          ]
+        },
+        {
           "heading": "The range",
           "paragraphs": [
             "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
           ]
         }
       ],
-      "notes": "Tier detail drafted; Chris to confirm features and price."
+      "notes": "Tier detail drafted; Chris to confirm features."
     },
     "P-TEM-05": {
       "summary": "The most powerful appliance in the range, for bigger offices and community organisations.",
@@ -95,13 +119,19 @@
           ]
         },
         {
+          "heading": "Price",
+          "items": [
+            "$1,299–$1,499 (AUD)"
+          ]
+        },
+        {
           "heading": "The range",
           "paragraphs": [
             "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
           ]
         }
       ],
-      "notes": "Tier detail drafted; Chris to confirm features and price."
+      "notes": "Tier detail drafted; Chris to confirm features."
     },
     "P-TEM-06": {
       "summary": "IT7Q's own Australian-designed board that powers the whole TEMPESTAS range.",

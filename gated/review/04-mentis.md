@@ -1,20 +1,20 @@
 # Gated review: MENTIS
 
-**5 entries, 2 flagged ⚠️**
+**5 entries, 1 flagged ⚠️**
 
 Source: `gated/mentis.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
-## 1. Project Persephone (`P-MEN-01`) ⚠️
+## 1. Project Persephone (`P-MEN-01`)
 
 **Public one-liner:** A team of AI agents running IT7Q's back office.
-
-> ⚠️ **Claude's note:** Says 21 agents but lists 5 (Oracle, Marianna, Constance, FORTUNA, plus an unnamed security agent). Fine if deliberate.
 
 **Gated text:**
 
 > A workforce of 21 specialised AI agents, run on IT7Q's own systems, that handles much of the back office.
 >
 > **Agents at work**
+>
+> A planned team of 21 agents, including:
 >
 > - Oracle: watches the health of IT7Q's systems
 > - A security agent that watches for attacks and blocks repeat offenders

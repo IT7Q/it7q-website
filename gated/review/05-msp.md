@@ -1,6 +1,6 @@
 # Gated review: MSP
 
-**6 entries, 4 flagged ⚠️**
+**6 entries, 2 flagged ⚠️**
 
 Source: `gated/msp.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
@@ -25,11 +25,9 @@ Source: `gated/msp.json` (`reviewed: false`). Public one-liners from `src/data/p
 > - Checklists for Windows, Android and home routers are being written
 > - Pilot with existing managed clients first
 
-## 2. SCUTUM (`P-MSP-01`) ⚠️
+## 2. SCUTUM (`P-MSP-01`)
 
 **Public one-liner:** 24/7 managed protection for your computers: enterprise-grade, explained in plain English.
-
-> ⚠️ **Claude's note:** Gated text says "target $68 a year per device"; the public card says "From $68 a year (incl. GST)". Pick one wording (target vs from, per device).
 
 **Gated text:**
 
@@ -45,18 +43,16 @@ Source: `gated/msp.json` (`reviewed: false`). Public one-liners from `src/data/p
 > **Why it's different**
 >
 > - Alerts are triaged in-house by IT7Q's own AI (Andromeda) first; an outside AI service is used only when genuinely needed, so client data stays with IT7Q
-> - Priced for homes and small businesses: target $68 a year per device, including GST
+> - Priced for homes and small businesses: from $68 a year per device (incl. GST)
 >
 > **Where it's at**
 >
 > - Built for Windows fleets first
 > - Being piloted on IT7Q's own monitored devices
 
-## 3. MSP Companion App (`P-MSP-02`) ⚠️
+## 3. MSP Companion App (`P-MSP-02`)
 
 **Public one-liner:** One-click sign-up to IT7Q managed protection.
-
-> ⚠️ **Claude's note:** "IT7Q's existing four-device monitored fleet" reveals how small the fleet is. Fine under NDA, or say "IT7Q's own monitored devices" like SCUTUM does?
 
 **Gated text:**
 
@@ -70,7 +66,7 @@ Source: `gated/msp.json` (`reviewed: false`). Public one-liners from `src/data/p
 > **Where it's at**
 >
 > - Working enrolment service built
-> - Pilot on IT7Q's existing four-device monitored fleet
+> - Currently in pilot on a monitored fleet
 
 ## 4. Managed security monitoring (`P-MSP-03`)
 

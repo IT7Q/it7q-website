@@ -1,14 +1,12 @@
 # Gated review: OPUS
 
-**11 entries, 4 flagged ⚠️**
+**11 entries, 2 flagged ⚠️**
 
 Source: `gated/opus.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
-## 1. Athena Browser (`P-OPUS-01`) ⚠️
+## 1. Athena Browser (`P-OPUS-01`)
 
 **Public one-liner:** A private, all-in-one browser built for IT7Q clients.
-
-> ⚠️ **Claude's note:** "A one-click private connection back to IT7Q services" is the VPN feature. It's feature-level (no WireGuard named), but check you're happy with it under §4.9.
 
 **Gated text:**
 
@@ -48,11 +46,9 @@ Source: `gated/opus.json` (`reviewed: false`). Public one-liners from `src/data/
 > - A Windows installer
 > - An Android app
 
-## 3. Calendis and Calendi IT7Q (`P-OPUS-03`) ⚠️
+## 3. Calendis and Calendi IT7Q (`P-OPUS-03`)
 
 **Public one-liner:** Smart scheduling, for you and for your projects.
-
-> ⚠️ **Claude's note:** Names Pine Rivers RSL as the original club. OK to name them to NDA viewers?
 
 **Gated text:**
 
@@ -67,7 +63,7 @@ Source: `gated/opus.json` (`reviewed: false`). Public one-liners from `src/data/
 >
 > **History**
 >
-> - Grew out of a single-club calendar first built for Pine Rivers RSL, since retired
+> - Grew out of a single-club calendar first built for a former club client, since retired
 
 ## 4. LexiScan (`P-OPUS-04`)
 
