@@ -46,6 +46,7 @@ MASTER_COLOURS = {"tl": "#00B4CC", "tr": "#7EC820", "bl": "#8B5CF6", "br": "#F97
 STATUS_CLASS = {
     "Developed": "done", "In development": "dev", "In design": "design",
     "Documented": "doc", "Coming soon": "soon",
+    "In use": "done", "In use in-house": "done", "Concept": "design",  # Chris, gated review 8 Nov
 }
 PROD_SCRIPTS = ("forms", "nda")  # page scripts a page may ask for in front matter
 PROJECT_FIELDS = {"id", "division", "name", "status", "one_liner", "why", "who", "note",

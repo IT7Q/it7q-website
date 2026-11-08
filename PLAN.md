@@ -193,7 +193,7 @@ Home users first, small business second, all in plain English.
 | "5 security appliance tiers" | TEMPESTAS T1–T5 (Q25) |
 | "21 AI agents in our back office" | Build pack's public Persephone teaser ("21 specialised agents") |
 | "Based in Kallangur, QLD" | Q18 public facts |
-- **Division pages**: one template. Header = the division badge + descriptive subtitle (§1). Cards come from `src/data/projects.json` via `tools/build.py`. Gated detail is **not** in that file. Each card: image placeholder, status badge (*Developed · In development · In design · Documented · Coming soon*), name, one-liner, "Why it's unique" (or "Who it's for" on TEMPESTAS tiers), and a "Full details under NDA" line linking to `/access/`. Featured cards (T3 Guard, the coming-soon MSP service) sit first and span the grid.
+- **Division pages**: one template. Header = the division badge + descriptive subtitle (§1). Cards come from `src/data/projects.json` via `tools/build.py`. Gated detail is **not** in that file. Each card: image placeholder, status badge (*Developed · In use · In use in-house · In development · In design · Concept · Documented · Coming soon*), name, one-liner, "Why it's unique" (or "Who it's for" on TEMPESTAS tiers), and a "Full details under NDA" line linking to `/access/`. Featured cards (T3 Guard, the coming-soon MSP service) sit first and span the grid.
 - **MENTIS page** also carries a plain-English **"AI automations we can set up"** services list (from v2: patch management, social media pipeline, invoice/phone-system automation, email triage, security alerting, compliance reporting). It's a list, not cards (Q24).
 - **Services**: plain-English public services for homes and small business, from `src/data/services.json`, each linking to its division. How IT7Q delivers them internally (tooling, stack) is gated (Q15). Until the enquiry form arrives (Phase 3, with service and division selectors), the page points to phone and email.
 - **Contact / footer**: phone 0411 753 366, info@it7q.com.au, ABN 43 922 878 001, Kallangur QLD 4503. The Contact page also links WhatsApp at `wa.me/61411753366` (assumes WhatsApp is on the mobile number; Q49) and carries the enquiry form. Messenger is left off until Chris gives the page link (Q49).
@@ -211,7 +211,7 @@ Home users first, small business second, all in plain English.
 
 ### 2.1 Project inventory (public card list)
 
-Names and statuses come from the build pack unless marked otherwise. Each card gets an image ID `P-<div>-<nn>` (§5). Status values: *Developed · In development · In design · Documented · Coming soon*.
+Names and statuses come from the build pack unless marked otherwise. Each card gets an image ID `P-<div>-<nn>` (§5). Status values: *Developed · In use · In use in-house · In development · In design · Concept · Documented · Coming soon*.
 
 The card text (one-liner + "why it's unique") lives in `src/data/projects.json`. It's written from the build pack's **public teasers** (and v2 for products the pack doesn't cover), in plain English, with no tooling, ports, prices or specs. The TEMPESTAS "who it's for" lines and the one-liners for COLLOQUIUM, the PORTUS apps and the three FABRICUS services are **my drafts**, since the sources say little. Chris checks them all in the Phase 2 preview (Q45).
 
@@ -219,14 +219,14 @@ The card text (one-liner + "why it's unique") lives in `src/data/projects.json`.
 
 | ID | Project | Status now | Correct to |
 |---|---|---|---|
-| P-MSP-05 | IT7Q SysMon | In development | |
+| P-MSP-05 | IT7Q SysMon | In development | In use in-house (8 Nov) |
 | P-OPUS-10 | Andromeda CE / AI companion | In development | |
-| P-OPUS-11 | Aegir — SecureStart | In development | |
+| P-OPUS-11 | Aegir — SecureStart | In development | In use (8 Nov) |
 | P-OPUS-12 | FABRICUS App | In development | |
 | P-MEN-04 | FORTUNA | In development | |
 | P-MEN-05 | COLLOQUIUM | In development | |
-| P-POR-02 | PORTUS App | In development | |
-| P-POR-03 | PORTUS Jnr | In development | |
+| P-POR-02 | PORTUS App | In development | Concept (8 Nov) |
+| P-POR-03 | PORTUS Jnr | In development | Concept (8 Nov) |
 | P-FAB-102 | FORMAE | In development | |
 | P-FAB-103 | BIONICUS | In development | |
 
@@ -237,7 +237,7 @@ The card text (one-liner + "why it's unique") lives in `src/data/projects.json`.
 | P-MSP-02 | MSP Companion App (one-click enrolment) | In development (pilot) | build pack |
 | P-MSP-03 | Managed security monitoring | Developed | build pack |
 | P-MSP-04 | IT7Q Support Portal | In development | build pack, v2 |
-| P-MSP-05 | IT7Q SysMon (server health monitoring) | In development | v2 |
+| P-MSP-05 | IT7Q SysMon (server health monitoring) | In use in-house | v2 |
 | P-MSP-06 | **AI-powered security hardening for your small business and home** (featured on Home) | **Coming soon** | Chris (27 Oct) |
 | P-MSP-07 | **MERCATOR — Parts, Sales & Service** (featured, links to `/shop/`): IT7Q's hardware store for networking, office peripherals and storage, with Supply + Install bundles | **Coming soon** | Chris (29 Oct) |
 
@@ -258,7 +258,7 @@ P-MSP-06 public wording is plain English only: what it does for the customer (fi
 | P-OPUS-08 | JANUS (one inbox for every channel) | In design | build pack, v2 |
 | P-OPUS-09 | Project Silo (private Workspace alternative) | In design | build pack, v2 |
 | P-OPUS-10 | Andromeda CE / Andromeda AI companion | In development | v2, Feb notes |
-| P-OPUS-11 | Aegir — SecureStart (Windows privacy/setup tool) | In development | v2 |
+| P-OPUS-11 | Aegir — SecureStart (Windows privacy/setup tool) | In use | v2 |
 | P-OPUS-12 | FABRICUS App (offline-first ordering app for small businesses; moved from FABRICUS, 8 Nov) | In development | Feb notes, Chris |
 
 **MENTIS — Mind & Intelligence (AI & automation)**
@@ -286,9 +286,9 @@ Public tier cards show only the tier name, a one-liner and who it's for. Prices,
 **PORTUS — Harbour & Gateway (community safety)**
 | ID | Project | Status | Source |
 |---|---|---|---|
-| P-POR-01 | PORTUS community safety network (absorbs K.I.T.S.) | In design | build pack, business plan |
-| P-POR-02 | PORTUS App | In development | v2 |
-| P-POR-03 | PORTUS Jnr (child-safe version) | In development | v2 |
+| P-POR-01 | PORTUS community safety network (absorbs K.I.T.S.) | Concept | build pack, business plan |
+| P-POR-02 | PORTUS App | Concept | v2 |
+| P-POR-03 | PORTUS Jnr (child-safe version) | Concept | v2 |
 
 **PORTUS wording (29 Oct)**: every public line presents PORTUS as a **community safety tool** (neighbours, verified safe places, calling for help fast). Any domestic-violence use case lives **only in gated detail** (§4.9), so someone glancing at a phone or browser history sees nothing that puts a user at risk. The current public lines already fit; v10 adds a guard (§3) so they stay that way.
 

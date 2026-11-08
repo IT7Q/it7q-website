@@ -58,7 +58,7 @@
   "id": "P-MSP-05",
   "division": "msp",
   "name": "IT7Q SysMon",
-  "status": "In development",
+  "status": "In use in-house",
   "one_liner": "Keeps an eye on server health around the clock and flags problems early.",
   "why": "Spots slow-downs and failures before your staff do."
  },
@@ -141,14 +141,14 @@
   "division": "opus",
   "name": "Andromeda CE",
   "status": "In development",
-  "one_liner": "A friendly AI companion app that works with more than one AI provider.",
-  "why": "Pick the AI that suits you, all in one app."
+  "one_liner": "A cut-down AI helper with just the basics, for help when something goes wrong with your PC.",
+  "why": "Diagnoses and fixes PC problems, without signing up to lots of AI services."
  },
  {
   "id": "P-OPUS-11",
   "division": "opus",
   "name": "Aegir SecureStart",
-  "status": "In development",
+  "status": "In use",
   "one_liner": "Sets up a Windows computer for privacy and security, step by step.",
   "why": "Clears out clutter and tracking in one go, made for non-technical people."
  },
@@ -165,8 +165,8 @@
   "division": "mentis",
   "name": "Project Persephone",
   "status": "Developed",
-  "one_liner": "A team of AI agents running IT7Q's back office.",
-  "why": "21 specialised agents, run on our own systems.",
+  "one_liner": "A planned team of specialised AI agents running IT7Q's back office.",
+  "why": "Specialised agents, run on our own systems.",
   "note": "Partly live"
  },
  {
@@ -248,14 +248,14 @@
   "division": "tempestas",
   "name": "TEMPESTAS carrier board",
   "status": "In design",
-  "one_liner": "Our own Australian-designed board that powers the TEMPESTAS range.",
+  "one_liner": "Our own Australian-designed board that powers TEMPESTAS T1 to T4.",
   "why": "Designed here, so we control the hardware from the ground up."
  },
  {
   "id": "P-POR-01",
   "division": "portus",
   "name": "PORTUS community safety network",
-  "status": "In design",
+  "status": "Concept",
   "one_liner": "Technology that keeps our community safer.",
   "why": "Neighbourhood Watch, modernised, with verified members and safe places to go."
  },
@@ -263,7 +263,7 @@
   "id": "P-POR-02",
   "division": "portus",
   "name": "PORTUS App",
-  "status": "In development",
+  "status": "Concept",
   "one_liner": "A community safety app that shows verified safe places nearby and helps you call for help fast.",
   "why": "Built for neighbours looking out for each other, on the phone you already carry."
  },
@@ -271,7 +271,7 @@
   "id": "P-POR-03",
   "division": "portus",
   "name": "PORTUS Jnr",
-  "status": "In development",
+  "status": "Concept",
   "one_liner": "A child-safe version of the PORTUS app.",
   "why": "A simpler screen for kids, with parents kept in the loop."
  },
