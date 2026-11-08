@@ -36,7 +36,7 @@ class CheckGuards(unittest.TestCase):
         shutil.rmtree(self.tmp)
 
     def failures_after(self, rel, transform):
-        f = self.dist / rel
+        f = check.asset(self.dist, rel)  # CSS/JS carry a content hash in dist/
         f.write_text(transform(f.read_text(encoding="utf-8")), encoding="utf-8")
         return "\n".join(check.run(self.dist).failures)
 
@@ -95,11 +95,25 @@ class CheckGuards(unittest.TestCase):
         out = self.failures_after("assets/js/forms.js", lambda s: s + "\n// https://hooks.nubius.com.au/webhook\n")
         self.assertIn("assets/js/forms.js: public-wording guard", out)
 
+    def test_hashed_assets(self):
+        self.assertIn("assets/css/site.css: content hash doesn't match",
+                      self.failures_after("assets/css/site.css", lambda s: s + "\n/* edited in dist */"))
+        nda = check.asset(self.dist, "assets/js/nda.js")
+        nda.rename(nda.with_name("nda.js"))
+        self.assertIn("assets/js/nda.js: not content-hashed", "\n".join(check.run(self.dist).failures))
+
+    def test_cache_headers(self):
+        out = self.failures_after("_headers", lambda s: s.replace("/assets/js/*\n  Cache-Control: public, max-age=31536000, immutable",
+                                                                  "/assets/js/*\n  Cache-Control: public, max-age=86400"))
+        self.assertIn("/assets/js/* needs", out)
+        out = self.failures_after("_headers", lambda s: s.replace("/*\n", "/*\n  Cache-Control: public, max-age=3600\n", 1))
+        self.assertIn("/* sets Cache-Control: HTML must keep Pages' default", out)
+
     def test_mock_config_refused_unless_mock(self):
         def to_mock(s):
             return s.replace('"mock": false', '"mock": true').replace("https://forms.it7q.com.au/webhook", "/webhook")
         self.assertIn("LOCAL MOCK build", self.failures_after("assets/js/config.js", to_mock))
-        self.assertEqual(check.run(self.dist, mock=True).failures, [])
+        self.assertEqual([f for f in check.run(self.dist, mock=True).failures if "content hash" not in f], [])
         out = self.failures_after("assets/js/config.js", lambda s: s.replace('"mock": true', '"mock": false'))
         self.assertIn("hooks must be", out)
 
@@ -241,7 +255,7 @@ class CheckGuards(unittest.TestCase):
         self.assertEqual(check.run(self.dist, launch=True).failures, [])  # key set (Q66), launch decision made
 
         def launch_after(rel, transform):
-            f = self.dist / rel
+            f = check.asset(self.dist, rel)
             original = f.read_text(encoding="utf-8")
             f.write_text(transform(original), encoding="utf-8")
             try:

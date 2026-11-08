@@ -6,5 +6,14 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
   Cross-Origin-Opener-Policy: same-origin
 
-/assets/*
+/assets/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/fonts/*
+  Cache-Control: public, max-age=86400
+
+/assets/img/*
   Cache-Control: public, max-age=86400

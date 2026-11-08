@@ -13,6 +13,7 @@ Exits non-zero if anything fails. tools/build.py runs this after every build;
 LAUNCH.md runs it again with --launch before anything is uploaded.
 """
 import datetime
+import hashlib
 import html
 import json
 import re
@@ -68,6 +69,12 @@ PDF_META = re.compile(rb"/(?:Author|Creator)\s*(?:\((?!\))|<(?!>))|<(?:dc:creato
 LOCAL_PATH = re.compile(rb"[A-Za-z]:\\{1,2}\w|/home/|/Users/|/srv/|/opt/")
 # §4.12 / Q58: the webhook base (endpoints.json "hooks") may appear only in the generated config and the CSP
 CONFIG_JS = "assets/js/config.js"
+# Release cache-busting: CSS and JS ship as name.<hash>.ext, cached for a year; HTML keeps Pages' default
+# (max-age=0, must-revalidate), so a release shows at once without a cache purge
+HASHED_DIRS = ("assets/css", "assets/js")
+HASH_LEN = 10
+HASHED_NAME = re.compile(r"\.([0-9a-f]{%d})(\.(?:css|js))$" % HASH_LEN)
+LONG_CACHE = "Cache-Control: public, max-age=31536000, immutable"
 HEADERS = "_headers"
 ENDPOINTS = SRC / "data/endpoints.json"
 # Rendering of gated content must use DOM APIs only (§4.6)
@@ -115,6 +122,22 @@ def visible_sentences(text):
     return [s for s in re.split(r"(?<=[.!?])\s+|\n\s*\n", re.sub(r"[ \t]+", " ", text)) if s.strip()]
 
 
+def content_hash(data):
+    return hashlib.sha256(data).hexdigest()[:HASH_LEN]
+
+
+def logical(where):
+    """assets/js/forms.<hash>.js -> assets/js/forms.js, so reports and tests don't depend on the hash."""
+    return HASHED_NAME.sub(r"\2", where)
+
+
+def asset(dist, name):
+    """The built file for a logical asset name (e.g. CONFIG_JS), hashed or not."""
+    folder, stem_ext = (dist / name).parent, Path(name)
+    found = [f for f in folder.glob("%s.*%s" % (stem_ext.stem, stem_ext.suffix)) if logical(f.name) == stem_ext.name]
+    return found[0] if len(found) == 1 else dist / name
+
+
 def rel(path):
     """Readable path for reports, whether or not it sits inside the repo."""
     try:
@@ -128,7 +151,7 @@ class Report:
         self.failures = []
 
     def fail(self, where, msg):
-        self.failures.append("%s: %s" % (where, msg))
+        self.failures.append("%s: %s" % (logical(where), msg))
 
 
 class PageParser(HTMLParser):
@@ -271,7 +294,7 @@ def check_text_guards(dist, r, allowed_prices=frozenset()):
     for f in public:
         where = str(f.relative_to(dist))
         text = f.read_text(encoding="utf-8", errors="replace")
-        if where == CONFIG_JS:
+        if logical(where) == CONFIG_JS:
             text = text.replace(hooks, "")  # the allowed mentions (§4.12, Q58)
         elif where == HEADERS:
             text = text.replace(origin(hooks), "")
@@ -329,7 +352,7 @@ def check_scripts(dist, r, mock=False):
         m = JS_SINKS.search(f.read_text(encoding="utf-8", errors="replace"))
         if m:
             r.fail(str(f.relative_to(dist)), "script uses %r: build DOM with textContent only (§4.6)" % m.group(0))
-    path = dist / CONFIG_JS
+    path = asset(dist, CONFIG_JS)
     if not path.exists():
         r.fail(CONFIG_JS, "missing from dist/")
         return
@@ -351,6 +374,32 @@ def check_scripts(dist, r, mock=False):
         r.fail(rel(ENDPOINTS), "hooks must not be on nubius (Q58): use %s" % LAUNCH_HOOKS)
 
 
+def check_hashed(dist, r):
+    """Every CSS/JS file carries its own content hash, and _headers caches only those for a year."""
+    for d in HASHED_DIRS:
+        for f in sorted((dist / d).glob("*")):
+            where = "%s/%s" % (d, f.name)
+            m = HASHED_NAME.search(f.name)
+            if f.suffix not in (".css", ".js"):
+                continue
+            if not m:
+                r.fail(where, "not content-hashed: run tools/build.py")
+            elif m.group(1) != content_hash(f.read_bytes()):
+                r.fail(where, "content hash doesn't match the file: rebuild, don't edit dist/")
+    headers = (dist / HEADERS).read_text(encoding="utf-8") if (dist / HEADERS).exists() else ""
+    rules = {}
+    for block in re.split(r"\n\s*\n", headers.strip()):
+        lines = block.strip().splitlines()
+        if lines:
+            rules[lines[0].strip()] = [l.strip() for l in lines[1:]]
+    for d in HASHED_DIRS:
+        if LONG_CACHE not in rules.get("/%s/*" % d, []):
+            r.fail(HEADERS, "/%s/* needs %r (hashed files)" % (d, LONG_CACHE))
+    for pattern, lines in rules.items():
+        if any(l.lower().startswith("cache-control") for l in lines) and not pattern.startswith("/assets/"):
+            r.fail(HEADERS, "%s sets Cache-Control: HTML must keep Pages' default (max-age=0)" % pattern)
+
+
 def check_launch(dist, r):
     """check.py --launch: the extra gates for a production upload (LAUNCH.md)."""
     endpoints = json.loads(ENDPOINTS.read_text(encoding="utf-8"))
@@ -359,7 +408,8 @@ def check_launch(dist, r):
     key = endpoints["turnstile_site_key"]
     if not TURNSTILE_KEY.fullmatch(key):
         r.fail(rel(ENDPOINTS), "launch: turnstile_site_key is %r, not a real site key (LAUNCH.md step 1)" % key)
-    config = (dist / CONFIG_JS).read_text(encoding="utf-8") if (dist / CONFIG_JS).exists() else ""
+    config_path = asset(dist, CONFIG_JS)
+    config = config_path.read_text(encoding="utf-8") if config_path.exists() else ""
     if TURNSTILE_KEY.fullmatch(key) and '"turnstileSiteKey": %s' % json.dumps(key) not in config:
         r.fail(CONFIG_JS, "launch: built without the site key in endpoints.json; rebuild")
     for f in sorted(dist.rglob("*.html")):
@@ -606,6 +656,7 @@ def run(dist, mock=False, launch=False):
     check_svgs(dist, r)
     check_rasters(dist, r)
     check_scripts(dist, r, mock)
+    check_hashed(dist, r)
     check_fonts(dist, r)
     check_gated(dist, r)
     check_portfolio(dist, r)
@@ -639,7 +690,7 @@ def main(argv):
         return 1
     pages = len(list(dist.rglob("*.html")))
     print("check passed: %d pages, links, CSP, wording, prices, pack colours, SVGs, watermarks, fonts, consent, "
-          "downloads, PDFs, PORTUS, footer, artwork%s" % (pages, ", LAUNCH gates" if launch else ""))
+          "downloads, PDFs, PORTUS, footer, artwork, hashed assets%s" % (pages, ", LAUNCH gates" if launch else ""))
     return 0
 
 

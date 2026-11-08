@@ -1141,6 +1141,24 @@ def headers_text():
     return text.replace("{{hooks_origin}}", check.origin(hooks))
 
 
+def hash_assets():
+    """Rename dist/ CSS and JS to name.<hash>.ext and point every page at the new names.
+    src/_headers caches these for a year; a changed file gets a new name, so no purge is needed."""
+    names = {}
+    for d in check.HASHED_DIRS:
+        for f in sorted((DIST / d).glob("*")):
+            if f.suffix in (".css", ".js"):
+                new = f.with_name("%s.%s%s" % (f.stem, check.content_hash(f.read_bytes()), f.suffix))
+                f.rename(new)
+                names['"/%s/%s"' % (d, f.name)] = '"/%s/%s"' % (d, new.name)
+    for page in DIST.rglob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        for old, new in names.items():
+            text = text.replace(old, new)
+        page.write_text(text, encoding="utf-8")
+    return len(names)
+
+
 def render_template_pages(name, items, base_ctx, partials, outputs):
     tmpl = (SRC / "templates" / name).read_text(encoding="utf-8")
     for rel, ctx in items:
@@ -1205,12 +1223,13 @@ def build(mock=False):
     (DIST / "assets/js/config.js").write_text(config_js(base_ctx["nda"], mock), encoding="utf-8")
     (DIST / "favicon.svg").write_text(favicon, encoding="utf-8")
     (DIST / "_headers").write_text(headers_text(), encoding="utf-8")
+    hashed = hash_assets()
     pdfs = [g for g in guides.values() if g["pdf"]]
     for g in pdfs:
         (DIST / GUIDE_PDF_DIR).mkdir(parents=True, exist_ok=True)
         shutil.copyfile(GUIDES_SRC / (g["slug"] + ".pdf"), DIST / GUIDE_PDF_DIR / (g["slug"] + ".pdf"))
-    print("built %d pages, %d project cards, %d testimonials, %d watermarked images -> %s%s"
-          % (len(outputs), len(projects), len(base_ctx["testimonials"]), marked, DIST.relative_to(ROOT),
+    print("built %d pages, %d project cards, %d testimonials, %d watermarked images, %d hashed CSS/JS -> %s%s"
+          % (len(outputs), len(projects), len(base_ctx["testimonials"]), marked, hashed, DIST.relative_to(ROOT),
              " (LOCAL MOCK BUILD: do not deploy)" if mock else ""))
 
 
