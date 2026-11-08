@@ -2,7 +2,7 @@
 
 **1 entries, 0 flagged ⚠️**
 
-Source: `gated/domus.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
+Source: `gated/domus.json` (`reviewed: true`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
 ## 1. Smart, segmented, private home (`P-DOM-01`)
 

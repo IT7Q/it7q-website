@@ -1,7 +1,7 @@
 {
   "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
   "division": "domus",
-  "reviewed": false,
+  "reviewed": true,
   "projects": {
     "P-DOM-01": {
       "summary": "A smarter, safer home: devices split onto separate networks, with media kept at home instead of locked in someone's cloud.",

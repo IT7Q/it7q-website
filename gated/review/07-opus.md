@@ -1,8 +1,8 @@
 # Gated review: OPUS
 
-**11 entries, 2 flagged ⚠️**
+**12 entries, 0 flagged ⚠️**
 
-Source: `gated/opus.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
+Source: `gated/opus.json` (`reviewed: true`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
 ## 1. Athena Browser (`P-OPUS-01`)
 
@@ -167,33 +167,59 @@ Source: `gated/opus.json` (`reviewed: false`). Public one-liners from `src/data/
 >
 > - In design
 
-## 10. Andromeda CE (`P-OPUS-10`) ⚠️
+## 10. Andromeda CE (`P-OPUS-10`)
 
 **Public one-liner:** A friendly AI companion app that works with more than one AI provider.
 
-> ⚠️ **Note in file:** No detail in the build pack. Drafted from the public card; Chris to fill in.
-
 **Gated text:**
 
-> An AI companion app that works with more than one AI provider, so people can pick the one that suits them.
->
-> **Features**
->
-> - One app, several AI providers
-> - Conversations kept in one place
-
-## 11. Aegir SecureStart (`P-OPUS-11`) ⚠️
-
-**Public one-liner:** Sets up a Windows computer for privacy and security, step by step.
-
-> ⚠️ **Note in file:** No detail in the build pack. Drafted from the public card; Chris to fill in.
-
-**Gated text:**
-
-> A step-by-step tool that sets up a Windows computer for privacy and security, made for non-technical people.
+> A cut-down Andromeda for people who just want the basics, without signing up to all the different AI services on the market.
 >
 > **What it does**
 >
-> - Removes bloatware and tracking
-> - Applies sensible privacy and security settings
-> - Explains each step as it goes
+> - Helps diagnose what's wrong when a PC plays up
+> - Helps fix it, step by step
+> - Just the basics, in one simple app
+
+## 11. Aegir SecureStart (`P-OPUS-11`)
+
+**Public one-liner:** Sets up a Windows computer for privacy and security, step by step.
+
+**Gated text:**
+
+> Automated Windows setup and hardening, made for non-technical people: about 10 minutes per PC.
+>
+> **What it does**
+>
+> - Removes bloatware
+> - Applies privacy and security settings
+> - Installs the essentials
+> - About 10 minutes per PC
+>
+> **Where it's at**
+>
+> - In use
+
+## 12. FABRICUS App (`P-OPUS-12`)
+
+**Public one-liner:** An offline-first ordering app that small businesses run on their own tablets.
+
+**Gated text:**
+
+> An offline-first ordering app that small businesses run on their own tablets, set up to suit each business.
+>
+> **Features**
+>
+> - Works with no internet connection at markets, events and on the road
+> - Each business customises it: its own catalogue, products, options and branding
+> - Orders are stored safely on the device
+> - Back online, in the office or anywhere with a connection, it syncs and emails the orders through automatically
+>
+> **Background**
+>
+> - Started as IT7Q's own event-sales tool, proven selling 3D prints at a live event
+> - Now offered as a blank, customisable app for other businesses
+>
+> **Where it's at**
+>
+> - In development as a product

@@ -1,29 +1,32 @@
 # Gated review: MSP
 
-**6 entries, 2 flagged ⚠️**
+**6 entries, 0 flagged ⚠️**
 
-Source: `gated/msp.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
+Source: `gated/msp.json` (`reviewed: true`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
-## 1. AI-powered security hardening for your small business and home (`P-MSP-06`) ⚠️
+## 1. AI-powered security hardening for your small business and home (`P-MSP-06`)
 
 **Public one-liner:** A new service that finds weak security settings on your computers and home or office network, and helps put them right. Plain English, no jargon.
 
-> ⚠️ **Note in file:** Drafted from the public card and the Resources hardening guides; Chris to confirm scope and timing.
-
 **Gated text:**
 
-> A guided service that checks the security settings on a client's computers and home or office network, explains what it finds in plain English, and helps fix it.
+> An AI security service that watches for threats around the clock and keeps devices, servers and websites up to standard.
 >
 > **How it works**
 >
-> - An AI assistant reviews each device against a hardening checklist built by IT7Q
-> - Findings are ranked by risk and explained without jargon
-> - Fixes are applied with the client's say-so, then checked again
+> - Watches for threats around the clock
+> - Checks devices, servers and websites against security standards
+> - Fixes routine issues automatically, with safeguards
+> - Escalates anything serious to a person
+> - Sends plain-English reports
+>
+> **Who it's for**
+>
+> - Homes, small businesses and websites
 >
 > **Where it's at**
 >
-> - Checklists for Windows, Android and home routers are being written
-> - Pilot with existing managed clients first
+> - Due in 2027
 
 ## 2. SCUTUM (`P-MSP-01`)
 
@@ -106,18 +109,23 @@ Source: `gated/msp.json` (`reviewed: false`). Public one-liners from `src/data/p
 >
 > - A cross-platform app with its own back end and database, all self-hosted
 
-## 6. IT7Q SysMon (`P-MSP-05`) ⚠️
+## 6. IT7Q SysMon (`P-MSP-05`)
 
 **Public one-liner:** Keeps an eye on server health around the clock and flags problems early.
 
-> ⚠️ **Note in file:** No detail in the build pack. Drafted from the public card; Chris to add features and status.
-
 **Gated text:**
 
-> A server health monitor that watches performance and availability around the clock and raises problems before staff notice them.
+> Health monitoring for servers and devices, with alerts and dashboards that flag problems before staff notice them.
 >
 > **What it watches**
 >
-> - Uptime, slow-downs and failing services
-> - Disk, memory and processor pressure
-> - Alerts in plain English, with the likely cause
+> - Processor (CPU) load
+> - Memory
+> - Disk space
+> - Uptime, with alerts when something goes down
+> - Dashboards at a glance
+>
+> **Where it's at**
+>
+> - In use in-house
+> - Being turned into a product for clients

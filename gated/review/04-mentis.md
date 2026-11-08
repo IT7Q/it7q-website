@@ -1,8 +1,8 @@
 # Gated review: MENTIS
 
-**5 entries, 1 flagged ⚠️**
+**5 entries, 0 flagged ⚠️**
 
-Source: `gated/mentis.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
+Source: `gated/mentis.json` (`reviewed: true`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
 ## 1. Project Persephone (`P-MEN-01`)
 
@@ -85,18 +85,22 @@ Source: `gated/mentis.json` (`reviewed: false`). Public one-liners from `src/dat
 >
 > - Paper trading only
 
-## 5. COLLOQUIUM (`P-MEN-05`) ⚠️
+## 5. COLLOQUIUM (`P-MEN-05`)
 
 **Public one-liner:** A chat and AI assistant service for businesses.
 
-> ⚠️ **Note in file:** No detail in the build pack. Drafted from the public card; Chris to fill in.
-
 **Gated text:**
 
-> A chat and AI assistant service that gives a business's customers quick, friendly answers, day or night.
+> White-label AI chat assistants for small businesses: 24/7 customer support without extra staff.
 >
-> **Planned features**
+> **What clients get**
 >
-> - A website chat widget
-> - Answers drawn from the business's own information
-> - Hands over to a person when needed
+> - An assistant customised to the business's brand, FAQs and services
+> - Deployed on the business's website or as a standalone assistant
+> - Customer support around the clock, without extra staff
+> - Runs on IT7Q's own AI infrastructure, with no third-party AI subscriptions
+>
+> **Pricing and timing**
+>
+> - Indicative: $500 setup, then $49–$149 a month
+> - 1–2 weeks to deploy

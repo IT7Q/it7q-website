@@ -222,11 +222,11 @@ The card text (one-liner + "why it's unique") lives in `src/data/projects.json`.
 | P-MSP-05 | IT7Q SysMon | In development | |
 | P-OPUS-10 | Andromeda CE / AI companion | In development | |
 | P-OPUS-11 | Aegir — SecureStart | In development | |
+| P-OPUS-12 | FABRICUS App | In development | |
 | P-MEN-04 | FORTUNA | In development | |
 | P-MEN-05 | COLLOQUIUM | In development | |
 | P-POR-02 | PORTUS App | In development | |
 | P-POR-03 | PORTUS Jnr | In development | |
-| P-FAB-101 | FABRICUS App | In development | |
 | P-FAB-102 | FORMAE | In development | |
 | P-FAB-103 | BIONICUS | In development | |
 
@@ -259,6 +259,7 @@ P-MSP-06 public wording is plain English only: what it does for the customer (fi
 | P-OPUS-09 | Project Silo (private Workspace alternative) | In design | build pack, v2 |
 | P-OPUS-10 | Andromeda CE / Andromeda AI companion | In development | v2, Feb notes |
 | P-OPUS-11 | Aegir — SecureStart (Windows privacy/setup tool) | In development | v2 |
+| P-OPUS-12 | FABRICUS App (offline-first ordering app for small businesses; moved from FABRICUS, 8 Nov) | In development | Feb notes, Chris |
 
 **MENTIS — Mind & Intelligence (AI & automation)**
 | ID | Project | Status | Source |
@@ -294,7 +295,6 @@ Public tier cards show only the tier name, a one-liner and who it's for. Prices,
 **FABRICUS — Craft & Making (woodcraft & digital manufacturing)**
 | ID | Project | Status | Source |
 |---|---|---|---|
-| P-FAB-101 | FABRICUS App (offline order/catalogue PWA) | In development | Feb notes |
 | P-FAB-102 | FORMAE custom 3D prints | In development | Feb notes |
 | P-FAB-103 | BIONICUS assistive body supports (Project Bionic) | In development | Feb notes |
 
@@ -759,11 +759,11 @@ Screenshots are taken from the static snapshots (§6.3), so they match what the 
 | IDs | Count | Notes |
 |---|---|---|
 | P-MSP-01…06 | 6 | UI mock-ups or illustrative graphics, not real admin screens |
-| P-OPUS-01…11 | 11 | App screenshots with dummy data |
+| P-OPUS-01…12 | 12 | App screenshots with dummy data |
 | P-MEN-01…05 | 5 | Illustrative (agent "team" graphic etc.) |
 | P-TEM-01…06 | 6 | One per tier (T3 Guard gets a larger hero image, 1600×1000, from Chris's earlier **marketing renders**) + carrier board. **No PCB/schematic close-ups or spec labels** |
 | P-POR-01…03 | 3 | Concept art/signage, no real locations of people's homes |
-| P-FAB-001…035, P-FAB-101…103 | 38 | F-001–F-035 product photos (real photos week of 2 Nov) + FABRICUS App, FORMAE, BIONICUS |
+| P-FAB-001…035, P-FAB-102…103 | 37 | F-001–F-035 product photos (real photos week of 2 Nov) + FORMAE, BIONICUS (FABRICUS App is now P-OPUS-12) |
 | P-DOM-01 | 1 | Generic smart-home photo |
 
 Plus P-MSP-07 (MERCATOR: a generic photo of networking gear and peripherals, no brand logos visible). That's **71 project images**, all watermarked at build (§5.1).

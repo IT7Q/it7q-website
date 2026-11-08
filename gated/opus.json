@@ -1,7 +1,7 @@
 {
   "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
   "division": "opus",
-  "reviewed": false,
+  "reviewed": true,
   "projects": {
     "P-OPUS-01": {
       "summary": "A private, all-in-one browser for IT7Q clients, with mail, chat, passwords and support built in. Available on desktop and as a signed Android app.",
@@ -172,31 +172,64 @@
       ]
     },
     "P-OPUS-10": {
-      "summary": "An AI companion app that works with more than one AI provider, so people can pick the one that suits them.",
-      "sections": [
-        {
-          "heading": "Features",
-          "items": [
-            "One app, several AI providers",
-            "Conversations kept in one place"
-          ]
-        }
-      ],
-      "notes": "No detail in the build pack. Drafted from the public card; Chris to fill in."
-    },
-    "P-OPUS-11": {
-      "summary": "A step-by-step tool that sets up a Windows computer for privacy and security, made for non-technical people.",
+      "summary": "A cut-down Andromeda for people who just want the basics, without signing up to all the different AI services on the market.",
       "sections": [
         {
           "heading": "What it does",
           "items": [
-            "Removes bloatware and tracking",
-            "Applies sensible privacy and security settings",
-            "Explains each step as it goes"
+            "Helps diagnose what's wrong when a PC plays up",
+            "Helps fix it, step by step",
+            "Just the basics, in one simple app"
           ]
         }
-      ],
-      "notes": "No detail in the build pack. Drafted from the public card; Chris to fill in."
+      ]
+    },
+    "P-OPUS-11": {
+      "summary": "Automated Windows setup and hardening, made for non-technical people: about 10 minutes per PC.",
+      "sections": [
+        {
+          "heading": "What it does",
+          "items": [
+            "Removes bloatware",
+            "Applies privacy and security settings",
+            "Installs the essentials",
+            "About 10 minutes per PC"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "In use"
+          ]
+        }
+      ]
+    },
+    "P-OPUS-12": {
+      "summary": "An offline-first ordering app that small businesses run on their own tablets, set up to suit each business.",
+      "sections": [
+        {
+          "heading": "Features",
+          "items": [
+            "Works with no internet connection at markets, events and on the road",
+            "Each business customises it: its own catalogue, products, options and branding",
+            "Orders are stored safely on the device",
+            "Back online, in the office or anywhere with a connection, it syncs and emails the orders through automatically"
+          ]
+        },
+        {
+          "heading": "Background",
+          "items": [
+            "Started as IT7Q's own event-sales tool, proven selling 3D prints at a live event",
+            "Now offered as a blank, customisable app for other businesses"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "In development as a product"
+          ]
+        }
+      ]
     }
   }
 }

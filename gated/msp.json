@@ -1,28 +1,34 @@
 {
   "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
   "division": "msp",
-  "reviewed": false,
+  "reviewed": true,
   "projects": {
     "P-MSP-06": {
-      "summary": "A guided service that checks the security settings on a client's computers and home or office network, explains what it finds in plain English, and helps fix it.",
+      "summary": "An AI security service that watches for threats around the clock and keeps devices, servers and websites up to standard.",
       "sections": [
         {
           "heading": "How it works",
           "items": [
-            "An AI assistant reviews each device against a hardening checklist built by IT7Q",
-            "Findings are ranked by risk and explained without jargon",
-            "Fixes are applied with the client's say-so, then checked again"
+            "Watches for threats around the clock",
+            "Checks devices, servers and websites against security standards",
+            "Fixes routine issues automatically, with safeguards",
+            "Escalates anything serious to a person",
+            "Sends plain-English reports"
+          ]
+        },
+        {
+          "heading": "Who it's for",
+          "items": [
+            "Homes, small businesses and websites"
           ]
         },
         {
           "heading": "Where it's at",
           "items": [
-            "Checklists for Windows, Android and home routers are being written",
-            "Pilot with existing managed clients first"
+            "Due in 2027"
           ]
         }
-      ],
-      "notes": "Drafted from the public card and the Resources hardening guides; Chris to confirm scope and timing."
+      ]
     },
     "P-MSP-01": {
       "summary": "Managed protection for Windows computers: Microsoft Defender hardened and tuned as the main shield, backed by IT7Q's own monitoring and an AI-assisted triage step that checks alerts before a person does.",
@@ -112,18 +118,26 @@
       ]
     },
     "P-MSP-05": {
-      "summary": "A server health monitor that watches performance and availability around the clock and raises problems before staff notice them.",
+      "summary": "Health monitoring for servers and devices, with alerts and dashboards that flag problems before staff notice them.",
       "sections": [
         {
           "heading": "What it watches",
           "items": [
-            "Uptime, slow-downs and failing services",
-            "Disk, memory and processor pressure",
-            "Alerts in plain English, with the likely cause"
+            "Processor (CPU) load",
+            "Memory",
+            "Disk space",
+            "Uptime, with alerts when something goes down",
+            "Dashboards at a glance"
+          ]
+        },
+        {
+          "heading": "Where it's at",
+          "items": [
+            "In use in-house",
+            "Being turned into a product for clients"
           ]
         }
-      ],
-      "notes": "No detail in the build pack. Drafted from the public card; Chris to add features and status."
+      ]
     }
   }
 }

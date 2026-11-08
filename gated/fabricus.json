@@ -1,22 +1,8 @@
 {
   "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
   "division": "fabricus",
-  "reviewed": false,
+  "reviewed": true,
   "projects": {
-    "P-FAB-101": {
-      "summary": "The FABRICUS ordering app: browse the range and place orders, even with no internet connection.",
-      "sections": [
-        {
-          "heading": "Features",
-          "items": [
-            "Full catalogue with photos",
-            "Orders saved offline and sent when back online",
-            "Handy at markets and in the workshop"
-          ]
-        }
-      ],
-      "notes": "Drafted from the public card; Chris to fill in."
-    },
     "P-FAB-102": {
       "summary": "Custom 3D-printed pieces, designed and printed in-house as one-offs or small runs.",
       "sections": [
@@ -31,18 +17,23 @@
       ]
     },
     "P-FAB-103": {
-      "summary": "Assistive supports for the body, made to measure in-house with 3D printing.",
+      "summary": "Custom-fit assistive supports, made to order after a measurement session.",
       "sections": [
         {
           "heading": "How it works",
           "items": [
-            "Measured to fit the person",
-            "Printed in-house",
-            "Adjusted until it fits right"
+            "A measurement session first",
+            "Made to order in-house with 3D printing",
+            "Shaped to fit the person who wears it"
+          ]
+        },
+        {
+          "heading": "Please note",
+          "paragraphs": [
+            "Not a medical device. Talk to your health professional about your needs."
           ]
         }
-      ],
-      "notes": "Drafted from the public card; Chris to fill in. Check any health claims before review."
+      ]
     }
   },
   "catalogue": {

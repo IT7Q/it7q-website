@@ -1,50 +1,58 @@
 # Gated review: PORTUS
 
-**3 entries, 3 flagged ⚠️**
+**3 entries, 0 flagged ⚠️**
 
-Source: `gated/portus.json` (`reviewed: false`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
+Source: `gated/portus.json` (`reviewed: true`). Public one-liners from `src/data/projects.json`. Gated text is shown as the NDA page renders it: summary paragraph, then each section's heading, paragraphs and bullets. Notes are Chris-only and never reach the site.
 
-## 1. PORTUS community safety network (`P-POR-01`) ⚠️
+## 1. PORTUS community safety network (`P-POR-01`)
 
 **Public one-liner:** Technology that keeps our community safer.
 
-> ⚠️ **Note in file:** Kept deliberately general (PLAN.md §2.5). Chris to decide how much more to say even behind the NDA.
-
 **Gated text:**
 
-> A community safety network: Neighbourhood Watch, modernised, with verified members and verified safe places to go. A strategic venture that also carries forward IT7Q's earlier community education work.
+> A community safety network: a network of verified safe-haven locations, with partner businesses in the community and fast help when it's needed.
+>
+> **Planned features**
+>
+> - A network of verified safe-haven locations
+> - Real-time location sharing
+> - A panic alert with emergency escalation to 000
+> - Community partner businesses
 >
 > **Where it's at**
 >
-> - In design
+> - Concept
 
-## 2. PORTUS App (`P-POR-02`) ⚠️
+## 2. PORTUS App (`P-POR-02`)
 
 **Public one-liner:** A community safety app that shows verified safe places nearby and helps you call for help fast.
 
-> ⚠️ **Note in file:** Drafted from the public card; Chris to fill in. Sensitive use cases stay out unless Chris says otherwise (§2.5).
-
 **Gated text:**
 
-> The PORTUS app: shows verified safe places nearby and helps someone call for help fast, on the phone they already carry.
+> The PORTUS app: a silent alert, live location for trusted contacts and the way to the nearest safe haven, on the phone they already carry.
 >
 > **Planned features**
 >
-> - Map of verified safe places
-> - Fast call-for-help
-> - Verified community members
+> - One-tap silent alert
+> - Live location shared with trusted contacts
+> - A map to the nearest safe haven
+> - Discreet mode for people at risk: quick exit, no history
 
-## 3. PORTUS Jnr (`P-POR-03`) ⚠️
+## 3. PORTUS Jnr (`P-POR-03`)
 
 **Public one-liner:** A child-safe version of the PORTUS app.
 
-> ⚠️ **Note in file:** Drafted from the public card; Chris to fill in.
-
 **Gated text:**
 
-> A child-safe version of the PORTUS app with a simpler screen and parents kept in the loop.
+> PORTUS for children: a big, simple SOS button, child-safe places to go and parents or carers alerted straight away.
 >
 > **Planned features**
 >
-> - Simple, large controls for kids
-> - Parents notified when help is called
+> - A big, simple SOS button
+> - Verified child-safe locations (Blue Card-checked)
+> - Alerts to parents and carers
+> - Safe places along school routes
+>
+> **Where it's at**
+>
+> - Concept

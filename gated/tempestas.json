@@ -1,19 +1,29 @@
 {
   "_about": "Gated detail for approved NDA viewers (PLAN.md §4.9). Written by Claude from the private build pack; Chris reviews it, then sets \"reviewed\": true. tools/gated_sql.py refuses to load a file until then. 'notes' are for Chris only and never reach the database or the site.",
   "division": "tempestas",
-  "reviewed": false,
+  "reviewed": true,
   "projects": {
     "P-TEM-03": {
       "summary": "The flagship appliance: AI-accelerated threat detection in a box, with a 7-inch touch screen.",
       "sections": [
         {
-          "heading": "Inside",
+          "heading": "Features",
           "items": [
-            "IT7Q's carrier board with a Raspberry Pi compute module",
-            "A dedicated AI accelerator for spotting threats in real time",
-            "Fast 2.5-gigabit networking",
-            "A radio sensor that watches for wireless attacks",
-            "A 7-inch touch screen for status and control"
+            "Firewall",
+            "Intrusion detection",
+            "VPN",
+            "Ad and tracker blocking",
+            "Network segmentation, so devices sit on separate networks",
+            "7-inch touchscreen status dashboard",
+            "Wi-Fi 7",
+            "The shield enclosure",
+            "Built on IT7Q's own Australian-designed board"
+          ]
+        },
+        {
+          "heading": "Who it's for",
+          "items": [
+            "Made for home offices and small businesses that want serious protection"
           ]
         },
         {
@@ -25,20 +35,29 @@
         {
           "heading": "The range",
           "paragraphs": [
-            "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
+            "Five tiers, from T1 Scout to T5 Citadel, priced from $149 to $1,499. T1 to T4 are built on IT7Q's own Australian-designed carrier board, around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers."
           ]
         }
-      ],
-      "notes": "Tier-specific features beyond the build pack are drafted; Chris to confirm per tier."
+      ]
     },
     "P-TEM-01": {
       "summary": "The entry-level box: blocks ads, trackers and known bad sites for every device in a smaller home.",
       "sections": [
         {
-          "heading": "Inside",
+          "heading": "Features",
           "items": [
-            "IT7Q's carrier board",
-            "A small status screen on the front"
+            "Ad and tracker blocking",
+            "Basic firewall",
+            "A single wired network connection",
+            "Silent, passive cooling (no fan)",
+            "LED status lights",
+            "Built on IT7Q's own Australian-designed board"
+          ]
+        },
+        {
+          "heading": "Who it's for",
+          "items": [
+            "Made for households"
           ]
         },
         {
@@ -50,20 +69,28 @@
         {
           "heading": "The range",
           "paragraphs": [
-            "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
+            "Five tiers, from T1 Scout to T5 Citadel, priced from $149 to $1,499. T1 to T4 are built on IT7Q's own Australian-designed carrier board, around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers."
           ]
         }
-      ],
-      "notes": "Tier detail drafted; Chris to confirm features."
+      ]
     },
     "P-TEM-02": {
-      "summary": "A firewall for a busy household: every device protected, with family-friendly controls.",
+      "summary": "A firewall and VPN box for power users and home offices, with parental controls.",
       "sections": [
         {
-          "heading": "Inside",
+          "heading": "Features",
           "items": [
-            "IT7Q's carrier board",
-            "A small status screen on the front"
+            "Dual 2.5Gb ports",
+            "Firewall and VPN",
+            "OLED status display",
+            "Parental controls",
+            "Built on IT7Q's own Australian-designed board"
+          ]
+        },
+        {
+          "heading": "Who it's for",
+          "items": [
+            "Made for power users and home offices"
           ]
         },
         {
@@ -75,21 +102,28 @@
         {
           "heading": "The range",
           "paragraphs": [
-            "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
+            "Five tiers, from T1 Scout to T5 Citadel, priced from $149 to $1,499. T1 to T4 are built on IT7Q's own Australian-designed carrier board, around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers."
           ]
         }
-      ],
-      "notes": "Tier detail drafted; Chris to confirm features."
+      ]
     },
     "P-TEM-04": {
       "summary": "Built for growing offices: more people, more devices and more traffic, with AI-accelerated protection.",
       "sections": [
         {
-          "heading": "Inside",
+          "heading": "Features",
           "items": [
-            "IT7Q's carrier board with AI acceleration",
-            "Touch screen",
-            "Fast networking for more traffic"
+            "Everything in T3 Guard, plus:",
+            "Fibre (SFP) support",
+            "More ports",
+            "Built-in NVMe storage for private backups",
+            "Built on IT7Q's own Australian-designed board"
+          ]
+        },
+        {
+          "heading": "Who it's for",
+          "items": [
+            "Made for growing small businesses"
           ]
         },
         {
@@ -101,21 +135,27 @@
         {
           "heading": "The range",
           "paragraphs": [
-            "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
+            "Five tiers, from T1 Scout to T5 Citadel, priced from $149 to $1,499. T1 to T4 are built on IT7Q's own Australian-designed carrier board, around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers."
           ]
         }
-      ],
-      "notes": "Tier detail drafted; Chris to confirm features."
+      ]
     },
     "P-TEM-05": {
       "summary": "The most powerful appliance in the range, for bigger offices and community organisations.",
       "sections": [
         {
-          "heading": "Inside",
+          "heading": "Features",
           "items": [
-            "IT7Q's carrier board with AI acceleration",
-            "Touch screen",
-            "The most headroom for larger networks"
+            "Enterprise-grade firewall",
+            "PoE ports",
+            "Rack-mount",
+            "High throughput"
+          ]
+        },
+        {
+          "heading": "Who it's for",
+          "items": [
+            "Made for larger offices"
           ]
         },
         {
@@ -127,21 +167,20 @@
         {
           "heading": "The range",
           "paragraphs": [
-            "The TEMPESTAS range runs on IT7Q's own carrier board, built around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers. Five tiers, priced from $149 to $1,499."
+            "Five tiers, from T1 Scout to T5 Citadel, priced from $149 to $1,499. T1 to T4 are built on IT7Q's own Australian-designed carrier board, around a Raspberry Pi compute module, with AI-accelerated threat detection on the higher tiers."
           ]
         }
-      ],
-      "notes": "Tier detail drafted; Chris to confirm features."
+      ]
     },
     "P-TEM-06": {
-      "summary": "IT7Q's own Australian-designed board that powers the whole TEMPESTAS range.",
+      "summary": "IT7Q's own Australian-designed board that powers TEMPESTAS T1 to T4.",
       "sections": [
         {
           "heading": "Design",
           "items": [
             "Built around a Raspberry Pi compute module",
             "A fast expansion switch feeding 2.5-gigabit networking and an AI accelerator",
-            "Touch screen (top tiers) or a small status screen (entry tiers)",
+            "Touchscreen (T3 and T4), OLED display (T2) or LED status lights (T1)",
             "Long-range radio sensor for wireless threat detection",
             "Simple 30-watt power input"
           ]

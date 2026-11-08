@@ -407,8 +407,8 @@ the site.
    `gated_sql.py` refuses to write anything while any file still says `"reviewed": false`. Then
    it prints why, and psql receives nothing and changes nothing.
 
-**Test**: the output ends with a count per division (domus 1, fabricus 38, investors 1,
-mentis 5, msp 6, opus 11, portus 3, tempestas 6), then `COMMIT`. You can do steps 9–11 before
+**Test**: the output ends with a count per division (domus 1, fabricus 37, investors 1,
+mentis 5, msp 6, opus 12, portus 3, tempestas 6), then `COMMIT`. You can do steps 9–11 before
 this one: divisions just come back empty until the content is loaded.
 
 ---

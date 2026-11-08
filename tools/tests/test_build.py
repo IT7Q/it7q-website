@@ -80,7 +80,7 @@ class Artwork(unittest.TestCase):
                          {"P-TEM-01", "P-TEM-02", "P-TEM-03", "P-TEM-04", "P-TEM-05"})
         self.assertEqual(kinds["P-TEM-06"], "project")  # the carrier board isn't a tier
         self.assertEqual(kinds["P-FAB-001"], "soon")
-        self.assertEqual(kinds["P-FAB-101"], "project")  # the FABRICUS App is software, not a photo
+        self.assertEqual(kinds["P-OPUS-12"], "project")  # the FABRICUS App is software, not a photo
         self.assertEqual(kinds["IMG-19"], "client")
         self.assertNotIn("IMG-29", kinds)  # about and shop get brand artwork
 

@@ -153,6 +153,14 @@
   "why": "Clears out clutter and tracking in one go, made for non-technical people."
  },
  {
+  "id": "P-OPUS-12",
+  "division": "opus",
+  "name": "FABRICUS App",
+  "status": "In development",
+  "one_liner": "An offline-first ordering app that small businesses run on their own tablets.",
+  "why": "No internet needed at markets, events or on the road; orders go through once it's back online."
+ },
+ {
   "id": "P-MEN-01",
   "division": "mentis",
   "name": "Project Persephone",
@@ -266,15 +274,6 @@
   "status": "In development",
   "one_liner": "A child-safe version of the PORTUS app.",
   "why": "A simpler screen for kids, with parents kept in the loop."
- },
- {
-  "id": "P-FAB-101",
-  "division": "fabricus",
-  "name": "FABRICUS App",
-  "status": "In development",
-  "one_liner": "Browse the range and place an order, even without an internet connection.",
-  "why": "Works offline, so it's handy at markets and in the workshop.",
-  "group": "made"
  },
  {
   "id": "P-FAB-102",
